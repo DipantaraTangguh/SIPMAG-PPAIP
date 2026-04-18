@@ -1,0 +1,72 @@
+/**
+ * Form1SubmittedData.jsx
+ * Read-only display of all submitted Form 1 fields.
+ * Renders identically across all 3 status states (Pending, Approved, Rejected).
+ *
+ * @prop {object} formData — All submitted form field values + submittedAt date.
+ */
+import React from 'react';
+import { FileText, Calendar } from 'lucide-react';
+
+/** Label + value pair used in the data grid */
+function DataField({ label, value, valueClassName = '' }) {
+    return (
+        <div>
+            <p className="text-[11px] font-medium uppercase tracking-wider text-gray-400">
+                {label}
+            </p>
+            <p className={`mt-1 text-sm font-semibold text-gray-900 ${valueClassName}`}>
+                {value || '—'}
+            </p>
+        </div>
+    );
+}
+
+export default function Form1SubmittedData({ formData }) {
+    return (
+        <div className="flex flex-col rounded-xl border border-gray-200 bg-white p-8">
+            {/* Card header */}
+            <div className="mb-6 flex items-center gap-2">
+                <FileText className="h-5 w-5 text-primary" />
+                <h3 className="text-lg font-bold text-gray-900">
+                    Data Pengajuan Mahasiswa
+                </h3>
+            </div>
+
+            {/* Data grid */}
+            <div className="grid grid-cols-2 gap-x-8 gap-y-6">
+                {/* Row 1 */}
+                <DataField label="Nama Lengkap" value={formData.nama} />
+                <DataField label="NIM" value={formData.nim} />
+
+                {/* Row 2 */}
+                <DataField label="Program Studi" value={formData.programStudi} />
+                <DataField label="Semester" value={formData.semester} />
+
+                {/* Row 3 */}
+                <DataField label="Tahun Akademik" value={formData.tahunAkademik} />
+                <DataField label="Jumlah SKS" value={formData.jumlahSks} />
+
+                {/* Row 4 */}
+                <DataField
+                    label="IPK Terakhir"
+                    value={formData.ipk}
+                    valueClassName="text-primary"
+                />
+                <DataField label="Rencana Skema Magang" value={formData.rencanaSkema} />
+
+                {/* Row 5 */}
+                <DataField label="Topik / Tempat" value={formData.topikTempat} />
+                <DataField label="Target Output" value={formData.output} />
+            </div>
+
+            {/* Footer: submitted date */}
+            <div className="mt-6 border-t border-gray-100 pt-4">
+                <div className="flex items-center gap-1.5 text-[13px] italic text-gray-500">
+                    <Calendar className="h-3.5 w-3.5 text-gray-400" />
+                    <span>Diajukan pada {formData.submittedAt || '—'}</span>
+                </div>
+            </div>
+        </div>
+    );
+}
