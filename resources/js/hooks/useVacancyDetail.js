@@ -6,20 +6,36 @@
  * @param {object} vacancy — The vacancy detail object.
  * @returns {object} State and handlers for the detail page.
  */
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { useSimulation } from '../context/SimulationContext';
 import { canAccessPortal } from '../utils/accessUtils';
 
 export default function useVacancyDetail(vacancy) {
-    const { student, applyToVacancy } = useSimulation();
+    const { student, activeApplications, applyToVacancy } = useSimulation();
 
     const [cvFile, setCvFile] = useState(null);
     const [cvError, setCvError] = useState(null);
     const [isApplying, setIsApplying] = useState(false);
-    const [isApplied, setIsApplied] = useState(false);
+    const [justApplied, setJustApplied] = useState(false);
 
     const accessStatus = student.accessStatus;
     const canApply = canAccessPortal(accessStatus);
+
+    // Check if THIS specific vacancy was already applied to (persisted in context)
+    const alreadyApplied = useMemo(() => {
+        if (!vacancy || !activeApplications) return false;
+        return activeApplications.some(
+            (app) => app.vacancyId === vacancy.id
+        );
+    }, [vacancy, activeApplications]);
+
+    // Check if the student has applied to ANY vacancy
+    const hasAnyApplication = useMemo(() => {
+        return (activeApplications || []).length > 0;
+    }, [activeApplications]);
+
+    // Combined: either just applied in this session, or was already applied
+    const isApplied = justApplied || alreadyApplied;
 
     const handleFileChange = useCallback((file) => {
         if (!file) return;
@@ -50,7 +66,7 @@ export default function useVacancyDetail(vacancy) {
         setTimeout(() => {
             applyToVacancy(vacancy, cvFile);
             setIsApplying(false);
-            setIsApplied(true);
+            setJustApplied(true);
         }, 1000);
     }, [vacancy, cvFile, applyToVacancy]);
 
@@ -61,6 +77,7 @@ export default function useVacancyDetail(vacancy) {
         isApplied,
         canApply,
         accessStatus,
+        hasAnyApplication,
         handleFileChange,
         handleRemoveFile,
         handleApply,

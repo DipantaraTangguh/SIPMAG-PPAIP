@@ -79,7 +79,8 @@ export default function VacancyApplySidebar({
                     </div>
                 </div>
 
-                {/* CV Upload */}
+                {/* CV Upload — hide if already applied to this vacancy */}
+                {!isApplied && (
                 <div className="mt-4">
                     <p className="mb-2 text-[13px] font-bold text-gray-900">
                         Unggah CV &amp; Portfolio
@@ -141,37 +142,40 @@ export default function VacancyApplySidebar({
                         </p>
                     )}
                 </div>
+                )}
 
                 {/* Apply button / success state */}
                 <div className="mt-4">
                     {isApplied ? (
                         <>
-                            <div className="rounded-xl border border-green-200 bg-green-50 px-4 py-4 text-center">
-                                <CheckCircle className="mx-auto h-8 w-8 text-green-500" />
-                                <p className="mt-2 text-md font-bold text-gray-900">
+                            <div className="rounded-xl border border-green-200 bg-green-50 p-5 shadow-sm text-center">
+                                <div className="mx-auto flex h-[48px] w-[48px] items-center justify-center rounded-full bg-green-100 mb-3 shadow-sm">
+                                    <CheckCircle className="h-[24px] w-[24px] text-green-600" />
+                                </div>
+                                <h3 className="text-[16px] font-bold text-green-800">
                                     Lamaran Berhasil Dikirim!
+                                </h3>
+                                <p className="mt-1.5 text-[13px] font-medium text-green-700">
+                                    Lamaran ke <span className="font-bold">{vacancy.companyName}</span> telah tercatat.
                                 </p>
-                                <p className="mt-3 text-sm ">
-                                    Lamaran Anda ke {vacancy.companyName} telah tercatat.
-                                </p>
-                                <p className="mt-2 text-sm leading-relaxed">
+                                <p className="mt-3.5 text-[12px] leading-relaxed text-green-800/80">
                                     Cek berkala email Anda untuk mendapatkan pemberitahuan lolos atau seleksi lanjutan dari mitra.
                                 </p>
                             </div>
 
                             {/* Catatan Penting */}
-                            <div className="mt-4 rounded-xl bg-primary-pale px-4 py-4">
+                            <div className="mt-4 rounded-xl border border-primary/20 border-l-4 border-l-primary bg-primary-pale p-4 shadow-sm">
                                 <div className="flex items-center gap-2">
-                                    <CheckSquare className="h-5 w-5 text-primary" />
-                                    <p className="text-sm font-bold text-primary">
-                                        CATATAN PENTING
-                                    </p>
+                                    <Info className="h-[18px] w-[18px] text-primary" />
+                                    <span className="text-[12px] font-bold uppercase tracking-wider text-primary">
+                                        Catatan Penting
+                                    </span>
                                 </div>
-                                <p className="mt-3 text-sm leading-relaxed text-primary-dark">
+                                <p className="mt-2.5 text-[13px] leading-relaxed text-gray-700">
                                     Setelah diterima magang, Anda wajib mengunggah{' '}
-                                    <span className="font-bold">Letter of Acceptance (LoA)</span>{' '}
+                                    <span className="font-semibold text-gray-900">Letter of Acceptance (LoA)</span>{' '}
                                     secara terpisah melalui menu{' '}
-                                    <span className="font-bold underline">Bimbingan &amp; Logbook</span>{' '}
+                                    <span className="font-semibold text-primary underline">Bimbingan &amp; Logbook</span>{' '}
                                     untuk memulai periode magang resmi.
                                 </p>
                             </div>
@@ -256,11 +260,11 @@ export default function VacancyApplySidebar({
 
                                 {/* Info */}
                                 <div className="min-w-0 flex-1">
-                                    <p className="text-[13px] font-bold text-gray-900">
-                                        {sv.companyName}
-                                    </p>
-                                    <p className="mt-0.5 text-xs text-gray-500">
+                                    <p className="text-[13px] font-bold text-gray-900 truncate">
                                         {sv.position}
+                                    </p>
+                                    <p className="mt-0.5 text-xs text-gray-500 truncate">
+                                        {sv.companyName}
                                     </p>
                                     <div className="mt-0.5 flex items-center gap-1 text-[11px] text-gray-400">
                                         <MapPin className="h-2.5 w-2.5" />

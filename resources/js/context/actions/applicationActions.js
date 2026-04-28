@@ -8,6 +8,7 @@ export function useApplicationActions(setState) {
     const applyToVacancy = useCallback((vacancy, cvFile) => {
         const newApp = {
             id: Date.now(),
+            vacancyId: vacancy.id,
             companyName: vacancy.companyName,
             position: vacancy.position,
             status: 'Dilamar',

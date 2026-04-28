@@ -12,7 +12,7 @@ export default function VacancyCard({ vacancy, onCardClick }) {
     return (
         <div
             onClick={() => onCardClick(vacancy.id)}
-            className="cursor-pointer rounded-xl border border-gray-200 border-l-4 border-l-primary bg-white p-5 transition-all duration-150 hover:border-primary/30 hover:shadow-sm"
+            className="cursor-pointer rounded-xl border border-gray-200 border-l-4 border-l-primary bg-white p-5 transition-all duration-200 hover:-translate-y-1 hover:border-primary hover:bg-red-50 hover:shadow-md"
         >
             {/* Top row: logo + deadline */}
             <div className="flex items-start justify-between">
@@ -33,10 +33,10 @@ export default function VacancyCard({ vacancy, onCardClick }) {
             {/* Company info */}
             <div className="mt-3">
                 <p className="text-[15px] font-bold text-gray-900">
-                    {vacancy.companyName}
+                    {vacancy.position}
                 </p>
                 <p className="mt-0.5 text-[13px] text-gray-500">
-                    {vacancy.position}
+                    {vacancy.companyName}
                 </p>
             </div>
 

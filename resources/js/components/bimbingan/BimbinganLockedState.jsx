@@ -44,7 +44,7 @@ export default function BimbinganLockedState({ accessStatus }) {
             icon: <FileSearch className="h-14 w-14 text-blue-500" />,
             iconBg: 'bg-blue-100',
             title: 'Belum Ada Lamaran Aktif',
-            description: 'Anda perlu mengajukan lamaran magang terlebih dahulu — baik melalui Portal Mitra maupun Magang Mandiri — sebelum dapat mengakses fitur Bimbingan & Logbook.',
+            description: 'Anda perlu mengajukan lamaran magang terlebih dahulu, baik melalui Portal Mitra maupun Magang Mandiri, sebelum dapat mengakses fitur Bimbingan dan Logbook.',
             buttons: (
                 <div className="mt-6 flex justify-center gap-4">
                     <button
