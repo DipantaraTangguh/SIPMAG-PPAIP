@@ -48,10 +48,10 @@ export default function DashboardPage() {
     const { student, notifications, logbookEntries } = useSimulation();
     const navigate = useNavigate();
 
-    const name = student.name;
-    const accessStatus = student.accessStatus;
-    const logbookCount = (logbookEntries || []).filter(e => e.status === 'Disetujui').length;
-    const dpm = student.dpm;
+    const name = student?.name;
+    const accessStatus = student?.accessStatus;
+    const logbookCount = (logbookEntries || []).filter(e => e.status === 'Disetujui' || e.status === 'Approved').length;
+    const dpm = student?.dpm;
     const currentStep = deriveStep(accessStatus);
 
     const handleQuickAction = () => {

@@ -16,32 +16,49 @@ import Form1StatusPanel from '../../components/form1/Form1StatusPanel';
 export default function Form1StatusPage() {
     const { form1Submission, student } = useSimulation();
 
-    // Guard: if no submission exists, redirect to form fill page
-    if (!form1Submission) {
+    // Guard: only redirect back if student truly hasn't submitted Form 1.
+    // We check accessStatus instead of form1Submission because setState is async —
+    // form1Submission might not be committed yet when navigating from the form.
+    const status = student?.accessStatus;
+    const hasNotSubmitted = !status || status === 'Unverified' || status === 'RejectedForm1';
+    if (hasNotSubmitted && !form1Submission) {
         return <Navigate to="/form1" replace />;
     }
 
+    // Show loading if we know form was submitted but data hasn't arrived in state yet
+    if (!form1Submission) {
+        return (
+            <DashboardLayout pageTitle="Status Form Magang 01">
+                <div className="flex items-center justify-center py-20 text-gray-400">
+                    Memuat data form...
+                </div>
+            </DashboardLayout>
+        );
+    }
+
     // Build the formData object that the sub-components expect
+    // form1Submission may come from API (jumlahSKS, skemaMagang) or old sim (jumlahSks, rencanaSkema)
+    const f = form1Submission;
     const formData = {
-        nama: form1Submission.nama ?? student.name,
-        nim: form1Submission.nim ?? student.nim,
-        programStudi: form1Submission.programStudi ?? student.programStudi,
-        semester: form1Submission.semester,
-        tahunAkademik: form1Submission.tahunAkademik,
-        jumlahSks: form1Submission.jumlahSks,
-        ipk: form1Submission.ipk,
-        rencanaSkema: form1Submission.rencanaSkema,
-        topikTempat: form1Submission.topikTempat,
-        output: form1Submission.output,
-        submittedAt: form1Submission.submittedAt,
+        nama: f.nama ?? student?.name ?? '',
+        nim: f.nim ?? student?.nim ?? '',
+        programStudi: f.programStudi ?? student?.programStudi ?? '',
+        semester: f.semester,
+        tahunAkademik: f.tahunAkademik,
+        jumlahSks: f.jumlahSks ?? f.jumlahSKS,
+        ipk: f.ipk,
+        rencanaSkema: f.rencanaSkema ?? f.skemaMagang,
+        topikTempat: f.topikTempat ?? f.topikMagang,
+        output: f.output ?? f.outputTarget,
+        submittedAt: f.submittedAt,
         // Approval-specific fields
-        approverName: form1Submission.approver?.name,
-        approverNidn: form1Submission.approver?.nidn,
-        approverRole: form1Submission.approver?.role,
-        approvalDate: form1Submission.approver?.approvalDate,
-        pdfFileName: form1Submission.pdfFileName,
-        pdfSize: form1Submission.pdfSize,
-        pdfPath: form1Submission.pdfPath,
+        approverName: f.approver?.name,
+        approverNidn: f.approver?.nidn,
+        approverRole: f.approver?.role,
+        approvalDate: f.approver?.approvalDate,
+        pdfFileName: f.pdfFileName,
+        pdfSize: f.pdfSize,
+        pdfPath: f.pdfPath,
     };
 
     return (
@@ -63,7 +80,7 @@ export default function Form1StatusPage() {
                     form1_status={form1Submission.status}
                     rejectionReason={form1Submission.rejectionReason}
                     pdfPath={form1Submission.pdfPath}
-                    nim={student.nim}
+                    nim={student?.nim}
                     formData={formData}
                 />
             </div>

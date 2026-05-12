@@ -242,8 +242,9 @@ export default function Form1Card({
                             disabled={isSubmitting}
                         >
                             <option value="">Pilih skema magang</option>
-                            <option value="perusahaan">Magang Perusahaan</option>
-                            <option value="kewirausahaan">Magang Kewirausahaan</option>
+                            <option value="Mitra">Magang Mitra (Perusahaan)</option>
+                            <option value="Mandiri">Magang Mandiri</option>
+                            <option value="Kewirausahaan">Magang Kewirausahaan</option>
                         </select>
                         <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
                     </div>

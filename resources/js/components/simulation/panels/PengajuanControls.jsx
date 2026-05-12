@@ -7,7 +7,7 @@ import React from 'react';
 export default function PengajuanControls({ sim, status }) {
     return (
         <>
-            {sim.pengajuanPembimbing && !sim.student.dpm && (
+            {sim.pengajuanPembimbing && !sim.student?.dpm && (
                 <div className="mt-1 border-t border-gray-700 pt-3">
                     <p className="mb-2 text-[10px] font-bold uppercase tracking-wider text-gray-500">
                         Pengajuan Pembimbing
@@ -30,7 +30,7 @@ export default function PengajuanControls({ sim, status }) {
                 </div>
             )}
 
-            {sim.student.dpm && !['LogbookComplete', 'MenungguSidang', 'SiklusSelesai'].includes(status) && (
+            {sim.student?.dpm && !['LogbookComplete', 'MenungguSidang', 'SiklusSelesai'].includes(status) && (
                 <div className="mt-1 border-t border-gray-700 pt-3">
                     <p className="mb-1 text-[10px] font-bold uppercase tracking-wider text-gray-500">
                         Pengajuan Pembimbing

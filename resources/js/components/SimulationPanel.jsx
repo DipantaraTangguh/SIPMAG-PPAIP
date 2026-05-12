@@ -22,7 +22,7 @@ export default function SimulationPanel() {
     const navigate = useNavigate();
     const [open, setOpen] = useState(false);
 
-    const status = sim.student.accessStatus;
+    const status = sim.student?.accessStatus || 'Unverified';
 
     return (
         <div className="fixed bottom-4 right-4 z-[9999] w-[240px] select-none">
@@ -52,9 +52,9 @@ export default function SimulationPanel() {
                                 {status}
                             </span>
                         </div>
-                        {(['HasDPM', 'LogbookComplete', 'MenungguSidang', 'SiklusSelesai'].includes(status)) && sim.student.dpm && (
+                        {(['HasDPM', 'LogbookComplete', 'MenungguSidang', 'SiklusSelesai'].includes(status)) && sim.student?.dpm && (
                             <p className="mt-1 text-[10px] italic text-purple-400">
-                                DPM: {sim.student.dpm.name.substring(0, 18)}...
+                                DPM: {sim.student.dpm.name?.substring(0, 18)}...
                             </p>
                         )}
                     </div>

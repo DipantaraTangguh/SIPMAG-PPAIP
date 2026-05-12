@@ -16,7 +16,7 @@ import BimbinganFullPage from '../components/bimbingan/BimbinganFullPage';
 
 export default function BimbinganPage() {
     const { student } = useSimulation();
-    const accessStatus = student.accessStatus;
+    const accessStatus = student?.accessStatus;
 
     const hasAccess = accessStatus === 'HasApplication' || accessStatus === 'HasDPM' || accessStatus === 'LogbookComplete';
 

@@ -18,11 +18,11 @@ export default function useForm1() {
     /* ── Read-only values from student profile ───── */
     const readOnlyFields = useMemo(
         () => ({
-            nama: student.name ?? '',
-            nim: student.nim ?? '',
-            programStudi: student.programStudi ?? '',
+            nama: student?.name ?? '',
+            nim: student?.nim ?? '',
+            programStudi: student?.programStudi ?? '',
         }),
-        [student.name, student.nim, student.programStudi],
+        [student?.name, student?.nim, student?.programStudi],
     );
 
     /* ── Pre-fill from rejected resubmit (React Router state) ── */
@@ -136,25 +136,25 @@ export default function useForm1() {
 
             setIsSubmitting(true);
 
-            // Simulate network delay (1000ms)
-            await new Promise((r) => setTimeout(r, 1000));
+            try {
+                // Map frontend field names → Laravel API field names
+                const apiPayload = {
+                    semester:     formData.semester,
+                    jumlahSKS:    formData.jumlahSks,
+                    ipk:          formData.ipk,
+                    skemaMagang:  formData.rencanaSkema,
+                    topikMagang:  formData.topikTempat,
+                    outputTarget: formData.output,
+                };
 
-            // Build submission data for simulation context
-            const submissionData = {
-                nama: readOnlyFields.nama,
-                nim: readOnlyFields.nim,
-                programStudi: readOnlyFields.programStudi,
-                semester: formData.semester,
-                tahunAkademik: formData.tahunAkademik,
-                jumlahSks: formData.jumlahSks,
-                ipk: formData.ipk,
-                rencanaSkema: formData.rencanaSkema,
-                topikTempat: formData.topikTempat,
-                output: formData.output,
-            };
-
-            submitForm1(submissionData);
-            navigate('/form1/status', { replace: true });
+                await submitForm1(apiPayload);
+                navigate('/form1/status', { replace: true });
+            } catch (err) {
+                console.error('[Form1] Submit error:', err);
+                setErrors({ _general: err.message || 'Gagal mengirim Form 1' });
+            } finally {
+                setIsSubmitting(false);
+            }
         },
         [formData, readOnlyFields, validateForm, navigate, submitForm1],
     );

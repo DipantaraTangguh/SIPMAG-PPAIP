@@ -70,15 +70,17 @@ export default function LoginPage() {
 
         setIsSubmitting(true);
 
-        // Simulate network delay
-        await new Promise((r) => setTimeout(r, 800));
-
-        const result = login(nim.trim());
-        if (result.success) {
-            setShowFullScreen(true);
-            setTimeout(() => navigate('/dashboard', { replace: true }), 400);
-        } else {
-            setError(result.error);
+        try {
+            const result = await login(nim.trim(), password);
+            if (result.success) {
+                setShowFullScreen(true);
+                setTimeout(() => navigate('/dashboard', { replace: true }), 400);
+            } else {
+                setError(result.error);
+                setIsSubmitting(false);
+            }
+        } catch (err) {
+            setError(err.message || 'Terjadi kesalahan. Coba lagi.');
             setIsSubmitting(false);
         }
     };
@@ -119,9 +121,9 @@ export default function LoginPage() {
                         <p className="login-form__subtitle">Masuk dengan akun BIG Anda.</p>
                     </div>
 
-                    {/* Hint for simulation */}
+                    {/* Hint for demo login */}
                     <div className="mb-4 rounded-lg bg-blue-50 border border-blue-200 px-4 py-3 text-xs text-blue-700">
-                        <strong>Demo:</strong> Gunakan NIM <code className="rounded bg-blue-100 px-1 font-mono">1234567890</code> dengan password apapun.
+                        <strong>Demo:</strong> NIM <code className="rounded bg-blue-100 px-1 font-mono">1101214230</code> · Password <code className="rounded bg-blue-100 px-1 font-mono">password</code>
                     </div>
 
                     {/* Error Alert */}

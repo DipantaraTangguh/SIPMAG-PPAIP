@@ -135,7 +135,7 @@ export default function PortalMagangPage() {
     const { student, activeApplications } = useSimulation();
     const navigate = useNavigate();
     const location = useLocation();
-    const accessStatus = student.accessStatus;
+    const accessStatus = student?.accessStatus;
 
     // Restore active tab from navigation state (e.g. after Form 2 submit)
     const [activeTab, setActiveTab] = useState(

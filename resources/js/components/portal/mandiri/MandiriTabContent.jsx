@@ -21,7 +21,7 @@ export default function MandiriTabContent() {
     const { form2Submissions, student } = useSimulation();
 
     const submissions = form2Submissions || [];
-    const accessStatus = student.accessStatus;
+    const accessStatus = student?.accessStatus;
 
     // Form 2 is only accessible if Form 1 is approved (or beyond)
     const isUnlocked = canAccessPortal(accessStatus); // FIXED

@@ -20,14 +20,14 @@ export default function BimbinganFullPage() {
 
     const [activeTab, setActiveTab] = useState('pengajuan');
 
-    const canAccessLogbook = student.accessStatus === 'HasDPM' || student.accessStatus === 'LogbookComplete';
+    const canAccessLogbook = student?.accessStatus === 'HasDPM' || student?.accessStatus === 'LogbookComplete';
 
     // Determine which view to show based on context state
     const pengajuanView = (() => {
-        if (student.dpm && (student.accessStatus === 'HasDPM' || student.accessStatus === 'LogbookComplete')) {
+        if (student?.dpm && (student?.accessStatus === 'HasDPM' || student?.accessStatus === 'LogbookComplete')) {
             return 'dpm_assigned';
         }
-        if (pengajuanPembimbing && !student.dpm) {
+        if (pengajuanPembimbing && !student?.dpm) {
             return 'submitted';
         }
         return 'form';
@@ -72,13 +72,13 @@ export default function BimbinganFullPage() {
                     {pengajuanView === 'submitted' && (
                         <PengajuanSubmittedView
                             data={pengajuanPembimbing}
-                            studentName={student.name}
-                            studentNim={student.nim}
+                            studentName={student?.name}
+                            studentNim={student?.nim}
                         />
                     )}
                     {pengajuanView === 'dpm_assigned' && (
                         <PengajuanDPMAssignedView
-                            dpm={student.dpm}
+                            dpm={student?.dpm}
                             onGoToLogbook={() => setActiveTab('logbook')}
                         />
                     )}

@@ -107,7 +107,7 @@ export default function PengajuanPembimbingForm({ onSubmit }) {
                                     <input
                                         type="text"
                                         readOnly
-                                        value={student.name}
+                                        value={student?.name}
                                         className="h-11 w-full cursor-not-allowed rounded-lg border border-gray-200 bg-[#F3F4F6] px-3 pr-10 text-gray-600 outline-none"
                                     />
                                     <Lock className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
@@ -121,7 +121,7 @@ export default function PengajuanPembimbingForm({ onSubmit }) {
                                     <input
                                         type="text"
                                         readOnly
-                                        value={student.nim}
+                                        value={student?.nim}
                                         className="h-11 w-full cursor-not-allowed rounded-lg border border-gray-200 bg-[#F3F4F6] px-3 pr-10 text-gray-600 outline-none"
                                     />
                                     <Lock className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />

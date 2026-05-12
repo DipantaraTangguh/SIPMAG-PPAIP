@@ -20,7 +20,7 @@ export default function Form1Page() {
     const form1 = useForm1();
 
     // Guard: only allow filling if Unverified or RejectedForm1
-    const canFill = student.accessStatus === 'Unverified' || student.accessStatus === 'RejectedForm1';
+    const canFill = student?.accessStatus === 'Unverified' || student?.accessStatus === 'RejectedForm1';
     if (!canFill) {
         return <Navigate to="/form1/status" replace />;
     }

@@ -12,7 +12,7 @@ export default function SidangCompletedView() {
 
     const perusahaan = pengajuanPembimbing?.namaPerusahaan || 'Perusahaan Magang';
     const posisi = pengajuanPembimbing?.lingkupMagang || pengajuanPembimbing?.jabatanPraktisi || 'Peserta Magang';
-    const dosenPembimbing = student.dpm?.name || 'Dosen Pembimbing';
+    const dosenPembimbing = student?.dpm?.name || 'Dosen Pembimbing';
     const approvedLogbook = (logbookEntries || []).filter(e => e.status === 'Disetujui').length;
     const totalRequired = 6;
 

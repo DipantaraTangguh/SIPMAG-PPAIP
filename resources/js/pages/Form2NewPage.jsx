@@ -23,7 +23,7 @@ export default function Form2NewPage() {
 
     // Hard gate — redirect if Form 1 not approved
     useEffect(() => {
-        if (!canSubmitForm2(student.accessStatus)) {
+        if (!canSubmitForm2(student?.accessStatus)) {
             navigate('/portal', {
                 state: {
                     activeTab: 'mandiri',
@@ -31,7 +31,7 @@ export default function Form2NewPage() {
                 },
             });
         }
-    }, [student.accessStatus, navigate]);
+    }, [student?.accessStatus, navigate]);
 
     // Local state for form data
     const [formData, setFormData] = useState({

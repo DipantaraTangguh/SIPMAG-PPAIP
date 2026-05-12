@@ -20,8 +20,8 @@ export default function DashboardLayout({
 }) {
     const { student, logout } = useSimulation();
 
-    const studentName = student.name ?? '—';
-    const nim = student.nim ?? '—';
+    const studentName = student?.name ?? '—';
+    const nim = student?.nim ?? '—';
     const initials = studentName
         .split(' ')
         .map((w) => w[0])

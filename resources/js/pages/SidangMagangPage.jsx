@@ -21,7 +21,7 @@ import SidangCompletedView from '../components/sidang/SidangCompletedView';
 
 export default function SidangMagangPage() {
     const { student, sidangSubmission, sidangSchedule } = useSimulation();
-    const accessStatus = student.accessStatus;
+    const accessStatus = student?.accessStatus;
 
     // Derive the current view entirely from context — no local state
     const sidangView = (() => {

@@ -18,7 +18,7 @@ export default function useVacancyDetail(vacancy) {
     const [isApplying, setIsApplying] = useState(false);
     const [justApplied, setJustApplied] = useState(false);
 
-    const accessStatus = student.accessStatus;
+    const accessStatus = student?.accessStatus;
     const canApply = canAccessPortal(accessStatus);
 
     // Check if THIS specific vacancy was already applied to (persisted in context)
@@ -58,16 +58,19 @@ export default function useVacancyDetail(vacancy) {
         setCvError(null);
     }, []);
 
-    const handleApply = useCallback(() => {
-        if (!vacancy) return;
+    const handleApply = useCallback(async () => {
+        if (!vacancy || !cvFile) return;
 
         setIsApplying(true);
-        // Simulate 1000ms API delay
-        setTimeout(() => {
-            applyToVacancy(vacancy, cvFile);
-            setIsApplying(false);
+        try {
+            await applyToVacancy(vacancy.id, cvFile);
             setJustApplied(true);
-        }, 1000);
+        } catch (err) {
+            console.error('[Apply] Error:', err);
+            setCvError(err.message || 'Gagal melamar.');
+        } finally {
+            setIsApplying(false);
+        }
     }, [vacancy, cvFile, applyToVacancy]);
 
     return {

@@ -165,13 +165,16 @@ export default function SidangFormView() {
         setChecks(prev => ({ ...prev, [key]: !prev[key] }));
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         if (!isFormValid || isSubmitting) return;
         setIsSubmitting(true);
-        setTimeout(() => {
-            submitSidang(files);
+        try {
+            await submitSidang(files);
+        } catch (err) {
+            console.error('[Sidang] Submit error:', err);
+        } finally {
             setIsSubmitting(false);
-        }, 1500);
+        }
     };
 
     return (
