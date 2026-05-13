@@ -76,42 +76,6 @@ class UserSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
-            // Mahasiswa 2 — ApprovedForm1
-            [
-                'name'     => 'Rina Amelia',
-                'email'    => 'rina.amelia@student.bakrie.ac.id',
-                'password' => $password,
-                'role'     => 'mahasiswa',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            // Mahasiswa 3 — HasApplication
-            [
-                'name'     => 'Farhan Pratama',
-                'email'    => 'farhan.pratama@student.bakrie.ac.id',
-                'password' => $password,
-                'role'     => 'mahasiswa',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            // Mahasiswa 4 — HasDPM
-            [
-                'name'     => 'Dewi Kartika',
-                'email'    => 'dewi.kartika@student.bakrie.ac.id',
-                'password' => $password,
-                'role'     => 'mahasiswa',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            // Mahasiswa 5 — MenungguSidang
-            [
-                'name'     => 'Bayu Aditya',
-                'email'    => 'bayu.aditya@student.bakrie.ac.id',
-                'password' => $password,
-                'role'     => 'mahasiswa',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
         ]);
     }
 }

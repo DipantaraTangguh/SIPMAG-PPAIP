@@ -99,11 +99,15 @@ class LogbookController extends Controller
 
     /**
      * POST /api/dpm/logbooks/{id}/approve
+     * DPM can only approve logbooks of students assigned to them.
      */
-    public function approve($id)
+    public function approve(Request $request, $id)
     {
+        $lecturer = $request->user()->lecturer;
+
         $logbook = Logbook::where('id', $id)
             ->where('status', 'PendingReview')
+            ->whereHas('student', fn ($q) => $q->where('dpm_id', $lecturer->id))
             ->firstOrFail();
 
         $logbook->update(['status' => 'Approved', 'dpm_note' => null]);
@@ -125,13 +129,17 @@ class LogbookController extends Controller
 
     /**
      * POST /api/dpm/logbooks/{id}/reject
+     * DPM can only reject logbooks of students assigned to them.
      */
     public function reject(Request $request, $id)
     {
         $request->validate(['note' => 'nullable|string|max:500']);
 
+        $lecturer = $request->user()->lecturer;
+
         $logbook = Logbook::where('id', $id)
             ->where('status', 'PendingReview')
+            ->whereHas('student', fn ($q) => $q->where('dpm_id', $lecturer->id))
             ->firstOrFail();
 
         $logbook->update([

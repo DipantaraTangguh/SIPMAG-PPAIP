@@ -159,70 +159,27 @@ export default function Form1Card({
                     <ReadOnlyInput id="programStudi" value={readOnlyFields.programStudi} />
                 </div>
 
-                {/* ── ROW 3: Semester + Tahun Akademik ── */}
+                {/* ── ROW 3: Semester + Tahun Akademik (read-only) ── */}
                 <div className="grid grid-cols-2 gap-6">
                     <div>
                         <FieldLabel htmlFor="semester">Semester</FieldLabel>
-                        <input
-                            id="semester"
-                            type="text"
-                            placeholder="Contoh: 6"
-                            value={formData.semester}
-                            onChange={(e) => updateField('semester', e.target.value)}
-                            className={errors.semester ? inputError : inputNormal}
-                            disabled={isSubmitting}
-                        />
-                        <FieldError message={errors.semester} />
+                        <ReadOnlyInput id="semester" value={readOnlyFields.semester} />
                     </div>
                     <div>
                         <FieldLabel htmlFor="tahunAkademik">Tahun Akademik</FieldLabel>
-                        <input
-                            id="tahunAkademik"
-                            type="text"
-                            placeholder="Contoh: 2024/2025"
-                            value={formData.tahunAkademik}
-                            onChange={(e) => updateField('tahunAkademik', e.target.value)}
-                            className={errors.tahunAkademik ? inputError : inputNormal}
-                            disabled={isSubmitting}
-                        />
-                        <FieldError message={errors.tahunAkademik} />
+                        <ReadOnlyInput id="tahunAkademik" value={readOnlyFields.tahunAkademik} />
                     </div>
                 </div>
 
-                {/* ── ROW 4: Jumlah SKS + IPK ── */}
+                {/* ── ROW 4: Jumlah SKS + IPK (read-only) ── */}
                 <div className="grid grid-cols-2 gap-6">
                     <div>
                         <FieldLabel htmlFor="jumlahSks">Jumlah SKS</FieldLabel>
-                        <input
-                            id="jumlahSks"
-                            type="text"
-                            inputMode="numeric"
-                            placeholder="Contoh: 144"
-                            value={formData.jumlahSks}
-                            onChange={(e) => updateField('jumlahSks', e.target.value)}
-                            className={errors.jumlahSks ? inputError : inputNormal}
-                            disabled={isSubmitting}
-                        />
-                        <FieldError message={errors.jumlahSks} />
+                        <ReadOnlyInput id="jumlahSks" value={readOnlyFields.jumlahSks} />
                     </div>
                     <div>
                         <FieldLabel htmlFor="ipk">IPK</FieldLabel>
-                        <input
-                            id="ipk"
-                            type="text"
-                            inputMode="decimal"
-                            placeholder="Contoh: 3.75"
-                            value={formData.ipk}
-                            onChange={(e) => updateField('ipk', e.target.value)}
-                            className={errors.ipk ? inputError : inputNormal}
-                            disabled={isSubmitting}
-                        />
-                        {!errors.ipk && (
-                            <HelperText>
-                                Gunakan titik (.) sebagai pemisah desimal
-                            </HelperText>
-                        )}
-                        <FieldError message={errors.ipk} />
+                        <ReadOnlyInput id="ipk" value={readOnlyFields.ipk} />
                     </div>
                 </div>
 

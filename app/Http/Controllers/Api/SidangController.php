@@ -65,12 +65,18 @@ class SidangController extends Controller
     }
 
     /**
-     * GET /api/ppaip/sidang
-     * List students waiting for sidang (PPAIP only).
+     * GET /api/kaprodi/sidang
+     * List students waiting for sidang — scoped to Kaprodi's prodi.
      */
-    public function indexForPpaip()
+    public function indexForKaprodi(Request $request)
     {
-        $students = Student::where('access_status', 'MenungguSidang')
+        $lecturer = $request->user()->lecturer;
+        if (!$lecturer || !$lecturer->study_program) {
+            return response()->json(['message' => 'Akses ditolak.'], 403);
+        }
+
+        $students = Student::where('study_program', $lecturer->study_program)
+            ->where('access_status', 'MenungguSidang')
             ->with(['sidangSubmission', 'dpm:id,lecturer_name'])
             ->select(['id', 'nim', 'name', 'study_program', 'dpm_id', 'access_status'])
             ->get();
@@ -79,12 +85,43 @@ class SidangController extends Controller
     }
 
     /**
-     * POST /api/ppaip/sidang/{studentId}/complete
-     * Cycle reset — PPAIP confirms offline sidang is done.
+     * POST /api/kaprodi/sidang/{studentId}/schedule
+     * Set sidang schedule — Kaprodi only, scoped to own prodi.
      */
-    public function completeCycle($studentId)
+    public function setSchedule(Request $request, $studentId)
     {
+        $lecturer = $request->user()->lecturer;
+
         $student = Student::where('id', $studentId)
+            ->where('study_program', $lecturer->study_program)
+            ->where('access_status', 'MenungguSidang')
+            ->firstOrFail();
+
+        $request->validate([
+            'scheduled_date' => 'required|date|after:today',
+            'room'           => 'nullable|string|max:100',
+        ]);
+
+        $student->sidangSubmission?->update([
+            'scheduled_date' => $request->scheduled_date,
+            'room'           => $request->room,
+        ]);
+
+        return response()->json([
+            'message' => 'Jadwal sidang berhasil ditetapkan.',
+        ]);
+    }
+
+    /**
+     * POST /api/kaprodi/sidang/{studentId}/complete
+     * Complete the internship cycle — Kaprodi only, scoped to own prodi.
+     */
+    public function completeCycle(Request $request, $studentId)
+    {
+        $lecturer = $request->user()->lecturer;
+
+        $student = Student::where('id', $studentId)
+            ->where('study_program', $lecturer->study_program)
             ->where('access_status', 'MenungguSidang')
             ->firstOrFail();
 

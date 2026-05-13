@@ -74,6 +74,10 @@ export function SimulationProvider({ children }) {
             nim: s.nim,
             programStudi: s.study_program,
             email: s.email,
+            semester: s.semester,
+            tahunAkademik: s.tahun_akademik,
+            jumlahSks: s.jumlah_sks,
+            ipk: s.ipk,
             accessStatus: s.access_status,
             approvedLogbookCount: s.approved_logbook_count,
             dpm: s.dpm ? {
@@ -115,6 +119,7 @@ export function SimulationProvider({ children }) {
                         status: form1Res.value.access_status,
                         rejectionReason: form1Res.value.rejection_reason,
                         pdfPath: form1Res.value.pdf_path,
+                        approver: form1Res.value.approver || null,
                     }
                     : null,
                 activeApplications: appsRes.status === 'fulfilled'
@@ -182,7 +187,7 @@ export function SimulationProvider({ children }) {
 
     const submitForm1 = useCallback(async (formData) => {
         try {
-            await api.post('/form1', formData);
+            await api.upload('/form1', formData);
             await refreshProfile();
             const form1Res = await api.get('/form1');
             setState((s) => ({
@@ -191,6 +196,7 @@ export function SimulationProvider({ children }) {
                     ...form1Res.form1,
                     status: form1Res.access_status,
                     rejectionReason: form1Res.rejection_reason,
+                    approver: form1Res.approver || null,
                 },
                 student: { ...s.student, accessStatus: 'PendingReview' },
                 notifications: [
@@ -220,6 +226,7 @@ export function SimulationProvider({ children }) {
                 ...form1Res.form1,
                 status: form1Res.access_status,
                 rejectionReason: form1Res.rejection_reason,
+                approver: form1Res.approver || null,
             } : null,
         }));
     }, [refreshProfile]);

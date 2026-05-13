@@ -13,19 +13,26 @@ class Student extends Model
         'name',
         'study_program',
         'email',
+        'semester',
+        'tahun_akademik',
+        'jumlah_sks',
+        'ipk',
         'access_status',
         'is_independent',
         'form1_data',
         'form1_pdf_path',
         'form1_rejection_reason',
+        'form1_approved_by',
+        'form1_approved_at',
         'approved_logbook_count',
     ];
 
     protected function casts(): array
     {
         return [
-            'form1_data'     => 'array',
-            'is_independent' => 'boolean',
+            'form1_data'         => 'array',
+            'is_independent'     => 'boolean',
+            'form1_approved_at'  => 'datetime',
         ];
     }
 
@@ -37,6 +44,11 @@ class Student extends Model
     public function dpm()
     {
         return $this->belongsTo(Lecturer::class, 'dpm_id');
+    }
+
+    public function form1Approver()
+    {
+        return $this->belongsTo(Lecturer::class, 'form1_approved_by');
     }
 
     public function applications()

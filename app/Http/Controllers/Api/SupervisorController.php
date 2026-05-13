@@ -37,8 +37,11 @@ class SupervisorController extends Controller
     {
         $student = $request->user()->student;
 
-        if (!in_array($student->access_status, ['HasApplication', 'ApprovedForm1'])) {
-            return response()->json(['message' => 'Akses ditolak.'], 403);
+        // Guard: student must have completed prior steps
+        // Mitra: Form1 Approved → Applied to vacancy (HasApplication)
+        // Mandiri: Form1 Approved → Form2 submitted & approved (HasApplication)
+        if (!in_array($student->access_status, ['HasApplication'])) {
+            return response()->json(['message' => 'Anda belum menyelesaikan tahap sebelumnya.'], 403);
         }
 
         if (SupervisorApplication::where('student_id', $student->id)->exists()) {
@@ -96,6 +99,20 @@ class SupervisorController extends Controller
         $student = Student::where('id', $request->student_id)
             ->where('study_program', $lecturer->study_program)
             ->firstOrFail();
+
+        // Guard: student must have submitted a supervisor nomination
+        if (!$student->supervisorApplication()->exists()) {
+            return response()->json([
+                'message' => 'Mahasiswa belum mengajukan pengajuan pembimbing.',
+            ], 422);
+        }
+
+        // Guard: student must not already have a DPM
+        if ($student->dpm_id) {
+            return response()->json([
+                'message' => 'DPM sudah ditugaskan untuk mahasiswa ini.',
+            ], 422);
+        }
 
         $student->update([
             'dpm_id'        => $request->lecturer_id,

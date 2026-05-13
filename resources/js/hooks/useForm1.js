@@ -21,8 +21,13 @@ export default function useForm1() {
             nama: student?.name ?? '',
             nim: student?.nim ?? '',
             programStudi: student?.programStudi ?? '',
+            semester: student?.semester ?? '',
+            tahunAkademik: student?.tahunAkademik ?? '',
+            jumlahSks: student?.jumlahSks ?? '',
+            ipk: student?.ipk ?? '',
         }),
-        [student?.name, student?.nim, student?.programStudi],
+        [student?.name, student?.nim, student?.programStudi,
+         student?.semester, student?.tahunAkademik, student?.jumlahSks, student?.ipk],
     );
 
     /* ── Pre-fill from rejected resubmit (React Router state) ── */
@@ -30,10 +35,6 @@ export default function useForm1() {
 
     /* ── Editable form state ─────────────────────── */
     const [formData, setFormData] = useState({
-        semester: prefill?.semester ?? '',
-        tahunAkademik: prefill?.tahunAkademik ?? '',
-        jumlahSks: prefill?.jumlahSks ?? '',
-        ipk: prefill?.ipk ?? '',
         rencanaSkema: prefill?.rencanaSkema ?? '',
         topikTempat: prefill?.topikTempat ?? '',
         transkripFile: null,
@@ -87,21 +88,6 @@ export default function useForm1() {
     const validateForm = useCallback(() => {
         const e = {};
 
-        if (!formData.semester.trim()) e.semester = 'Semester wajib diisi';
-        if (!formData.tahunAkademik.trim()) e.tahunAkademik = 'Tahun akademik wajib diisi';
-
-        if (!formData.jumlahSks.trim()) {
-            e.jumlahSks = 'Jumlah SKS wajib diisi';
-        } else if (isNaN(Number(formData.jumlahSks))) {
-            e.jumlahSks = 'Jumlah SKS harus berupa angka';
-        }
-
-        if (!formData.ipk.trim()) {
-            e.ipk = 'IPK wajib diisi';
-        } else if (!/^\d+(\.\d+)?$/.test(formData.ipk.trim())) {
-            e.ipk = 'IPK harus berupa angka desimal (contoh: 3.75)';
-        }
-
         if (!formData.rencanaSkema) e.rencanaSkema = 'Pilih skema magang terlebih dahulu';
         if (!formData.topikTempat.trim()) e.topikTempat = 'Topik/tempat magang wajib diisi';
         // File upload optional in simulation mode
@@ -116,10 +102,6 @@ export default function useForm1() {
     /* ── Derived: is every required field filled? ── */
     const isFormValid = useMemo(
         () =>
-            formData.semester.trim() !== '' &&
-            formData.tahunAkademik.trim() !== '' &&
-            formData.jumlahSks.trim() !== '' &&
-            formData.ipk.trim() !== '' &&
             formData.rencanaSkema !== '' &&
             formData.topikTempat.trim() !== '' &&
             // formData.transkripFile !== null && // optional in simulation
@@ -137,17 +119,20 @@ export default function useForm1() {
             setIsSubmitting(true);
 
             try {
-                // Map frontend field names → Laravel API field names
-                const apiPayload = {
-                    semester:     formData.semester,
-                    jumlahSKS:    formData.jumlahSks,
-                    ipk:          formData.ipk,
-                    skemaMagang:  formData.rencanaSkema,
-                    topikMagang:  formData.topikTempat,
-                    outputTarget: formData.output,
-                };
+                // Build FormData to support file upload (transkrip)
+                const fd = new FormData();
+                fd.append('semester',     readOnlyFields.semester);
+                fd.append('jumlahSKS',    readOnlyFields.jumlahSks);
+                fd.append('ipk',          readOnlyFields.ipk);
+                fd.append('skemaMagang',  formData.rencanaSkema);
+                fd.append('topikMagang',  formData.topikTempat);
+                fd.append('outputTarget', formData.output);
 
-                await submitForm1(apiPayload);
+                if (formData.transkripFile) {
+                    fd.append('transkrip', formData.transkripFile);
+                }
+
+                await submitForm1(fd);
                 navigate('/form1/status', { replace: true });
             } catch (err) {
                 console.error('[Form1] Submit error:', err);

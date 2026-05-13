@@ -19,11 +19,25 @@ class Form1Controller extends Controller
             return response()->json(['message' => 'Profil mahasiswa tidak ditemukan.'], 404);
         }
 
+        // Load the approver relationship
+        $student->load('form1Approver');
+
+        $approver = null;
+        if ($student->form1Approver) {
+            $approver = [
+                'name'         => $student->form1Approver->lecturer_name,
+                'nidn'         => $student->form1Approver->nidn,
+                'role'         => 'Kaprodi ' . $student->form1Approver->study_program,
+                'approvalDate' => $student->form1_approved_at?->format('d/m/Y'),
+            ];
+        }
+
         return response()->json([
-            'form1'         => $student->form1_data,
-            'access_status' => $student->access_status,
-            'pdf_path'      => $student->form1_pdf_path,
+            'form1'            => $student->form1_data,
+            'access_status'    => $student->access_status,
+            'pdf_path'         => $student->form1_pdf_path,
             'rejection_reason' => $student->form1_rejection_reason,
+            'approver'         => $approver,
         ]);
     }
 
@@ -49,10 +63,21 @@ class Form1Controller extends Controller
             'skemaMagang'  => 'required|string|in:Mitra,Mandiri,Kewirausahaan',
             'topikMagang'  => 'nullable|string',
             'outputTarget' => 'required|string',
+            'transkrip'    => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
         ]);
+
+        // Store transcript file if provided
+        $transkripPath = null;
+        if ($request->hasFile('transkrip')) {
+            $transkripPath = $request->file('transkrip')->store('transkrip', 'local');
+        }
+
+        // Remove transkrip from validated data before storing as JSON
+        unset($validated['transkrip']);
 
         $student->update([
             'form1_data'             => $validated,
+            'form1_pdf_path'         => $transkripPath,
             'access_status'          => 'PendingReview',
             'form1_rejection_reason' => null,
         ]);
@@ -77,7 +102,7 @@ class Form1Controller extends Controller
         $students = Student::where('study_program', $lecturer->study_program)
             ->whereIn('access_status', ['PendingReview', 'ApprovedForm1', 'RejectedForm1'])
             ->whereNotNull('form1_data')
-            ->select(['id', 'nim', 'name', 'study_program', 'access_status', 'form1_data', 'form1_rejection_reason', 'updated_at'])
+            ->select(['id', 'nim', 'name', 'study_program', 'access_status', 'form1_data', 'form1_pdf_path', 'form1_rejection_reason', 'updated_at'])
             ->orderByDesc('updated_at')
             ->get();
 
@@ -98,6 +123,8 @@ class Form1Controller extends Controller
         $student->update([
             'access_status'          => 'ApprovedForm1',
             'form1_rejection_reason' => null,
+            'form1_approved_by'      => $lecturer->id,
+            'form1_approved_at'      => now(),
         ]);
 
         return response()->json([
@@ -128,5 +155,29 @@ class Form1Controller extends Controller
             'message' => 'Form 1 ditolak.',
             'access_status' => 'RejectedForm1',
         ]);
+    }
+
+    /**
+     * GET /api/kaprodi/students/{studentId}/transkrip
+     * Download/view student transcript — Kaprodi only, scoped to own prodi.
+     */
+    public function downloadTranskrip(Request $request, $studentId)
+    {
+        $lecturer = $request->user()->lecturer;
+        $student = Student::where('id', $studentId)
+            ->where('study_program', $lecturer->study_program)
+            ->firstOrFail();
+
+        if (!$student->form1_pdf_path) {
+            return response()->json(['message' => 'Transkrip tidak tersedia.'], 404);
+        }
+
+        $path = storage_path('app/private/' . $student->form1_pdf_path);
+
+        if (!file_exists($path)) {
+            return response()->json(['message' => 'File tidak ditemukan.'], 404);
+        }
+
+        return response()->file($path);
     }
 }

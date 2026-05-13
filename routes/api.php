@@ -9,11 +9,18 @@ use App\Http\Controllers\Api\Form2Controller;
 use App\Http\Controllers\Api\SupervisorController;
 use App\Http\Controllers\Api\LogbookController;
 use App\Http\Controllers\Api\SidangController;
+use App\Http\Controllers\Api\StudentController;
 
 /*
 |--------------------------------------------------------------------------
 | SIPMAG API Routes
 |--------------------------------------------------------------------------
+|
+| Role responsibilities:
+|   PPAIP   → Form 2 approve/reject only. Read-only all students. Internship CRUD.
+|   Kaprodi → Form 1, supervisor apps, assign DPM, sidang. Scoped to own prodi.
+|   DPM     → Logbook approve/reject. Scoped to assigned students only.
+|
 */
 
 // ── Public ──────────────────────────────────────────
@@ -56,37 +63,52 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/sidang', [SidangController::class, 'store']);
     });
 
-    // ── Kaprodi routes ──────────────────────────────
+    // ── Kaprodi routes (scoped to own prodi) ────────
     Route::middleware('role:kaprodi')->prefix('kaprodi')->group(function () {
+        // Form 1 review
         Route::get('/form1', [Form1Controller::class, 'indexForKaprodi']);
         Route::post('/form1/{studentId}/approve', [Form1Controller::class, 'approve']);
         Route::post('/form1/{studentId}/reject', [Form1Controller::class, 'reject']);
 
+        // Supervisor application review + DPM assignment
         Route::get('/supervisor-applications', [SupervisorController::class, 'indexForKaprodi']);
         Route::post('/assign-dpm', [SupervisorController::class, 'assignDpm']);
+
+        // Sidang management (schedule + cycle completion)
+        Route::get('/sidang', [SidangController::class, 'indexForKaprodi']);
+        Route::post('/sidang/{studentId}/schedule', [SidangController::class, 'setSchedule']);
+        Route::post('/sidang/{studentId}/complete', [SidangController::class, 'completeCycle']);
+
+        // Students list (scoped to prodi, for Kaprodi dashboard)
+        Route::get('/students', [StudentController::class, 'indexForKaprodi']);
+
+        // Download student transcript (scoped to prodi)
+        Route::get('/students/{studentId}/transkrip', [Form1Controller::class, 'downloadTranskrip']);
     });
 
-    // ── DPM routes ──────────────────────────────────
+    // ── DPM routes (scoped to assigned students) ────
     Route::middleware('role:dpm')->prefix('dpm')->group(function () {
         Route::get('/logbooks', [LogbookController::class, 'indexForDpm']);
         Route::post('/logbooks/{id}/approve', [LogbookController::class, 'approve']);
         Route::post('/logbooks/{id}/reject', [LogbookController::class, 'reject']);
+
+        // Students assigned to this DPM
+        Route::get('/students', [StudentController::class, 'indexForDpm']);
     });
 
-    // ── PPAIP routes ────────────────────────────────
+    // ── PPAIP routes (cross-program) ────────────────
     Route::middleware('role:ppaip')->prefix('ppaip')->group(function () {
-        // Vacancy CRUD
-        Route::post('/internships', [InternshipController::class, 'store']);
-        Route::put('/internships/{id}', [InternshipController::class, 'update']);
-        Route::delete('/internships/{id}', [InternshipController::class, 'destroy']);
-
-        // Form 2 review
+        // Form 2 review (only PPAIP responsibility)
         Route::get('/form2', [Form2Controller::class, 'indexForPpaip']);
         Route::post('/form2/{id}/approve', [Form2Controller::class, 'approve']);
         Route::post('/form2/{id}/reject', [Form2Controller::class, 'reject']);
 
-        // Sidang management
-        Route::get('/sidang', [SidangController::class, 'indexForPpaip']);
-        Route::post('/sidang/{studentId}/complete', [SidangController::class, 'completeCycle']);
+        // Read-only student overview (all programs)
+        Route::get('/students', [StudentController::class, 'indexForPpaip']);
+
+        // Internship CRUD (cross-program vacancy management)
+        Route::post('/internships', [InternshipController::class, 'store']);
+        Route::put('/internships/{id}', [InternshipController::class, 'update']);
+        Route::delete('/internships/{id}', [InternshipController::class, 'destroy']);
     });
 });
