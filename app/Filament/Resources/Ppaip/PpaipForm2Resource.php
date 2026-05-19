@@ -64,10 +64,18 @@ class PpaipForm2Resource extends Resource
                     ->color('success')
                     ->visible(fn (Form2Submission $record) => $record->status === 'PendingReview')
                     ->requiresConfirmation()
-                    ->action(fn (Form2Submission $record) => $record->update([
-                        'status'           => 'ApprovedForm2',
-                        'rejection_reason' => null,
-                    ])),
+                    ->modalHeading('Setujui Form 2')
+                    ->modalDescription('Menyetujui Form 2 akan mengubah status mahasiswa menjadi HasApplication.')
+                    ->action(function (Form2Submission $record) {
+                        $record->update([
+                            'status'           => 'ApprovedForm2',
+                            'rejection_reason' => null,
+                        ]);
+                        $student = $record->student;
+                        if ($student && $student->access_status === 'ApprovedForm1') {
+                            $student->update(['access_status' => 'HasApplication']);
+                        }
+                    }),
 
                 Tables\Actions\Action::make('reject')
                     ->label('Tolak')

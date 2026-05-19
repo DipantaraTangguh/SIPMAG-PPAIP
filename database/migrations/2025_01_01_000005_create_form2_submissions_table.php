@@ -21,9 +21,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('student_id')->constrained('students')->cascadeOnDelete();
             $table->string('company_name');
-            $table->string('contact_person_name');      // full name and title
-            $table->string('contact_person_role');      // job title/role
-            $table->string('contact_info');             // phone or email
+            $table->text('alamat_perusahaan');          // company address + postal code
             $table->text('lingkup_magang');             // scope/field of internship
             $table->date('tanggal_mulai');
             $table->date('tanggal_selesai');

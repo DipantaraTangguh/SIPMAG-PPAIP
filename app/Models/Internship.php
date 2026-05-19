@@ -10,8 +10,13 @@ class Internship extends Model
         'company_name',
         'position',
         'description',
-        'vacancy_details',
+        'capacity',
+        'duration',
+        'bidang',
+        'start_date',
         'job_description',
+        'skills',
+        'requirements',
         'minimum_education',
         'sistem_kerja',
         'location',
@@ -23,6 +28,9 @@ class Internship extends Model
     {
         return [
             'job_description' => 'array',
+            'skills'          => 'array',
+            'requirements'    => 'array',
+            'start_date'      => 'date',
             'deadline'        => 'date',
             'is_active'       => 'boolean',
         ];

@@ -40,6 +40,7 @@ Route::middleware('auth:sanctum')->group(function () {
         // Form 1
         Route::get('/form1', [Form1Controller::class, 'show']);
         Route::post('/form1', [Form1Controller::class, 'store']);
+        Route::get('/form1/surat-keterangan', [Form1Controller::class, 'downloadSuratKeterangan']);
 
         // Applications (Portal Mitra)
         Route::get('/applications', [ApplicationController::class, 'index']);

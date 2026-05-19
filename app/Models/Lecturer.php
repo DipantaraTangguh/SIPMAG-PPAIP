@@ -12,6 +12,7 @@ class Lecturer extends Model
         'lecturer_name',
         'contact',
         'study_program',
+        'signature_path',
     ];
 
     public function user()

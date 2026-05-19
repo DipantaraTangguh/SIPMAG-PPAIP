@@ -89,6 +89,33 @@ export function SimulationProvider({ children }) {
         };
     }
 
+    /** Map API Form2Submission → shape expected by MandiriFilledState cards */
+    function mapForm2Submission(s) {
+        if (!s) return s;
+        const statusMap = {
+            PendingReview:  'Menunggu Review',
+            ApprovedForm2:  'Disetujui',
+            RejectedForm2:  'Ditolak',
+        };
+        const submittedAt = s.submitted_at
+            ? new Date(s.submitted_at).toLocaleDateString('id-ID', {
+                day: 'numeric', month: 'short', year: 'numeric',
+            })
+            : null;
+        return {
+            id: s.id,
+            companyName: s.company_name,
+            position: s.lingkup_magang,
+            alamatPerusahaan: s.alamat_perusahaan,
+            tanggalMulai: s.tanggal_mulai,
+            tanggalSelesai: s.tanggal_selesai,
+            status: statusMap[s.status] || s.status,
+            submittedAt,
+            rejectionReason: s.rejection_reason,
+            pdfPath: s.pdf_path,
+        };
+    }
+
     /** Refresh student profile from /me */
     const refreshProfile = useCallback(async () => {
         try {
@@ -133,7 +160,7 @@ export function SimulationProvider({ children }) {
                     }))
                     : [],
                 form2Submissions: form2Res.status === 'fulfilled'
-                    ? (form2Res.value.submissions || [])
+                    ? (form2Res.value.submissions || []).map(mapForm2Submission)
                     : [],
                 logbookEntries: logbookRes.status === 'fulfilled'
                     ? (logbookRes.value.logbooks || []).map(l => ({
@@ -266,10 +293,17 @@ export function SimulationProvider({ children }) {
      * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
     const submitForm2 = useCallback(async (formData) => {
-        const data = await api.post('/form2', formData);
+        const payload = {
+            company_name:      formData.namaPerusahaan,
+            alamat_perusahaan: formData.alamatPerusahaan,
+            lingkup_magang:    formData.lingkupMagang,
+            tanggal_mulai:     formData.tanggalMulai,
+            tanggal_selesai:   formData.tanggalSelesai,
+        };
+        const data = await api.post('/form2', payload);
         setState((s) => ({
             ...s,
-            form2Submissions: [data.submission, ...s.form2Submissions],
+            form2Submissions: [mapForm2Submission(data.submission), ...s.form2Submissions],
             notifications: [
                 { id: Date.now(), message: 'Form 2 berhasil diajukan. Menunggu review PPAIP.', time: 'Baru saja' },
                 ...s.notifications,

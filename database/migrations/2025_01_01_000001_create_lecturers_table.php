@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('lecturer_name');
             $table->string('contact')->nullable();          // email or phone
             $table->string('study_program')->nullable();    // set for Kaprodi scoping
+            $table->string('signature_path')->nullable();   // uploaded signature image (for Form 1 PDF)
             $table->timestamps();
         });
     }

@@ -77,6 +77,35 @@ export const api = {
     /** POST with FormData (file uploads) */
     upload: (url, formData) => request(url, { method: 'POST', body: formData }),
 
+    /** Fetch a binary file (e.g. PDF) and trigger a browser download. */
+    download: async (url, filename) => {
+        const token = getToken();
+        const response = await fetch(`${API_BASE}${url}`, {
+            method: 'GET',
+            headers: token ? { 'Authorization': `Bearer ${token}` } : {},
+        });
+
+        if (response.status === 401) {
+            clearToken();
+            window.location.href = '/login';
+            throw new Error('Sesi berakhir. Silakan login kembali.');
+        }
+        if (!response.ok) {
+            const data = await response.json().catch(() => null);
+            throw new Error(data?.message || response.statusText);
+        }
+
+        const blob = await response.blob();
+        const objectUrl = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = objectUrl;
+        a.download = filename || 'download.pdf';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(objectUrl);
+    },
+
     /** Auth-specific: login returns token */
     login: async (login, password) => {
         const data = await request('/login', {

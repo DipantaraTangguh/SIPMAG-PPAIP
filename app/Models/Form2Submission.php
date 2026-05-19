@@ -9,9 +9,7 @@ class Form2Submission extends Model
     protected $fillable = [
         'student_id',
         'company_name',
-        'contact_person_name',
-        'contact_person_role',
-        'contact_info',
+        'alamat_perusahaan',
         'lingkup_magang',
         'tanggal_mulai',
         'tanggal_selesai',

@@ -44,6 +44,7 @@ export default function Form1StatusPanel({
                     approverNidn={formData.approverNidn}
                     approverRole={formData.approverRole}
                     approvalDate={formData.approvalDate}
+                    studentNim={nim}
                 />
             )}
 

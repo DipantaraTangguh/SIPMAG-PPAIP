@@ -4,17 +4,17 @@ namespace App\Filament\Resources\Ppaip\PpaipInternshipResource\Pages;
 
 use App\Filament\Resources\Ppaip\PpaipInternshipResource;
 use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
+use Filament\Resources\Pages\ViewRecord;
 
-class ListInternships extends ListRecords
+class ViewInternship extends ViewRecord
 {
     protected static string $resource = PpaipInternshipResource::class;
 
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make()
-                ->label('Tambah Lowongan'),
+            Actions\EditAction::make(),
+            Actions\DeleteAction::make(),
         ];
     }
 }

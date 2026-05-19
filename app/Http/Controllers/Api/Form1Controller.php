@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Student;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 
 class Form1Controller extends Controller
 {
@@ -155,6 +157,59 @@ class Form1Controller extends Controller
             'message' => 'Form 1 ditolak.',
             'access_status' => 'RejectedForm1',
         ]);
+    }
+
+    /**
+     * GET /api/form1/surat-keterangan
+     * Generate and stream the Form 1 "Surat Keterangan Memenuhi Syarat Akademik" PDF.
+     * Only available after Kaprodi has approved Form 1.
+     */
+    public function downloadSuratKeterangan(Request $request)
+    {
+        $student = $request->user()->student;
+        if (!$student) {
+            return response()->json(['message' => 'Profil mahasiswa tidak ditemukan.'], 404);
+        }
+
+        if ($student->access_status !== 'ApprovedForm1') {
+            return response()->json(['message' => 'Form 1 belum disetujui.'], 403);
+        }
+
+        $student->load('form1Approver');
+        $kaprodi = $student->form1Approver;
+
+        $signatureSrc = null;
+        if ($kaprodi && $kaprodi->signature_path) {
+            $absPath = storage_path('app/public/' . $kaprodi->signature_path);
+            if (file_exists($absPath)) {
+                $mime = mime_content_type($absPath) ?: 'image/png';
+                $signatureSrc = 'data:' . $mime . ';base64,' . base64_encode(file_get_contents($absPath));
+            }
+        }
+
+        $logoPath = public_path('assets/images/logo-ubakrie.png');
+        $logoSrc = file_exists($logoPath)
+            ? 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath))
+            : null;
+
+        Carbon::setLocale('id');
+        $submittedDate = optional($student->updated_at)->translatedFormat('d F Y') ?? '—';
+        $approvalDate  = optional($student->form1_approved_at)->translatedFormat('d F Y') ?? '—';
+
+        $pdf = Pdf::loadView('pdf.surat-keterangan', [
+            'student'       => $student,
+            'form1'         => $student->form1_data ?? [],
+            'kaprodiName'   => $kaprodi->lecturer_name ?? '—',
+            'kaprodiNidn'   => $kaprodi->nidn ?? '—',
+            'signatureSrc'  => $signatureSrc,
+            'logoSrc'       => $logoSrc,
+            'submittedDate' => $submittedDate,
+            'approvalDate'  => $approvalDate,
+        ])->setPaper('a4');
+
+        $filename = 'Surat_Keterangan_Form1_' . $student->nim . '.pdf';
+
+        return $pdf->download($filename);
     }
 
     /**

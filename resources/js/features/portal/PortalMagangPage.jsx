@@ -11,6 +11,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useSimulation } from '../../context/SimulationContext';
 import { canAccessPortal } from '../../utils/accessUtils';
+import { api } from '../../lib/api';
 import { Info, FileText } from 'lucide-react';
 import DashboardLayout from '../../layouts/DashboardLayout';
 import TabNavigation from '../../components/portal/TabNavigation';
@@ -19,97 +20,35 @@ import VacancyGrid from '../../components/portal/VacancyGrid';
 import ActiveApplicationsSidebar from '../../components/portal/ActiveApplicationsSidebar';
 import MandiriTabContent from '../../components/portal/mandiri/MandiriTabContent';
 
-/* ── Mock data ───────────────────────────────────── */
-const mockVacancies = [
-    {
-        id: 1,
-        companyName: 'PT. Gojek Tokopedia',
-        position: 'Software Engineer Intern',
-        location: 'Jakarta Selatan',
-        deadline: '30 Jun 2024',
-        deadlineDate: '2024-06-30',
-        logoColor: '#00AA5B',
-        logoInitial: 'G',
-        isActive: true,
-    },
-    {
-        id: 2,
-        companyName: 'Telkomsel',
-        position: 'Marketing Communications Intern',
-        location: 'Jakarta Selatan',
-        deadline: '30 Jun 2024',
-        deadlineDate: '2024-06-30',
-        logoColor: '#E02020',
-        logoInitial: 'T',
-        isActive: true,
-    },
-    {
-        id: 3,
-        companyName: 'Traveloka Indonesia',
-        position: 'UI/UX Designer Intern',
-        location: 'Jakarta Selatan',
-        deadline: '30 Jun 2024',
-        deadlineDate: '2024-06-30',
-        logoColor: '#0194F3',
-        logoInitial: 'T',
-        isActive: true,
-    },
-    {
-        id: 4,
-        companyName: 'PT. Microsoft',
-        position: 'Data Analyst Intern',
-        location: 'Jakarta Selatan',
-        deadline: '30 Jun 2024',
-        deadlineDate: '2024-06-30',
-        logoColor: '#737373',
-        logoInitial: 'M',
-        isActive: true,
-    },
-    {
-        id: 5,
-        companyName: 'PT. Google Indonesia',
-        position: 'Data Analyst Intern',
-        location: 'Jakarta Selatan',
-        deadline: '30 Jun 2024',
-        deadlineDate: '2024-06-30',
-        logoColor: '#737373',
-        logoInitial: 'G',
-        isActive: true,
-    },
-    {
-        id: 6,
-        companyName: 'PT. Bank Central Asia',
-        position: 'Data Analyst Intern',
-        location: 'Jakarta Selatan',
-        deadline: '30 Jun 2024',
-        deadlineDate: '2024-06-30',
-        logoColor: '#737373',
-        logoInitial: 'B',
-        isActive: true,
-    },
-    {
-        id: 7,
-        companyName: 'PT. Indofood',
-        position: 'Data Analyst Intern',
-        location: 'Jakarta Selatan',
-        deadline: '30 Jun 2024',
-        deadlineDate: '2024-06-30',
-        logoColor: '#737373',
-        logoInitial: 'I',
-        isActive: true,
-    },
-    {
-        id: 8,
-        companyName: 'Traveloka Indonesia',
-        position: 'UI/UX Designer Intern',
-        location: 'Tangerang',
-        deadline: '15 Jul 2024',
-        deadlineDate: '2024-07-15',
-        logoColor: '#0194F3',
-        logoInitial: 'T',
-        isActive: true,
-    },
-];
+/* Deterministic logo color from a small brand palette */
+const LOGO_PALETTE = ['#00AA5B', '#E02020', '#0194F3', '#F5A524', '#737373', '#682828', '#6F42C1'];
+function pickLogoColor(seed = '') {
+    let h = 0;
+    for (let i = 0; i < seed.length; i++) h = (h * 31 + seed.charCodeAt(i)) >>> 0;
+    return LOGO_PALETTE[h % LOGO_PALETTE.length];
+}
+
+/** Map API Internship → shape expected by VacancyCard */
+function mapInternship(i) {
+    const company = i.company_name || '';
+    const deadlineDate = i.deadline ? i.deadline.slice(0, 10) : null;
+    const deadline = deadlineDate
+        ? new Date(deadlineDate).toLocaleDateString('id-ID', {
+            day: 'numeric', month: 'short', year: 'numeric',
+        })
+        : '—';
+    return {
+        id: i.id,
+        companyName: company,
+        position: i.position,
+        location: i.location,
+        deadline,
+        deadlineDate,
+        logoColor: pickLogoColor(company),
+        logoInitial: (company.trim()[0] || '?').toUpperCase(),
+        isActive: !!i.is_active,
+    };
+}
 
 const mockActiveApplications = [
     {
@@ -143,6 +82,7 @@ export default function PortalMagangPage() {
     );
     const [searchQuery, setSearchQuery] = useState('');
     const [sortBy, setSortBy] = useState('terbaru');
+    const [vacancies, setVacancies] = useState([]);
 
     // Clear navigation state after reading to prevent stale tab on refresh
     useEffect(() => {
@@ -151,9 +91,21 @@ export default function PortalMagangPage() {
         }
     }, []);
 
+    // Fetch active vacancies from the backend
+    useEffect(() => {
+        let cancelled = false;
+        api.get('/internships')
+            .then((data) => {
+                if (cancelled) return;
+                setVacancies((data.internships || []).map(mapInternship));
+            })
+            .catch(() => { /* ignore — empty list */ });
+        return () => { cancelled = true; };
+    }, []);
+
     /* Derived filtered list */
     const filteredVacancies = useMemo(() => {
-        let result = [...mockVacancies];
+        let result = [...vacancies];
 
         if (searchQuery.trim()) {
             const q = searchQuery.toLowerCase();
@@ -173,7 +125,7 @@ export default function PortalMagangPage() {
         }
 
         return result;
-    }, [searchQuery, sortBy]);
+    }, [vacancies, searchQuery, sortBy]);
 
     const handleCardClick = (id) => {
         navigate(`/portal/vacancy/${id}`);

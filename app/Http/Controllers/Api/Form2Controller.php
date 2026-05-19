@@ -36,20 +36,18 @@ class Form2Controller extends Controller
         }
 
         $validated = $request->validate([
-            'company_name'        => 'required|string|max:255',
-            'contact_person_name' => 'required|string|max:255',
-            'contact_person_role' => 'required|string|max:255',
-            'contact_info'        => 'required|string|max:255',
-            'lingkup_magang'      => 'required|string',
-            'tanggal_mulai'       => 'required|date',
-            'tanggal_selesai'     => 'required|date|after:tanggal_mulai',
+            'company_name'      => 'required|string|max:255',
+            'alamat_perusahaan' => 'required|string',
+            'lingkup_magang'    => 'required|string',
+            'tanggal_mulai'     => 'required|date',
+            'tanggal_selesai'   => 'required|date|after:tanggal_mulai',
         ]);
 
         $validated['student_id'] = $student->id;
 
         $submission = Form2Submission::create($validated);
 
-        // Mark student as independent / Mandiri track
+        // Mark Mandiri track. access_status stays at ApprovedForm1 until PPAIP approves.
         if (!$student->is_independent) {
             $student->update(['is_independent' => true]);
         }
@@ -86,6 +84,12 @@ class Form2Controller extends Controller
             'status'           => 'ApprovedForm2',
             'rejection_reason' => null,
         ]);
+
+        // Promote the student's access_status now that Form 2 is approved.
+        $student = $submission->student;
+        if ($student && $student->access_status === 'ApprovedForm1') {
+            $student->update(['access_status' => 'HasApplication']);
+        }
 
         return response()->json(['message' => 'Form 2 disetujui.', 'submission' => $submission]);
     }

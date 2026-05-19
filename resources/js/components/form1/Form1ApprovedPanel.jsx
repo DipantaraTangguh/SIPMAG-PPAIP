@@ -12,7 +12,7 @@
  * @prop {string} approverRole  — Role title (e.g. "Kaprodi Informatika").
  * @prop {string} approvalDate  — Date of approval (e.g. "10/03/2026").
  */
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     CheckCircle,
@@ -21,17 +21,37 @@ import {
     Download,
     ArrowRight,
 } from 'lucide-react';
+import { api } from '../../lib/api';
 
 export default function Form1ApprovedPanel({
     pdfPath,
-    pdfFileName = 'Form_Magang_01.pdf',
-    pdfSize = '—',
+    pdfFileName = 'Surat_Keterangan_Form1.pdf',
+    pdfSize = 'PDF',
     approverName = '—',
     approverNidn = '—',
     approverRole = '—',
     approvalDate = '—',
+    studentNim,
 }) {
     const navigate = useNavigate();
+    const [isDownloading, setIsDownloading] = useState(false);
+    const [downloadError, setDownloadError] = useState(null);
+
+    const handleDownload = async () => {
+        setDownloadError(null);
+        setIsDownloading(true);
+        try {
+            const filename = studentNim
+                ? `Surat_Keterangan_Form1_${studentNim}.pdf`
+                : pdfFileName;
+            await api.download('/form1/surat-keterangan', filename);
+        } catch (err) {
+            console.error('[Form1] Download error:', err);
+            setDownloadError(err.message || 'Gagal mengunduh dokumen.');
+        } finally {
+            setIsDownloading(false);
+        }
+    };
 
     return (
         <div className="flex flex-col gap-4">
@@ -102,13 +122,17 @@ export default function Form1ApprovedPanel({
                     {/* Download button */}
                     <button
                         type="button"
-                        onClick={() => pdfPath && window.open(pdfPath, '_blank')}
-                        className="flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-[13px] font-medium text-white transition-colors hover:bg-primary-hover"
+                        onClick={handleDownload}
+                        disabled={isDownloading}
+                        className="flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-[13px] font-medium text-white transition-colors hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-60"
                     >
                         <Download className="h-4 w-4" />
-                        Unduh
+                        {isDownloading ? 'Memproses...' : 'Unduh'}
                     </button>
                 </div>
+                {downloadError && (
+                    <p className="mt-2 text-xs text-red-600">{downloadError}</p>
+                )}
             </div>
 
             {/* ── CTA button ── */}
