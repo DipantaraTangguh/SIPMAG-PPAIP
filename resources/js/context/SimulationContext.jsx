@@ -1,6 +1,6 @@
 /**
  * context/SimulationContext.jsx
- * Single source of truth for the SIPMAG application state.
+ * Single source of truth for the Portal Magang application state.
  *
  * STRATEGY: This context maintains the exact same API surface that all
  * 22+ consumer components use (useSimulation()), but replaces the

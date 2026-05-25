@@ -1,11 +1,11 @@
 /**
- * context/actions/pembimbingActions.js
+ * context/actions/supervisorActions.js
  * Pengajuan Pembimbing and DPM assignment actions.
  */
 import { useCallback } from 'react';
 import { MOCK_DPM } from '../../constants/simulationConstants';
 
-export function usePembimbingActions(setState) {
+export function useSupervisorActions(setState) {
     const submitPengajuanPembimbing = useCallback((formData) => {
         setState((p) => ({
             ...p,

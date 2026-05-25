@@ -1,11 +1,11 @@
 /**
- * context/actions/sidangActions.js
+ * context/actions/defenseActions.js
  * Sidang submission, schedule assignment, cycle completion, and full reset actions.
  */
 import { useCallback } from 'react';
 import { MOCK_SIDANG_SCHEDULE } from '../../constants/simulationConstants';
 
-export function useSidangActions(setState) {
+export function useDefenseActions(setState) {
     const submitSidang = useCallback((filesData) => {
         const serializeFile = (f) => f ? { name: f.name, size: `${(f.size / (1024 * 1024)).toFixed(1)} MB` } : null;
         setState((p) => ({

@@ -13,7 +13,7 @@ use App\Http\Controllers\Api\StudentController;
 
 /*
 |--------------------------------------------------------------------------
-| SIPMAG API Routes
+| Portal Magang API Routes
 |--------------------------------------------------------------------------
 |
 | Role responsibilities:

@@ -3,7 +3,7 @@
  * Default state shape for the SimulationContext.
  * Extracted from SimulationContext.jsx for separation of concerns.
  */
-export const STORAGE_KEY = 'sipmag_simulation_state';
+export const STORAGE_KEY = 'portal_magang_simulation_state';
 
 export const INITIAL_STATE = {
     isLoggedIn: false,

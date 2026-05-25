@@ -8,7 +8,7 @@
 @source "../js/**/*.{js,jsx}";
 
 /* ═══════════════════════════════════════════════════
-   DESIGN TOKENS — SIPMAG Color System
+   DESIGN TOKENS — Portal Magang Color System
    Tailwind v4 @theme block replaces both the :root
    CSS vars and tailwind.config.js extend colors.
    Change values here → every Tailwind utility updates.

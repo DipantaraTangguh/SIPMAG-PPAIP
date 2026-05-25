@@ -1,11 +1,11 @@
 /**
  * lib/api.js
- * Centralized API client for SIPMAG.
+ * Centralized API client for Portal Magang.
  * Uses Sanctum Bearer token stored in localStorage.
  */
 
 const API_BASE = '/api';
-const TOKEN_KEY = 'sipmag_token';
+const TOKEN_KEY = 'portal_magang_token';
 
 export function getToken() {
     return localStorage.getItem(TOKEN_KEY);
