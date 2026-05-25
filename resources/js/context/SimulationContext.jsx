@@ -135,7 +135,7 @@ export function SimulationProvider({ children }) {
                 api.get('/applications'),
                 api.get('/form2'),
                 api.get('/logbooks'),
-                api.get('/sidang'),
+                api.get('/defense'),
             ]);
 
             setState((s) => ({
@@ -433,7 +433,7 @@ export function SimulationProvider({ children }) {
         fd.append('poster', files.posterPresentasi || files.poster);
         fd.append('krs', files.krsMataKuliah || files.krs);
 
-        await api.upload('/sidang', fd);
+        await api.upload('/defense', fd);
         await refreshProfile();
 
         setState((s) => ({

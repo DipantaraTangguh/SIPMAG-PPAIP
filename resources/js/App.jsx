@@ -36,9 +36,9 @@ export default function App() {
                     <Route path="/form1/status" element={<ProtectedRoute><Form1StatusPage /></ProtectedRoute>} />
                     <Route path="/portal" element={<ProtectedRoute><InternshipPortalPage /></ProtectedRoute>} />
                     <Route path="/portal/vacancy/:id" element={<ProtectedRoute><VacancyDetailPage /></ProtectedRoute>} />
-                    <Route path="/portal/mandiri/form2/new" element={<ProtectedRoute><Form2NewPage /></ProtectedRoute>} />
-                    <Route path="/bimbingan" element={<ProtectedRoute><GuidancePage /></ProtectedRoute>} />
-                    <Route path="/sidang" element={<ProtectedRoute><InternshipDefensePage /></ProtectedRoute>} />
+                    <Route path="/portal/independent/form2/new" element={<ProtectedRoute><Form2NewPage /></ProtectedRoute>} />
+                    <Route path="/guidance" element={<ProtectedRoute><GuidancePage /></ProtectedRoute>} />
+                    <Route path="/defense" element={<ProtectedRoute><InternshipDefensePage /></ProtectedRoute>} />
 
                     {/* Fallback */}
                     <Route path="*" element={<Navigate to="/dashboard" replace />} />

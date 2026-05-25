@@ -16,8 +16,8 @@ export default function QuickNavigation({ navigate }) {
                     ['→ Form 1', '/form1'],
                     ['→ Status Form 1', '/form1/status'],
                     ['→ Portal Magang', '/portal'],
-                    ['→ Bimbingan', '/bimbingan'],
-                    ['→ Sidang', '/sidang'],
+                    ['→ Bimbingan', '/guidance'],
+                    ['→ Sidang', '/defense'],
                 ].map(([label, path]) => (
                     <button
                         key={path}

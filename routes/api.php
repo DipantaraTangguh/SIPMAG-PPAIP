@@ -8,7 +8,7 @@ use App\Http\Controllers\Api\ApplicationController;
 use App\Http\Controllers\Api\Form2Controller;
 use App\Http\Controllers\Api\SupervisorController;
 use App\Http\Controllers\Api\LogbookController;
-use App\Http\Controllers\Api\SidangController;
+use App\Http\Controllers\Api\DefenseController;
 use App\Http\Controllers\Api\StudentController;
 
 /*
@@ -59,9 +59,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/logbooks', [LogbookController::class, 'store']);
         Route::put('/logbooks/{id}', [LogbookController::class, 'update']);
 
-        // Sidang
-        Route::get('/sidang', [SidangController::class, 'show']);
-        Route::post('/sidang', [SidangController::class, 'store']);
+        // Defense
+        Route::get('/defense', [DefenseController::class, 'show']);
+        Route::post('/defense', [DefenseController::class, 'store']);
     });
 
     // ── Kaprodi routes (scoped to own prodi) ────────
@@ -76,9 +76,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/assign-dpm', [SupervisorController::class, 'assignDpm']);
 
         // Sidang management (schedule + cycle completion)
-        Route::get('/sidang', [SidangController::class, 'indexForKaprodi']);
-        Route::post('/sidang/{studentId}/schedule', [SidangController::class, 'setSchedule']);
-        Route::post('/sidang/{studentId}/complete', [SidangController::class, 'completeCycle']);
+        Route::get('/defense', [DefenseController::class, 'indexForKaprodi']);
+        Route::post('/defense/{studentId}/schedule', [DefenseController::class, 'setSchedule']);
+        Route::post('/defense/{studentId}/complete', [DefenseController::class, 'completeCycle']);
 
         // Students list (scoped to prodi, for Kaprodi dashboard)
         Route::get('/students', [StudentController::class, 'indexForKaprodi']);

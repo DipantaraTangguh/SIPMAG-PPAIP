@@ -65,13 +65,13 @@ export default function DashboardPage() {
                 break;
             case 'HasApplication':
             case 'HasDPM':
-                navigate('/bimbingan');
+                navigate('/guidance');
                 break;
             case 'LogbookComplete':
-                navigate('/sidang');
+                navigate('/defense');
                 break;
             case 'SiklusSelesai':
-                navigate('/sidang');
+                navigate('/defense');
                 break;
             default:
                 break;

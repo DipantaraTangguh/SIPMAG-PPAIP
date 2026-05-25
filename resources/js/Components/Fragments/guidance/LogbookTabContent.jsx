@@ -82,7 +82,7 @@ export default function LogbookTabContent() {
 
                     {isComplete ? (
                         <button
-                            onClick={() => navigate('/sidang')}
+                            onClick={() => navigate('/defense')}
                             className="ml-4 flex items-center justify-center gap-2 rounded-lg bg-green-500 px-5 py-2.5 text-[14px] font-bold text-white transition-colors hover:bg-green-600"
                         >
                             <GraduationCap className="h-[18px] w-[18px]" />

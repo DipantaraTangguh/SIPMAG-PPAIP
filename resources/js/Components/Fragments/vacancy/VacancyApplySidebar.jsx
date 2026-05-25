@@ -187,7 +187,7 @@ export default function VacancyApplySidebar({
                                 </p>
                                 <button
                                     type="button"
-                                    onClick={() => navigate('/bimbingan')}
+                                    onClick={() => navigate('/guidance')}
                                     className="w-full rounded-xl bg-primary py-3.5 text-[15px] font-bold text-white transition-colors hover:bg-primary-hover"
                                 >
                                     Ajukan Pembimbing

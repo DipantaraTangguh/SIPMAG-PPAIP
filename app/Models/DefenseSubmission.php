@@ -4,8 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class SidangSubmission extends Model
+class DefenseSubmission extends Model
 {
+    protected $table = 'sidang_submissions';
+
     protected $fillable = [
         'student_id',
         'laporan_path',

@@ -30,7 +30,7 @@ export default function IndependentTabContent() {
     const showWarning = !isUnlocked || location.state?.blockedReason === 'form1_required';
 
     const handleCreateNew = () => {
-        navigate('/portal/mandiri/form2/new');
+        navigate('/portal/independent/form2/new');
     };
 
     return (

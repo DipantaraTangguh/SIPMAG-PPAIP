@@ -98,7 +98,7 @@ export default function IndependentSidePanel() {
                     secara terpisah melalui menu{' '}
                     <span
                         className="cursor-pointer font-bold text-primary underline hover:text-primary-hover"
-                        onClick={() => navigate('/bimbingan')}
+                        onClick={() => navigate('/guidance')}
                     >
                         Bimbingan &amp; Logbook
                     </span>{' '}

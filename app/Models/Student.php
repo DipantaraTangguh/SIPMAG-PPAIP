@@ -68,7 +68,7 @@ class Student extends Model
 
     public function sidangSubmission()
     {
-        return $this->hasOne(SidangSubmission::class);
+        return $this->hasOne(DefenseSubmission::class);
     }
 
     public function supervisorApplication()

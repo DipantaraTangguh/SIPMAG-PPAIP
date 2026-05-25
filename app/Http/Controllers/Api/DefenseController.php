@@ -3,14 +3,14 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\SidangSubmission;
+use App\Models\DefenseSubmission;
 use App\Models\Student;
 use Illuminate\Http\Request;
 
-class SidangController extends Controller
+class DefenseController extends Controller
 {
     /**
-     * GET /api/sidang
+     * GET /api/defense
      * Get current student's sidang submission.
      */
     public function show(Request $request)
@@ -24,7 +24,7 @@ class SidangController extends Controller
     }
 
     /**
-     * POST /api/sidang
+     * POST /api/defense
      * Submit sidang documents (3 PDFs). Requires LogbookComplete.
      */
     public function store(Request $request)
@@ -49,7 +49,7 @@ class SidangController extends Controller
         $posterPath  = $request->file('poster')->store('sidang', 'local');
         $krsPath     = $request->file('krs')->store('sidang', 'local');
 
-        SidangSubmission::create([
+        DefenseSubmission::create([
             'student_id'   => $student->id,
             'laporan_path' => $laporanPath,
             'poster_path'  => $posterPath,
@@ -65,7 +65,7 @@ class SidangController extends Controller
     }
 
     /**
-     * GET /api/kaprodi/sidang
+     * GET /api/kaprodi/defense
      * List students waiting for sidang — scoped to Kaprodi's prodi.
      */
     public function indexForKaprodi(Request $request)
@@ -85,7 +85,7 @@ class SidangController extends Controller
     }
 
     /**
-     * POST /api/kaprodi/sidang/{studentId}/schedule
+     * POST /api/kaprodi/defense/{studentId}/schedule
      * Set sidang schedule — Kaprodi only, scoped to own prodi.
      */
     public function setSchedule(Request $request, $studentId)
@@ -113,7 +113,7 @@ class SidangController extends Controller
     }
 
     /**
-     * POST /api/kaprodi/sidang/{studentId}/complete
+     * POST /api/kaprodi/defense/{studentId}/complete
      * Complete the internship cycle — Kaprodi only, scoped to own prodi.
      */
     public function completeCycle(Request $request, $studentId)

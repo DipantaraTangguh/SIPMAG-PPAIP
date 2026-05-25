@@ -46,7 +46,7 @@ export default function DefenseLockedState({ accessStatus }) {
             description: 'Anda harus menyelesaikan dan mendapatkan persetujuan untuk 6 entri logbook sebelum dapat mendaftar Sidang Magang.',
             buttons: (
                 <button
-                    onClick={() => navigate('/bimbingan')}
+                    onClick={() => navigate('/guidance')}
                     className="mt-6 rounded-lg bg-primary px-6 py-3 font-bold text-white hover:bg-primary-hover transition-colors"
                 >
                     Lanjutkan Mengisi Logbook →

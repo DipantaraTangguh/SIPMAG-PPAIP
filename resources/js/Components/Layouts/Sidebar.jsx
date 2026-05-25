@@ -23,8 +23,8 @@ import {
 const navItems = [
     { to: '/dashboard', label: 'Beranda', icon: Home },
     { to: '/portal', label: 'Portal Magang', icon: Briefcase },
-    { to: '/bimbingan', label: 'Bimbingan & Logbook', icon: ClipboardList },
-    { to: '/sidang', label: 'Sidang Magang', icon: GraduationCap },
+    { to: '/guidance', label: 'Bimbingan & Logbook', icon: ClipboardList },
+    { to: '/defense', label: 'Sidang Magang', icon: GraduationCap },
     { to: '/form1', label: 'Profil', icon: User },
 ];
 
