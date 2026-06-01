@@ -174,6 +174,18 @@ class KaprodiStudentResource extends Resource
                     ->color('success')
                     ->visible(fn (Student $record) => $record->access_status === 'PendingReview')
                     ->requiresConfirmation()
+                    ->before(function (Tables\Actions\Action $action) {
+                        $lecturer = auth()->user()?->lecturer;
+                        if (!$lecturer || !$lecturer->signature_path) {
+                            \Filament\Notifications\Notification::make()
+                                ->title('Tanda tangan digital belum diunggah')
+                                ->body('Anda harus mengunggah tanda tangan digital terlebih dahulu melalui menu "Profil Saya" sebelum dapat menyetujui Form 1.')
+                                ->danger()
+                                ->persistent()
+                                ->send();
+                            $action->cancel();
+                        }
+                    })
                     ->action(function (Student $record) {
                         $lecturerId = auth()->user()?->lecturer?->id;
                         $record->update([

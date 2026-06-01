@@ -117,6 +117,14 @@ class Form1Controller extends Controller
     public function approve(Request $request, $studentId)
     {
         $lecturer = $request->user()->lecturer;
+
+        // Guard: Kaprodi must have uploaded their digital signature
+        if (!$lecturer->signature_path) {
+            return response()->json([
+                'message' => 'Anda harus mengunggah tanda tangan digital terlebih dahulu melalui menu "Profil Saya" sebelum dapat menyetujui Form 1.',
+            ], 422);
+        }
+
         $student = Student::where('id', $studentId)
             ->where('study_program', $lecturer->study_program)
             ->where('access_status', 'PendingReview')
