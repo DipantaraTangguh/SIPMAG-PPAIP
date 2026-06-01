@@ -44,7 +44,7 @@ export default function Form1StatusPage() {
         nim: f.nim ?? student?.nim ?? '',
         programStudi: f.programStudi ?? student?.programStudi ?? '',
         semester: f.semester,
-        tahunAkademik: f.tahunAkademik,
+        tahunAkademik: f.tahunAkademik ?? student?.tahunAkademik ?? '',
         jumlahSks: f.jumlahSks ?? f.jumlahSKS,
         ipk: f.ipk,
         rencanaSkema: f.rencanaSkema ?? f.skemaMagang,

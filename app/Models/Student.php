@@ -36,6 +36,24 @@ class Student extends Model
         ];
     }
 
+    /**
+     * Get the dynamic academic year.
+     * Before August: (current year - 1) / current year
+     * After August: current year / (current year + 1)
+     */
+    public function getTahunAkademikAttribute(): string
+    {
+        $now = now();
+        $year = $now->year;
+        $month = $now->month;
+
+        if ($month < 8) {
+            return ($year - 1) . '/' . $year;
+        }
+
+        return $year . '/' . ($year + 1);
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class);

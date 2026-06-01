@@ -40,6 +40,7 @@ class Form1Controller extends Controller
             'pdf_path'         => $student->form1_pdf_path,
             'rejection_reason' => $student->form1_rejection_reason,
             'approver'         => $approver,
+            'submitted_at'     => $student->updated_at?->toIso8601String(),
         ]);
     }
 

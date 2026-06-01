@@ -145,6 +145,9 @@ export function SimulationProvider({ children }) {
                         rejectionReason: form1Res.value.rejection_reason,
                         pdfPath: form1Res.value.pdf_path,
                         approver: form1Res.value.approver || null,
+                        submittedAt: form1Res.value.submitted_at
+                            ? new Date(form1Res.value.submitted_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })
+                            : null,
                     }
                     : null,
                 activeApplications: appsRes.status === 'fulfilled'
@@ -238,7 +241,11 @@ export function SimulationProvider({ children }) {
                     ...form1Res.form1,
                     status: form1Res.access_status,
                     rejectionReason: form1Res.rejection_reason,
+                    pdfPath: form1Res.pdf_path,
                     approver: form1Res.approver || null,
+                    submittedAt: form1Res.submitted_at
+                        ? new Date(form1Res.submitted_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })
+                        : null,
                 },
                 student: { ...s.student, accessStatus: 'PendingReview' },
                 notifications: [
