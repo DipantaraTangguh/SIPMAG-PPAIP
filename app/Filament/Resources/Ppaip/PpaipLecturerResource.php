@@ -43,15 +43,6 @@ class PpaipLecturerResource extends Resource
                     ->searchable()
                     ->preload()
                     ->nullable(),
-                Forms\Components\FileUpload::make('signature_path')
-                    ->label('Tanda Tangan Digital')
-                    ->helperText('Unggah gambar tanda tangan (PNG dengan latar transparan disarankan). Hanya untuk Kaprodi — digunakan pada Surat Keterangan Form Magang 01.')
-                    ->image()
-                    ->directory('signatures')
-                    ->disk('public')
-                    ->acceptedFileTypes(['image/png', 'image/jpeg'])
-                    ->maxSize(2048)
-                    ->columnSpanFull(),
             ])->columns(2),
         ]);
     }
