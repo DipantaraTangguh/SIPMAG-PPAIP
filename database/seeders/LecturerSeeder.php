@@ -9,7 +9,7 @@ class LecturerSeeder extends Seeder
 {
     public function run(): void
     {
-        // user_id 2 = Prof. Siti Wati (Kaprodi SI)
+        // user_id 2 = Prof. Dr. Hoga Saragih, ST, MT (Kaprodi SI)
         // user_id 3 = Dr. Budi Santoso (Kaprodi IF)
         // user_id 4 = Dita Nurmadewi (DPM)
         // user_id 5 = Dr. Ahmad Fauzi (DPM)
@@ -19,8 +19,8 @@ class LecturerSeeder extends Seeder
             [
                 'user_id'       => 2,
                 'nidn'          => '0422117502',
-                'lecturer_name' => 'Prof. Siti Wati',
-                'contact'       => 'siti.wati@bakrie.ac.id',
+                'lecturer_name' => 'Prof. Dr. Hoga Saragih, ST, MT',
+                'contact'       => 'hoga.saragih@bakrie.ac.id',
                 'study_program' => 'Sistem Informasi',
                 'created_at'    => now(),
                 'updated_at'    => now(),

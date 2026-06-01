@@ -24,8 +24,8 @@ class UserSeeder extends Seeder
             ],
             // Kaprodi — Sistem Informasi
             [
-                'name'     => 'Prof. Siti Wati',
-                'email'    => 'siti.wati@bakrie.ac.id',
+                'name'     => 'Prof. Dr. Hoga Saragih, ST, MT',
+                'email'    => 'hoga.saragih@bakrie.ac.id',
                 'password' => $password,
                 'role'     => 'kaprodi',
                 'created_at' => now(),
