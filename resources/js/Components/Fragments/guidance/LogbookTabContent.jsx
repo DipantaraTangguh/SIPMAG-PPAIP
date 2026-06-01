@@ -9,6 +9,32 @@ import { useNavigate } from 'react-router-dom';
 import { BookOpen, Info, Plus, GraduationCap, X } from 'lucide-react';
 import { useSimulation } from '../../../context/SimulationContext';
 
+const formatLogbookDate = (dateStr) => {
+    if (!dateStr) return '';
+    try {
+        const date = new Date(dateStr);
+        if (isNaN(date.getTime())) return dateStr;
+        return date.toLocaleDateString('id-ID', {
+            day: 'numeric',
+            month: 'short',
+            year: 'numeric'
+        });
+    } catch {
+        return dateStr;
+    }
+};
+
+const getLogbookDayName = (dateStr) => {
+    if (!dateStr) return '';
+    try {
+        const date = new Date(dateStr);
+        if (isNaN(date.getTime())) return '';
+        return date.toLocaleDateString('id-ID', { weekday: 'long' });
+    } catch {
+        return '';
+    }
+};
+
 export default function LogbookTabContent() {
     const navigate = useNavigate();
     const {
@@ -135,8 +161,8 @@ export default function LogbookTabContent() {
                             {logbookEntries.map((entry, idx) => (
                                 <tr key={entry.id} className={`group bg-white hover:bg-gray-50/50 ${idx !== logbookEntries.length - 1 ? 'border-b border-gray-100' : ''}`}>
                                     <td className="px-5 py-4 align-top">
-                                        <p className="text-[14px] font-bold text-[#1A1A1A]">{entry.tanggal}</p>
-                                        <p className="mt-0.5 text-[12px] text-gray-400">{entry.hari}</p>
+                                        <p className="text-[14px] font-bold text-[#1A1A1A]">{formatLogbookDate(entry.tanggal)}</p>
+                                        <p className="mt-0.5 text-[12px] text-gray-400">{getLogbookDayName(entry.tanggal)}</p>
                                     </td>
                                     <td className="relative px-5 py-4 align-top">
                                         <p className="max-w-full truncate text-[14px] font-bold text-[#1A1A1A]">{entry.kegiatanHarian}</p>
@@ -201,7 +227,7 @@ export default function LogbookTabContent() {
                                     <label className="mb-2 block text-[13px] font-bold text-[#1A1A1A]">Tanggal</label>
                                     <input
                                         type="date"
-                                        value={activeData.tanggal}
+                                        value={activeData.tanggal ? activeData.tanggal.slice(0, 10) : ''}
                                         onChange={(e) => updateActiveData({ tanggal: e.target.value })}
                                         className="h-11 w-full rounded-lg border border-gray-200 px-3 outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-primary/10"
                                     />

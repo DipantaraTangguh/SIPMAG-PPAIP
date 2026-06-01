@@ -64,20 +64,6 @@ export default function ActiveApplicationsSidebar({
                                         {app.status}
                                     </span>
                                 </div>
-
-                                {/* Bottom: date + track link */}
-                                <div className="mt-2 flex items-center justify-between">
-                                    <span className="text-[11px] text-gray-400">
-                                        Melamar pada {app.appliedAt}
-                                    </span>
-                                    <button
-                                        type="button"
-                                        onClick={() => onTrackStatus?.(app.id)}
-                                        className="text-[11px] font-bold text-primary hover:underline"
-                                    >
-                                        Lacak Status
-                                    </button>
-                                </div>
                             </div>
                         ))}
                     </div>
