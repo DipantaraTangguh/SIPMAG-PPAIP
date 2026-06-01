@@ -228,13 +228,46 @@ class KaprodiStudentResource extends Resource
 
                         // Show supervisor nomination context
                         if ($supApp) {
+                            $mulai = '-';
+                            if ($supApp->mulai_magang) {
+                                try {
+                                    $mulai = \Illuminate\Support\Carbon::parse($supApp->mulai_magang)->format('d/m/Y');
+                                } catch (\Throwable $e) {
+                                    $mulai = (string) $supApp->mulai_magang;
+                                }
+                            }
+
+                            $selesai = '-';
+                            if ($supApp->selesai_magang) {
+                                try {
+                                    $selesai = \Illuminate\Support\Carbon::parse($supApp->selesai_magang)->format('d/m/Y');
+                                } catch (\Throwable $e) {
+                                    $selesai = (string) $supApp->selesai_magang;
+                                }
+                            }
+
+                            $diajukan = '-';
+                            if ($supApp->submitted_at) {
+                                try {
+                                    $diajukan = \Illuminate\Support\Carbon::parse($supApp->submitted_at)->format('d/m/Y H:i');
+                                } catch (\Throwable $e) {
+                                    $diajukan = (string) $supApp->submitted_at;
+                                }
+                            }
+
+                            $periode = "{$mulai} s/d {$selesai}";
+
                             $fields[] = Forms\Components\Placeholder::make('nomination_info')
-                                ->label('Pengajuan Pembimbing')
-                                ->content(
-                                    "Perusahaan: {$supApp->company_name}\n" .
-                                    "Kontak: {$supApp->company_contact}\n" .
-                                    "Diajukan: " . ($supApp->submitted_at?->format('d/m/Y H:i') ?? '-')
-                                );
+                                ->label(new HtmlString('<strong>Pengajuan Pembimbing</strong>'))
+                                ->content(new HtmlString(
+                                    "<strong>Perusahaan:</strong> {$supApp->company_name}<br />" .
+                                    "<strong>Nama Praktisi:</strong> " . ($supApp->nama_praktisi ?? $supApp->company_contact) . "<br />" .
+                                    "<strong>Jabatan:</strong> " . ($supApp->jabatan_praktisi ?? '-') . "<br />" .
+                                    "<strong>No. Telepon:</strong> " . ($supApp->no_telepon ?? '-') . "<br />" .
+                                    "<strong>Email:</strong> " . ($supApp->email ?? '-') . "<br />" .
+                                    "<strong>Periode:</strong> {$periode}<br />" .
+                                    "<strong>Diajukan:</strong> {$diajukan}"
+                                ));
                         }
 
                         $fields[] = Forms\Components\Select::make('dpm_id')

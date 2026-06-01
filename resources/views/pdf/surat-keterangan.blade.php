@@ -108,8 +108,8 @@
 
     <div class="tight">
         <p>Kepada Yth.</p>
-        <p>Bapak/Ibu <strong>{{ $kaprodiName }}</strong></p>
-        <p>Ketua Program Studi <strong>{{ $student->study_program }}</strong></p>
+        <p>Bapak/Ibu {{ $kaprodiName }}</p>
+        <p>Ketua Program Studi {{ $student->study_program }}</p>
         <p>Universitas Bakrie</p>
     </div>
 

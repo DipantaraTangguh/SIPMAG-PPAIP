@@ -5,6 +5,7 @@
  */
 import React from 'react';
 import { BookOpen, Check, Info, Eye, Calendar } from 'lucide-react';
+import { api } from '../../../lib/api';
 
 export default function RequestSubmittedView({ data, studentName, studentNim }) {
     return (
@@ -112,25 +113,24 @@ export default function RequestSubmittedView({ data, studentName, studentNim }) 
                     <div className="my-5 border-b border-gray-100"></div>
 
                     {/* ROW 6: LoA File */}
-                    <div className="flex items-center gap-3 rounded-xl border border-gray-200 bg-gray-50 px-4 py-3.5">
+                    <div
+                        onClick={() => api.download('/supervisor-application/loa', 'Letter-Of-Acceptance.pdf')}
+                        className="flex items-center gap-3 rounded-xl border border-gray-200 bg-gray-50 px-4 py-3.5 cursor-pointer hover:bg-gray-100 hover:border-gray-300 transition-all duration-200"
+                    >
                         <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-red-100">
                             <span className="text-[11px] font-bold text-red-600">PDF</span>
                         </div>
                         <div className="flex-1">
                             <p className="text-[14px] font-bold text-[#1A1A1A]">
-                                {data.loaFileName}
+                                Letter-Of-Acceptance.pdf
                             </p>
                             <p className="mt-0.5 text-[12px] text-gray-400">
-                                Letter of Acceptance • {data.loaFileSize}
+                                Letter of Acceptance{data.loaFileSize ? ` • ${data.loaFileSize}` : ''}
                             </p>
                         </div>
-                        <button
-                            type="button"
-                            onClick={() => console.log("view LoA")}
-                            className="flex h-8 w-8 items-center justify-center rounded-full text-gray-400 hover:bg-white hover:text-primary"
-                        >
+                        <div className="flex h-8 w-8 items-center justify-center rounded-full text-gray-400 hover:text-primary transition-colors">
                             <Eye className="h-5 w-5" />
-                        </button>
+                        </div>
                     </div>
                 </div>
 

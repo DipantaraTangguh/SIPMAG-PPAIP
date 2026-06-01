@@ -127,12 +127,13 @@ export function SimulationProvider({ children }) {
     /** Fetch all module data for mahasiswa after login */
     const fetchAllStudentData = useCallback(async () => {
         try {
-            const [form1Res, appsRes, form2Res, logbookRes, sidangRes] = await Promise.allSettled([
+            const [form1Res, appsRes, form2Res, logbookRes, sidangRes, supervisorRes] = await Promise.allSettled([
                 api.get('/form1'),
                 api.get('/applications'),
                 api.get('/form2'),
                 api.get('/logbooks'),
                 api.get('/defense'),
+                api.get('/supervisor-application'),
             ]);
 
             setState((s) => ({
@@ -171,6 +172,23 @@ export function SimulationProvider({ children }) {
                     : [],
                 sidangSubmission: sidangRes.status === 'fulfilled'
                     ? sidangRes.value.submission
+                    : null,
+                pengajuanPembimbing: supervisorRes.status === 'fulfilled' && supervisorRes.value.application
+                    ? {
+                        namaPerusahaan: supervisorRes.value.application.company_name,
+                        namaPraktisi: supervisorRes.value.application.nama_praktisi || (supervisorRes.value.application.company_contact ? supervisorRes.value.application.company_contact.split(' - ')[0] : ''),
+                        jabatanPraktisi: supervisorRes.value.application.jabatan_praktisi || '',
+                        noTelepon: supervisorRes.value.application.no_telepon || (supervisorRes.value.application.company_contact ? supervisorRes.value.application.company_contact.split(' - ')[1] : ''),
+                        email: supervisorRes.value.application.email || '',
+                        mulaiMagang: supervisorRes.value.application.mulai_magang ? new Date(supervisorRes.value.application.mulai_magang).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : '',
+                        selesaiMagang: supervisorRes.value.application.selesai_magang ? new Date(supervisorRes.value.application.selesai_magang).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : '',
+                        submittedAt: supervisorRes.value.application.submitted_at
+                            ? new Date(supervisorRes.value.application.submitted_at).toLocaleDateString('id-ID', {
+                                day: 'numeric', month: 'short', year: 'numeric',
+                            })
+                            : null,
+                        loaPath: supervisorRes.value.application.loa_path,
+                    }
                     : null,
             }));
         } catch { /* ignore partial failures */ }
@@ -308,6 +326,12 @@ export function SimulationProvider({ children }) {
         const fd = new FormData();
         fd.append('company_name', formData.namaPerusahaan);
         fd.append('company_contact', `${formData.namaPraktisi} - ${formData.noTelepon}`);
+        fd.append('nama_praktisi', formData.namaPraktisi);
+        fd.append('jabatan_praktisi', formData.jabatanPraktisi);
+        fd.append('no_telepon', formData.noTelepon);
+        fd.append('email', formData.email);
+        fd.append('mulai_magang', formData.mulaiMagang);
+        fd.append('selesai_magang', formData.selesaiMagang);
         if (formData.loaFile) {
             fd.append('loa_file', formData.loaFile);
         }
@@ -319,6 +343,11 @@ export function SimulationProvider({ children }) {
             pengajuanPembimbing: {
                 namaPerusahaan: formData.namaPerusahaan,
                 namaPraktisi: formData.namaPraktisi,
+                jabatanPraktisi: formData.jabatanPraktisi,
+                noTelepon: formData.noTelepon,
+                email: formData.email,
+                mulaiMagang: formData.mulaiMagang ? new Date(formData.mulaiMagang).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : '',
+                selesaiMagang: formData.selesaiMagang ? new Date(formData.selesaiMagang).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : '',
                 submittedAt: new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }),
             },
             notifications: [
@@ -326,7 +355,10 @@ export function SimulationProvider({ children }) {
                 ...s.notifications,
             ],
         }));
-    }, []);
+
+        await refreshProfile();
+        await fetchAllStudentData();
+    }, [refreshProfile, fetchAllStudentData]);
 
     /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
      * Logbook Actions

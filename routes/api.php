@@ -52,6 +52,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
         // Supervisor / DPM application
         Route::get('/supervisor-application', [SupervisorController::class, 'show']);
+        Route::get('/supervisor-application/loa', [SupervisorController::class, 'downloadLoa']);
         Route::post('/supervisor-application', [SupervisorController::class, 'store']);
 
         // Logbook
@@ -73,6 +74,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
         // Supervisor application review + DPM assignment
         Route::get('/supervisor-applications', [SupervisorController::class, 'indexForKaprodi']);
+        Route::get('/supervisor-applications/{studentId}/loa', [SupervisorController::class, 'downloadLoaForKaprodi']);
         Route::post('/assign-dpm', [SupervisorController::class, 'assignDpm']);
 
         // Sidang management (schedule + cycle completion)
