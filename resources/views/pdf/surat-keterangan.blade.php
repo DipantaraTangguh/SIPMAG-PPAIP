@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>Surat Keterangan Memenuhi Syarat Akademik — {{ $student->nim }}</title>
     <style>
-        @page { margin: 1.8cm 2cm 1.6cm 2cm; }
+        @page { margin: 1.4cm 2cm 1.2cm 2cm; }
 
         body {
             font-family: 'Tahoma', 'DejaVu Sans', sans-serif;
@@ -14,53 +14,55 @@
             margin: 0;
         }
 
+        /* Document code: bottom-right footer, matches the source form */
         .doc-code {
             position: fixed;
-            top: -1.2cm;
+            bottom: -0.8cm;
             right: 0;
-            font-size: 7.5pt;
+            font-size: 8pt;
             color: #555;
         }
 
         .letterhead {
-            border-bottom: 1.2pt solid #000;
-            padding-bottom: 4pt;
             margin-bottom: 8pt;
         }
         .letterhead img {
-            height: 38pt;
+            height: 30pt;
             display: block;
         }
 
         h1.title {
             text-align: center;
-            font-size: 11pt;
+            font-size: 12pt;
             font-weight: bold;
             margin: 0 0 8pt 0;
         }
 
         h2.section-title {
             text-align: center;
-            font-size: 11pt;
+            font-size: 12pt;
             font-weight: bold;
-            margin: 8pt 0 3pt 0;
+            margin: 10pt 0 5pt 0;
         }
 
         p { margin: 0 0 3pt 0; }
         .tight p { margin: 0; }
-        .justify p { text-align: justify; }
+        .justify p { text-align: justify; margin: 0 0 6pt 0; }
 
         table.fields {
             width: 100%;
             border-collapse: collapse;
-            margin: 2pt 0 6pt 0;
+            margin: 3pt 0 6pt 0;
         }
         table.fields td {
             vertical-align: top;
-            padding: 0.3pt 0;
+            padding: 0.5pt 0;
             font-size: 9pt;
         }
-        table.fields td.label { width: 43%; }
+        table.fields td.label {
+            width: 43%;
+            padding-left: 20pt;
+        }
         table.fields td.value { width: 57%; }
         table.fields td.value::before { content: ":  "; }
 
@@ -69,30 +71,32 @@
             margin: 0 0 4pt 0;
         }
 
-        /* Right-aligned signature blocks: docx pushes them to the right half
-           of the page via right indent. Replicate with a left-margin offset. */
-        .sig-block {
-            width: 50%;
-            margin-left: 50%;
-            margin-top: 6pt;
+        /* Student signature: left-aligned, matches the source form */
+        .sig-student {
+            margin-top: 8pt;
         }
-        .sig-block.center { text-align: center; }
-        .sig-block p { margin: 0; }
-        .sig-space { height: 36pt; }
+        .sig-student p { margin: 0; }
+
+        /* Kaprodi signature: left-indented block, matches the source form */
+        .sig-kaprodi {
+            margin-top: 8pt;
+            padding-left: 28pt;
+        }
+        .sig-kaprodi p { margin: 0; }
+
+        .sig-space { height: 46pt; }
         .sig-img {
             display: block;
-            height: 44pt;
-            margin: 1pt auto;
+            height: 40pt;
+            margin: 2pt 0;
         }
         .sig-name {
-            font-weight: bold;
-            text-decoration: underline;
-            margin-top: 1pt;
+            margin-top: 2pt;
         }
     </style>
 </head>
 <body>
-    <div class="doc-code">F-EDU-PRC-01-03.01</div>
+    <div class="doc-code">F-EDU-PRC-01-03.01/r0</div>
 
     @if ($logoSrc)
         <div class="letterhead">
@@ -160,7 +164,7 @@
         saya tidak jujur dalam memberikan pernyataan, saya bersedia ditindak sesuai ketentuan akademik yang berlaku.</p>
     </div>
 
-    <div class="sig-block">
+    <div class="sig-student">
         <p>Jakarta, {{ $submittedDate }}</p>
         <p>Hormat saya,</p>
         <div class="sig-space"></div>
@@ -175,7 +179,7 @@
     <p>Saya yang bertandatangan di bawah ini menyatakan bahwa mahasiswa tersebut di atas memenuhi syarat
     akademik untuk mengikuti kegiatan Magang.</p>
 
-    <div class="sig-block center">
+    <div class="sig-kaprodi">
         <p>Jakarta, {{ $approvalDate }}</p>
         <p>Ketua Program Studi {{ $student->study_program }}</p>
         @if ($signatureSrc)
