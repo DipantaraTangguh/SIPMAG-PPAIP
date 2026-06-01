@@ -36,7 +36,7 @@ function FieldLabel({ children, htmlFor }) {
     return (
         <label
             htmlFor={htmlFor}
-            className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-gray-400"
+            className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-black"
         >
             {children}
         </label>
@@ -68,7 +68,7 @@ function ReadOnlyInput({ id, value }) {
 /** Helper / hint text below a field */
 function HelperText({ children }) {
     return (
-        <p className="mt-1 text-xs italic text-gray-400">{children}</p>
+        <p className="mt-1 text-xs italic text-black">{children}</p>
     );
 }
 
@@ -309,7 +309,7 @@ export default function Form1Card({
                         {['Produk', 'Prototype', 'Laporan'].map((opt) => (
                             <label
                                 key={opt}
-                                className="flex cursor-pointer items-center gap-2 text-sm text-gray-700"
+                                className="flex cursor-pointer items-center gap-2 text-sm text-black"
                             >
                                 <span
                                     className={`flex h-5 w-5 items-center justify-center rounded-full border-2 transition-colors ${
