@@ -2,12 +2,9 @@
  * context/SimulationContext.jsx
  * Single source of truth for the Portal Magang application state.
  *
- * STRATEGY: This context maintains the exact same API surface that all
- * 22+ consumer components use (useSimulation()), but replaces the
- * localStorage mock with real Laravel API calls via lib/api.js.
- *
- * Consumer components DO NOT need to change — they still destructure
- * { student, login, logout, submitForm1, ... } from useSimulation().
+ * All data is fetched from the real Laravel API via lib/api.js.
+ * Consumer components destructure { student, login, logout, submitForm1, ... }
+ * from useSimulation().
  */
 import React, { createContext, useContext, useState, useMemo, useCallback, useEffect } from 'react';
 import { api, getToken, clearToken } from '../lib/api';
@@ -236,14 +233,6 @@ export function SimulationProvider({ children }) {
         }
     }, [refreshProfile]);
 
-    const simulateApproveForm1 = useCallback(async () => {
-        // Not used in production — Kaprodi approves via admin panel
-    }, []);
-
-    const simulateRejectForm1 = useCallback(async () => {
-        // Not used in production — Kaprodi rejects via admin panel
-    }, []);
-
     const resetForm1 = useCallback(async () => {
         await refreshProfile();
         const form1Res = await api.get('/form1');
@@ -311,9 +300,6 @@ export function SimulationProvider({ children }) {
         }));
     }, []);
 
-    const simulateApproveForm2 = useCallback(async () => {}, []);
-    const simulateRejectForm2 = useCallback(async () => {}, []);
-
     /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
      * Pembimbing Actions
      * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
@@ -341,11 +327,6 @@ export function SimulationProvider({ children }) {
             ],
         }));
     }, []);
-
-    const assignDPM = useCallback(async () => {
-        // Not used in production — Kaprodi assigns via admin panel
-        await refreshProfile();
-    }, [refreshProfile]);
 
     /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
      * Logbook Actions
@@ -399,31 +380,8 @@ export function SimulationProvider({ children }) {
         }));
     }, []);
 
-    const approveLogbookEntry = useCallback(async () => {
-        // Not used in production — DPM approves via admin panel
-        await refreshProfile();
-        const logbookRes = await api.get('/logbooks');
-        setState((s) => ({
-            ...s,
-            logbookEntries: (logbookRes.logbooks || []).map(l => ({
-                id: l.id, tanggal: l.tanggal,
-                kegiatanHarian: l.kegiatan_harian,
-                hasil: l.hasil, status: l.status, dpmNote: l.dpm_note,
-            })),
-        }));
-    }, [refreshProfile]);
-
-    const rejectLogbookEntry = useCallback(async () => {
-        // Not used in production — DPM rejects via admin panel
-    }, []);
-
-    const completeSixLogbooks = useCallback(async () => {
-        // Not used — auto-triggered by backend when 6th logbook is approved
-        await refreshProfile();
-    }, [refreshProfile]);
-
     /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-     * Sidang Actions
+     * Defense (Sidang) Actions
      * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
     const submitSidang = useCallback(async (files) => {
@@ -447,21 +405,8 @@ export function SimulationProvider({ children }) {
         }));
     }, [refreshProfile]);
 
-    const assignSidangSchedule = useCallback(async () => {
-        // Not used in production
-    }, []);
-
-    const completeSidangCycle = useCallback(async () => {
-        // Not used in production — PPAIP completes via admin panel
-    }, []);
-
-    const resetFullCycle = useCallback(async () => {
-        // Not used in production — PPAIP resets via admin panel
-        await refreshProfile();
-    }, [refreshProfile]);
-
     /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-     * Context Value (same shape as before)
+     * Context Value
      * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
     const value = useMemo(() => ({
@@ -469,34 +414,21 @@ export function SimulationProvider({ children }) {
         login,
         logout,
         submitForm1,
-        simulateApproveForm1,
-        simulateRejectForm1,
         resetForm1,
         applyToVacancy,
         submitForm2,
-        simulateApproveForm2,
-        simulateRejectForm2,
         submitPengajuanPembimbing,
-        assignDPM,
         addLogbookEntry,
         updateLogbookEntry,
-        approveLogbookEntry,
-        rejectLogbookEntry,
-        completeSixLogbooks,
         submitSidang,
-        assignSidangSchedule,
-        completeSidangCycle,
-        resetFullCycle,
         // Utility: force refresh from API
         refreshProfile,
         fetchAllStudentData,
     }), [
-        state, login, logout, submitForm1, simulateApproveForm1,
-        simulateRejectForm1, resetForm1, applyToVacancy, submitForm2,
-        simulateApproveForm2, simulateRejectForm2, submitPengajuanPembimbing,
-        assignDPM, addLogbookEntry, updateLogbookEntry, approveLogbookEntry,
-        rejectLogbookEntry, completeSixLogbooks, submitSidang, assignSidangSchedule,
-        completeSidangCycle, resetFullCycle, refreshProfile, fetchAllStudentData,
+        state, login, logout, submitForm1, resetForm1,
+        applyToVacancy, submitForm2, submitPengajuanPembimbing,
+        addLogbookEntry, updateLogbookEntry, submitSidang,
+        refreshProfile, fetchAllStudentData,
     ]);
 
     return (

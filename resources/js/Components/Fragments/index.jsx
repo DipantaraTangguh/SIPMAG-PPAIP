@@ -54,12 +54,3 @@ export { default as VacancyDetailHeader } from './vacancy/VacancyDetailHeader';
 export { default as VacancyInfoSection } from './vacancy/VacancyInfoSection';
 export { default as VacancyJobDescSection } from './vacancy/VacancyJobDescSection';
 export { default as VacancyQualificationSection } from './vacancy/VacancyQualificationSection';
-
-// Simulation panel fragments
-export { default as AuthControls } from './simulation/AuthControls';
-export { default as DefenseControls } from './simulation/DefenseControls';
-export { default as Form1Controls } from './simulation/Form1Controls';
-export { default as Form2Controls } from './simulation/Form2Controls';
-export { default as LogbookControls } from './simulation/LogbookControls';
-export { default as QuickNavigation } from './simulation/QuickNavigation';
-export { default as SupervisorControls } from './simulation/SupervisorControls';

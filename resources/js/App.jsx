@@ -2,7 +2,6 @@
  * App.jsx — Root component for Portal Magang.
  * Uses SimulationProvider as the single source of truth.
  * Routes: /login (guest), /dashboard, /form1, /form1/status (protected).
- * SimulationPanel is always visible for demo control.
  */
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
@@ -10,7 +9,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { SimulationProvider } from './context/SimulationContext';
 import ProtectedRoute from './Components/Layouts/ProtectedRoute';
 import GuestRoute from './Components/Layouts/GuestRoute';
-import SimulationPanel from './Components/Layouts/SimulationPanel';
+
 
 import LoginPage from './Pages/Auth/LoginPage';
 import DashboardPage from './Pages/Dashboard/DashboardPage';
@@ -43,9 +42,6 @@ export default function App() {
                     {/* Fallback */}
                     <Route path="*" element={<Navigate to="/dashboard" replace />} />
                 </Routes>
-
-                {/* Simulation panel — always visible */}
-                <SimulationPanel />
             </BrowserRouter>
         </SimulationProvider>
     );
