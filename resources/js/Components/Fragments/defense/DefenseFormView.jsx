@@ -1,9 +1,3 @@
-/**
- * components/defense/DefenseFormView.jsx
- * State 1: Upload form for 5 documents + disclaimers.
- * Includes UploadField as a private sub-component.
- * Extracted from InternshipDefensePage.jsx lines 143–674.
- */
 import React, { useState, useRef } from 'react';
 import {
     CheckCircle,
@@ -19,7 +13,7 @@ import {
 } from 'lucide-react';
 import { useSimulation } from '../../../context/SimulationContext';
 
-// --- Upload Field Component (private) ---
+// Komponen upload kecil, sengaja lokal ke form sidang.
 function UploadField({ label, hint, icon: Icon, fieldKey, files, setFiles, fileErrors, setFileErrors, dragOver, setDragOver, inputRefs, maxSizeMB }) {
     const file = files[fieldKey];
     
@@ -120,7 +114,7 @@ function UploadField({ label, hint, icon: Icon, fieldKey, files, setFiles, fileE
                 onChange={(e) => {
                     const selected = e.target.files[0];
                     handleFile(selected);
-                    // Reset input value so same file can be selected again
+                    // Reset value supaya file yang sama bisa dipilih ulang.
                     e.target.value = '';
                 }}
             />
@@ -128,7 +122,7 @@ function UploadField({ label, hint, icon: Icon, fieldKey, files, setFiles, fileE
     );
 }
 
-// --- Main Form View ---
+// View utama buat upload berkas sidang.
 export default function DefenseFormView() {
     const { submitSidang } = useSimulation();
 

@@ -19,8 +19,6 @@ class Lecturer extends Model
     {
         return $this->belongsTo(User::class);
     }
-
-    /** Students supervised by this DPM */
     public function supervisedStudents()
     {
         return $this->hasMany(Student::class, 'dpm_id');

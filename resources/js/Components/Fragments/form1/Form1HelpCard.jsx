@@ -1,7 +1,3 @@
-/**
- * Form1HelpCard.jsx
- * "Butuh Bantuan?" info card — always shown below the back button.
- */
 import React from 'react';
 import { HelpCircle } from 'lucide-react';
 

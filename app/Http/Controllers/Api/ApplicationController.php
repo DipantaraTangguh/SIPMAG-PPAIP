@@ -9,10 +9,6 @@ use Illuminate\Http\Request;
 
 class ApplicationController extends Controller
 {
-    /**
-     * GET /api/applications
-     * List current student's applications with internship data.
-     */
     public function index(Request $request)
     {
         $student = $request->user()->student;
@@ -24,11 +20,6 @@ class ApplicationController extends Controller
 
         return response()->json(['applications' => $applications]);
     }
-
-    /**
-     * POST /api/applications
-     * Apply to an internship (upload CV). Max 5 simultaneous Applied.
-     */
     public function store(Request $request)
     {
         $student = $request->user()->student;
@@ -42,7 +33,7 @@ class ApplicationController extends Controller
             'cv_file'       => 'required|file|mimes:pdf|max:5120',
         ]);
 
-        // Check max 5 concurrent Applied applications
+        // Batasi 5 lamaran aktif biar mahasiswa nggak spam apply.
         $activeCount = Application::where('student_id', $student->id)
             ->where('status', 'Applied')
             ->count();
@@ -51,7 +42,7 @@ class ApplicationController extends Controller
             return response()->json(['message' => 'Maksimal 5 lamaran aktif.'], 422);
         }
 
-        // Check duplicate application to same internship
+        // Lowongan yang sama nggak boleh dilamar dua kali.
         $exists = Application::where('student_id', $student->id)
             ->where('internship_id', $request->internship_id)
             ->whereIn('status', ['Applied', 'Accepted'])
@@ -70,7 +61,7 @@ class ApplicationController extends Controller
             'status'        => 'Applied',
         ]);
 
-        // Update access status if first application
+        // Lamaran pertama langsung geser status ke tahap DPM.
         if ($student->access_status === 'ApprovedForm1') {
             $student->update(['access_status' => 'HasApplication']);
         }

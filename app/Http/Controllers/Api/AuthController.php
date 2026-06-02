@@ -10,11 +10,6 @@ use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
-    /**
-     * POST /api/login
-     * Mahasiswa login with NIM (used as email lookup) or email + password.
-     * Returns Sanctum token + user data + role-specific profile.
-     */
     public function login(Request $request)
     {
         $request->validate([
@@ -22,11 +17,11 @@ class AuthController extends Controller
             'password' => 'required|string',
         ]);
 
-        // Try to find user by email first, then by NIM via student profile
+        // Login boleh pakai email atau NIM, jadi cek dua jalur.
         $user = User::where('email', $request->login)->first();
 
         if (!$user) {
-            // Try NIM lookup
+            // Kalau bukan email, cocokkan ke profil mahasiswa.
             $student = \App\Models\Student::where('nim', $request->login)->first();
             if ($student) {
                 $user = $student->user;
@@ -39,10 +34,10 @@ class AuthController extends Controller
             ]);
         }
 
-        // Revoke previous tokens (single-session)
+        // Satu user satu sesi aktif biar token lama nggak gentayangan.
         $user->tokens()->delete();
 
-        // Create new token with role-based ability
+        // Ability token disesuaikan role buat gate API.
         $token = $user->createToken('auth-token', [$user->role])->plainTextToken;
 
         return response()->json([
@@ -50,32 +45,18 @@ class AuthController extends Controller
             'user'  => $this->buildUserPayload($user),
         ]);
     }
-
-    /**
-     * POST /api/logout
-     * Revoke current token.
-     */
     public function logout(Request $request)
     {
         $request->user()->currentAccessToken()->delete();
 
         return response()->json(['message' => 'Berhasil logout.']);
     }
-
-    /**
-     * GET /api/me
-     * Return authenticated user data + role-specific profile.
-     */
     public function me(Request $request)
     {
         return response()->json([
             'user' => $this->buildUserPayload($request->user()),
         ]);
     }
-
-    /**
-     * Build the user response payload with role-specific data.
-     */
     private function buildUserPayload(User $user): array
     {
         $payload = [

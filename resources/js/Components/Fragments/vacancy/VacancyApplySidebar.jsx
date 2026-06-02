@@ -1,21 +1,3 @@
-/**
- * VacancyApplySidebar.jsx
- * Sticky right sidebar with deadline banner, CV upload, apply button,
- * and similar vacancies section.
- *
- * @prop {object}   vacancy           — Vacancy detail (deadline, company).
- * @prop {Array}    similarVacancies  — List of similar vacancy objects.
- * @prop {string}   accessStatus      — Student access status.
- * @prop {object}   cvFile            — Selected CV file object or null.
- * @prop {string}   cvError           — File validation error or null.
- * @prop {boolean}  isApplying        — True while submitting.
- * @prop {boolean}  isApplied         — True after successful application.
- * @prop {boolean}  canApply          — True if accessStatus = ApprovedForm1.
- * @prop {function} onFileChange      — Callback for CV file selection.
- * @prop {function} onRemoveFile      — Callback to clear selected file.
- * @prop {function} onApply           — Callback to submit application.
- * @prop {function} onNavigate        — Navigation function.
- */
 import React, { useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
@@ -64,9 +46,7 @@ export default function VacancyApplySidebar({
 
     return (
         <div className="self-start xl:sticky xl:top-6">
-            {/* ── Card 1: Apply ──────────────── */}
             <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
-                {/* Deadline banner */}
                 <div className="flex items-center gap-3 rounded-lg border border-primary/20 bg-primary-pale px-3.5 py-2.5">
                     <Clock className="h-4 w-4 flex-shrink-0 text-primary" />
                     <div>
@@ -78,8 +58,6 @@ export default function VacancyApplySidebar({
                         </p>
                     </div>
                 </div>
-
-                {/* CV Upload — hide if already applied to this vacancy */}
                 {!isApplied && (
                 <div className="mt-4">
                     <p className="mb-2 text-[13px] font-bold text-gray-900">
@@ -143,8 +121,6 @@ export default function VacancyApplySidebar({
                     )}
                 </div>
                 )}
-
-                {/* Apply button / success state */}
                 <div className="mt-4">
                     {isApplied ? (
                         <>
@@ -162,8 +138,6 @@ export default function VacancyApplySidebar({
                                     Cek berkala email Anda untuk mendapatkan pemberitahuan lolos atau seleksi lanjutan dari mitra.
                                 </p>
                             </div>
-
-                            {/* Catatan Penting */}
                             <div className="mt-4 rounded-xl border border-primary/20 border-l-4 border-l-primary bg-primary-pale p-4 shadow-sm">
                                 <div className="flex items-center gap-2">
                                     <Info className="h-[18px] w-[18px] text-primary" />
@@ -179,8 +153,6 @@ export default function VacancyApplySidebar({
                                     untuk memulai periode magang resmi.
                                 </p>
                             </div>
-
-                            {/* Sudah dapat LOA? */}
                             <div className="mt-5">
                                 <p className="mb-2 text-sm font-bold text-gray-900">
                                     Sudah dapat LOA?
@@ -230,8 +202,6 @@ export default function VacancyApplySidebar({
                     )}
                 </div>
             </div>
-
-            {/* ── Card 2: Similar Vacancies ──── */}
             {similarVacancies.length > 0 && (
                 <div className="mt-4 rounded-xl border border-gray-200 bg-white p-5">
                     <p className="mb-3.5 text-[11px] font-bold uppercase tracking-wider text-primary">
@@ -248,7 +218,6 @@ export default function VacancyApplySidebar({
                                 }
                                 className="flex items-start gap-3 rounded-lg p-2 text-left transition-colors hover:bg-gray-50"
                             >
-                                {/* Logo */}
                                 <div
                                     className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg text-sm font-bold text-white"
                                     style={{
@@ -257,8 +226,6 @@ export default function VacancyApplySidebar({
                                 >
                                     {sv.logoInitial}
                                 </div>
-
-                                {/* Info */}
                                 <div className="min-w-0 flex-1">
                                     <p className="text-[13px] font-bold text-gray-900 truncate">
                                         {sv.position}
@@ -276,7 +243,6 @@ export default function VacancyApplySidebar({
                     </div>
                 </div>
             )}
-            {/* ── Confirmation Modal ──── */}
             {showConfirmModal && createPortal(
                 <div
                     className="fixed inset-0 z-[9999] flex items-center justify-center p-4"

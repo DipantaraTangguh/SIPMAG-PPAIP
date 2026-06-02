@@ -8,10 +8,6 @@ use Illuminate\Http\Request;
 
 class LogbookController extends Controller
 {
-    /**
-     * GET /api/logbooks
-     * List current student's logbook entries.
-     */
     public function index(Request $request)
     {
         $student = $request->user()->student;
@@ -25,11 +21,6 @@ class LogbookController extends Controller
             'approved_logbook_count' => $student->approved_logbook_count,
         ]);
     }
-
-    /**
-     * POST /api/logbooks
-     * Submit a new logbook entry.
-     */
     public function store(Request $request)
     {
         $student = $request->user()->student;
@@ -50,11 +41,6 @@ class LogbookController extends Controller
 
         return response()->json(['message' => 'Logbook berhasil disimpan.', 'logbook' => $logbook], 201);
     }
-
-    /**
-     * PUT /api/logbooks/{id}
-     * Update a logbook entry (only if PendingReview or Rejected).
-     */
     public function update(Request $request, $id)
     {
         $student = $request->user()->student;
@@ -70,7 +56,7 @@ class LogbookController extends Controller
             'hasil'            => 'sometimes|string',
         ]);
 
-        // Reset to PendingReview on edit
+        // Edit logbook berarti DPM perlu review ulang.
         $validated['status']   = 'PendingReview';
         $validated['dpm_note'] = null;
 
@@ -78,11 +64,6 @@ class LogbookController extends Controller
 
         return response()->json(['message' => 'Logbook berhasil diperbarui.', 'logbook' => $logbook]);
     }
-
-    /**
-     * GET /api/dpm/logbooks
-     * List logbook entries for assigned students (DPM only).
-     */
     public function indexForDpm(Request $request)
     {
         $lecturer = $request->user()->lecturer;
@@ -96,11 +77,6 @@ class LogbookController extends Controller
 
         return response()->json(['logbooks' => $logbooks]);
     }
-
-    /**
-     * POST /api/dpm/logbooks/{id}/approve
-     * DPM can only approve logbooks of students assigned to them.
-     */
     public function approve(Request $request, $id)
     {
         $lecturer = $request->user()->lecturer;
@@ -112,11 +88,11 @@ class LogbookController extends Controller
 
         $logbook->update(['status' => 'Approved', 'dpm_note' => null]);
 
-        // Increment student's approved count
+        // Counter ini dipakai buat buka akses sidang.
         $student = $logbook->student;
         $student->increment('approved_logbook_count');
 
-        // Auto-upgrade status if 6 approved
+        // Enam logbook approved jadi tiket masuk sidang.
         if ($student->approved_logbook_count >= 6 && $student->access_status === 'HasDPM') {
             $student->update(['access_status' => 'LogbookComplete']);
         }
@@ -126,11 +102,6 @@ class LogbookController extends Controller
             'approved_logbook_count' => $student->fresh()->approved_logbook_count,
         ]);
     }
-
-    /**
-     * POST /api/dpm/logbooks/{id}/reject
-     * DPM can only reject logbooks of students assigned to them.
-     */
     public function reject(Request $request, $id)
     {
         $request->validate(['note' => 'nullable|string|max:500']);

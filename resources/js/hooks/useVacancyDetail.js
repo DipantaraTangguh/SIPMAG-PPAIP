@@ -1,11 +1,3 @@
-/**
- * useVacancyDetail.js
- * Custom hook managing CV upload, apply logic, and simulation integration
- * for the vacancy detail page.
- *
- * @param {object} vacancy — The vacancy detail object.
- * @returns {object} State and handlers for the detail page.
- */
 import { useState, useCallback, useMemo } from 'react';
 import { useSimulation } from '../context/SimulationContext';
 import { canAccessPortal } from '../utils/accessUtils';
@@ -21,7 +13,7 @@ export default function useVacancyDetail(vacancy) {
     const accessStatus = student?.accessStatus;
     const canApply = canAccessPortal(accessStatus);
 
-    // Check if THIS specific vacancy was already applied to (persisted in context)
+    // Cek lowongan ini dulu, biar tombol nggak bisa apply dobel.
     const alreadyApplied = useMemo(() => {
         if (!vacancy || !activeApplications) return false;
         return activeApplications.some(
@@ -29,12 +21,12 @@ export default function useVacancyDetail(vacancy) {
         );
     }, [vacancy, activeApplications]);
 
-    // Check if the student has applied to ANY vacancy
+    // Portal mitra cuma boleh satu lamaran aktif.
     const hasAnyApplication = useMemo(() => {
         return (activeApplications || []).length > 0;
     }, [activeApplications]);
 
-    // Combined: either just applied in this session, or was already applied
+    // Gabung state session dan context supaya UI tetap konsisten.
     const isApplied = justApplied || alreadyApplied;
 
     const handleFileChange = useCallback((file) => {

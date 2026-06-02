@@ -6,14 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * logbooks — daily activity log entries submitted by students.
-     * Reviewed by the assigned DPM. 6 approved entries unlock Sidang.
-     *
-     * Status lifecycle:
-     *   PendingReview → Approved (counted toward 6)
-     *                 → Rejected (student revises & resubmits)
-     */
     public function up(): void
     {
         Schema::create('logbooks', function (Blueprint $table) {

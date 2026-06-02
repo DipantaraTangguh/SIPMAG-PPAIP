@@ -1,10 +1,3 @@
-/**
- * QuickActionButton.jsx
- * Primary CTA card that adapts its label, style, and state based on access_status.
- *
- * @prop {string} accessStatus — One of: Unverified, PendingReview, RejectedForm1, ApprovedForm1, HasApplication, HasDPM, LogbookComplete.
- * @prop {function} onClick — Callback when the button is clicked.
- */
 import React from 'react';
 import { ChevronRight } from 'lucide-react';
 

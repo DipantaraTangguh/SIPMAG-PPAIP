@@ -1,10 +1,3 @@
-/**
- * TabNavigation.jsx
- * Pill-style tab switcher between Mitra and Mandiri.
- *
- * @prop {string}   activeTab   — "mitra" | "mandiri"
- * @prop {function} onTabChange — Callback with new tab key.
- */
 import React from 'react';
 
 const tabs = [

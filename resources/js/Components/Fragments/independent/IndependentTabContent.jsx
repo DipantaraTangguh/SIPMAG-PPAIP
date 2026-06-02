@@ -1,9 +1,3 @@
-/**
- * IndependentTabContent.jsx
- * The main container for the Independent tab content inside Portal Magang.
- * Switches between EmptyState and FilledState based on form2Submissions.
- * Gates access behind Form 1 approval.
- */
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useSimulation } from '../../../context/SimulationContext';
@@ -23,10 +17,10 @@ export default function IndependentTabContent() {
     const submissions = form2Submissions || [];
     const accessStatus = student?.accessStatus;
 
-    // Form 2 is only accessible if Form 1 is approved (or beyond)
-    const isUnlocked = canAccessPortal(accessStatus); // FIXED
+    // Form 2 baru kebuka setelah Form 1 aman.
+    const isUnlocked = canAccessPortal(accessStatus); // Status ini sudah ikut helper akses terbaru.
 
-    // Show warning if blocked by navigation redirect OR by status
+    // Warning tetap muncul kalau user nyasar via URL manual.
     const showWarning = !isUnlocked || location.state?.blockedReason === 'form1_required';
 
     const handleCreateNew = () => {
@@ -36,8 +30,6 @@ export default function IndependentTabContent() {
     return (
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
             <IndependentInfoBanner />
-
-            {/* Form 1 gate warning banner */}
             {showWarning && (
                 <div className="my-6 flex items-center gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3">
                     <Info className="h-[18px] w-[18px] flex-shrink-0 text-amber-500" />

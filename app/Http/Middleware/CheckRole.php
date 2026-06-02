@@ -7,10 +7,6 @@ use Illuminate\Http\Request;
 
 class CheckRole
 {
-    /**
-     * Handle an incoming request.
-     * Usage: middleware('role:mahasiswa') or middleware('role:kaprodi,ppaip')
-     */
     public function handle(Request $request, Closure $next, string ...$roles): mixed
     {
         if (!$request->user() || !in_array($request->user()->role, $roles)) {

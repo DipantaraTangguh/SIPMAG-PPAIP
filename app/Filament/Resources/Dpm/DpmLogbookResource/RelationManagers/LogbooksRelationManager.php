@@ -52,7 +52,7 @@ class LogbooksRelationManager extends RelationManager
                     ]),
             ])
             ->actions([
-                // ── Approve logbook ──
+                // Action approve logbook DPM.
                 Tables\Actions\Action::make('approve')
                     ->label('Setujui')
                     ->icon('heroicon-o-check-circle')
@@ -69,7 +69,7 @@ class LogbooksRelationManager extends RelationManager
                         }
                     }),
 
-                // ── Reject logbook ──
+                // Action reject logbook DPM.
                 Tables\Actions\Action::make('reject')
                     ->label('Tolak')
                     ->icon('heroicon-o-x-circle')

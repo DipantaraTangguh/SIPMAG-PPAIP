@@ -1,8 +1,3 @@
-/**
- * components/defense/DefenseLockedState.jsx
- * Locked state for Sidang Magang page when prerequisites are not met.
- * Extracted from InternshipDefensePage.jsx lines 61–140.
- */
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Lock, BookOpen } from 'lucide-react';

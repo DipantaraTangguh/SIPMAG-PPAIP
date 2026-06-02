@@ -9,11 +9,11 @@ class StudentSeeder extends Seeder
 {
     public function run(): void
     {
-        // user_id 7-11 = Mahasiswa users (from UserSeeder)
-        // dpm_id references lecturers table (id 3 = Dita, id 4 = Ahmad Fauzi)
+        // ID ini ngikut urutan user demo di UserSeeder.
+        // DPM demo ambil dari lecturer seed, bukan user langsung.
 
         DB::table('students')->insert([
-            // Tangguh — Unverified (fresh start, main demo user)
+            // User demo utama sengaja mulai dari awal flow.
             [
                 'user_id'                => 7,
                 'dpm_id'                 => null,

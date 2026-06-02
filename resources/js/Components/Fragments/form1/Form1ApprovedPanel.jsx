@@ -1,17 +1,3 @@
-/**
- * Form1ApprovedPanel.jsx
- * Status panel shown when form1_status === "ApprovedForm1".
- * Green themed card with centered success icon, approver info,
- * PDF download, and CTA to Portal Magang.
- *
- * @prop {string} pdfPath       — URL to download the signed PDF.
- * @prop {string} pdfFileName   — Display name of the PDF file.
- * @prop {string} pdfSize       — Human-readable file size (e.g. "1.2 MB").
- * @prop {string} approverName  — Name of the approving Kaprodi.
- * @prop {string} approverNidn  — NIDN of the approver.
- * @prop {string} approverRole  — Role title (e.g. "Kaprodi Informatika").
- * @prop {string} approvalDate  — Date of approval (e.g. "10/03/2026").
- */
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -55,9 +41,7 @@ export default function Form1ApprovedPanel({
 
     return (
         <div className="flex flex-col gap-4">
-            {/* Main status card */}
             <div className="rounded-xl border border-gray-200 border-l-4 border-l-green-600 bg-white p-6">
-                {/* ── Centered success icon + title ── */}
                 <div className="flex flex-col items-center text-center">
                     <div className="flex h-[72px] w-[72px] items-center justify-center rounded-full bg-green-100">
                         <CheckCircle className="h-10 w-10 text-green-600" />
@@ -71,11 +55,7 @@ export default function Form1ApprovedPanel({
                         pendaftaran di portal magang perusahaan.
                     </p>
                 </div>
-
-                {/* ── Divider ── */}
                 <hr className="my-5 border-gray-100" />
-
-                {/* ── Approver info card ── */}
                 <div className="rounded-xl border border-green-200 bg-green-50 p-4">
                     <div className="flex items-center gap-1.5">
                         <ShieldCheck className="h-4 w-4 text-green-600" />
@@ -95,21 +75,14 @@ export default function Form1ApprovedPanel({
                         Digital signature verified pada {approvalDate}
                     </p>
                 </div>
-
-                {/* ── Divider ── */}
                 <hr className="my-5 border-gray-100" />
-
-                {/* ── Document download section ── */}
                 <p className="mb-3 text-[11px] font-bold uppercase tracking-wider text-primary">
                     Dokumen Resmi Anda
                 </p>
                 <div className="flex items-center gap-3 rounded-xl border border-gray-200 bg-white p-3.5">
-                    {/* PDF icon */}
                     <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-red-100">
                         <FileText className="h-5 w-5 text-red-600" />
                     </div>
-
-                    {/* File info */}
                     <div className="min-w-0 flex-1">
                         <p className="max-w-[160px] truncate text-[13px] font-bold text-gray-900">
                             {pdfFileName}
@@ -118,8 +91,6 @@ export default function Form1ApprovedPanel({
                             Signed PDF • {pdfSize}
                         </p>
                     </div>
-
-                    {/* Download button */}
                     <button
                         type="button"
                         onClick={handleDownload}
@@ -134,8 +105,6 @@ export default function Form1ApprovedPanel({
                     <p className="mt-2 text-xs text-red-600">{downloadError}</p>
                 )}
             </div>
-
-            {/* ── CTA button ── */}
             <button
                 type="button"
                 onClick={() => navigate('/portal')}

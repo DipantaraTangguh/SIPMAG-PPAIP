@@ -1,4 +1,4 @@
-// Dashboard fragments
+// Barrel export buat widget dashboard.
 export { default as WelcomeBanner } from './dashboard/WelcomeBanner';
 export { default as CycleStepper } from './dashboard/CycleStepper';
 export { default as DpmCard } from './dashboard/DpmCard';
@@ -7,7 +7,7 @@ export { default as QuickActionButton } from './dashboard/QuickActionButton';
 export { default as LogbookProgressCard } from './dashboard/LogbookProgressCard';
 export { default as TipsMagangCard } from './dashboard/TipsMagangCard';
 
-// Form1 fragments
+// Barrel export buat komponen Form 1.
 export { default as Form1ApprovedPanel } from './form1/Form1ApprovedPanel';
 export { default as Form1BackButton } from './form1/Form1BackButton';
 export { default as Form1Card } from './form1/Form1Card';
@@ -17,7 +17,7 @@ export { default as Form1RejectedPanel } from './form1/Form1RejectedPanel';
 export { default as Form1StatusPanel } from './form1/Form1StatusPanel';
 export { default as Form1SubmittedData } from './form1/Form1SubmittedData';
 
-// Portal fragments
+// Barrel export buat portal magang.
 export { default as ActiveApplicationsSidebar } from './portal/ActiveApplicationsSidebar';
 export { default as FloatingAddButton } from './portal/FloatingAddButton';
 export { default as SearchFilterBar } from './portal/SearchFilterBar';
@@ -25,7 +25,7 @@ export { default as TabNavigation } from './portal/TabNavigation';
 export { default as VacancyCard } from './portal/VacancyCard';
 export { default as VacancyGrid } from './portal/VacancyGrid';
 
-// Independent (self-sourced internship) fragments
+// Barrel export buat flow magang mandiri.
 export { default as IndependentEmptyState } from './independent/IndependentEmptyState';
 export { default as IndependentFilledState } from './independent/IndependentFilledState';
 export { default as IndependentInfoBanner } from './independent/IndependentInfoBanner';
@@ -33,7 +33,7 @@ export { default as IndependentSectionHeader } from './independent/IndependentSe
 export { default as IndependentSidePanel } from './independent/IndependentSidePanel';
 export { default as IndependentTabContent } from './independent/IndependentTabContent';
 
-// Guidance (bimbingan) fragments
+// Barrel export buat area bimbingan.
 export { default as DpmAssignedView } from './guidance/DpmAssignedView';
 export { default as GuidanceFullPage } from './guidance/GuidanceFullPage';
 export { default as GuidanceLockedState } from './guidance/GuidanceLockedState';
@@ -41,14 +41,14 @@ export { default as LogbookTabContent } from './guidance/LogbookTabContent';
 export { default as RequestSubmittedView } from './guidance/RequestSubmittedView';
 export { default as SupervisorRequestForm } from './guidance/SupervisorRequestForm';
 
-// Defense (sidang) fragments
+// Barrel export buat flow sidang.
 export { default as DefenseCompletedView } from './defense/DefenseCompletedView';
 export { default as DefenseFormView } from './defense/DefenseFormView';
 export { default as DefenseLockedState } from './defense/DefenseLockedState';
 export { default as DefenseScheduledView } from './defense/DefenseScheduledView';
 export { default as DefenseSuccessView } from './defense/DefenseSuccessView';
 
-// Vacancy detail fragments
+// Barrel export buat detail lowongan.
 export { default as VacancyApplySidebar } from './vacancy/VacancyApplySidebar';
 export { default as VacancyDetailHeader } from './vacancy/VacancyDetailHeader';
 export { default as VacancyInfoSection } from './vacancy/VacancyInfoSection';

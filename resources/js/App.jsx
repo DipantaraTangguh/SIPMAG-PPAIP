@@ -1,15 +1,9 @@
-/**
- * App.jsx — Root component for Portal Magang.
- * Uses SimulationProvider as the single source of truth.
- * Routes: /login (guest), /dashboard, /form1, /form1/status (protected).
- */
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
 import { SimulationProvider } from './context/SimulationContext';
 import ProtectedRoute from './Components/Layouts/ProtectedRoute';
 import GuestRoute from './Components/Layouts/GuestRoute';
-
 
 import LoginPage from './Pages/Auth/LoginPage';
 import DashboardPage from './Pages/Dashboard/DashboardPage';
@@ -26,10 +20,7 @@ export default function App() {
         <SimulationProvider>
             <BrowserRouter>
                 <Routes>
-                    {/* Guest only */}
                     <Route path="/login" element={<GuestRoute><LoginPage /></GuestRoute>} />
-
-                    {/* Protected routes */}
                     <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
                     <Route path="/form1" element={<ProtectedRoute><Form1Page /></ProtectedRoute>} />
                     <Route path="/form1/status" element={<ProtectedRoute><Form1StatusPage /></ProtectedRoute>} />
@@ -38,8 +29,6 @@ export default function App() {
                     <Route path="/portal/independent/form2/new" element={<ProtectedRoute><Form2NewPage /></ProtectedRoute>} />
                     <Route path="/guidance" element={<ProtectedRoute><GuidancePage /></ProtectedRoute>} />
                     <Route path="/defense" element={<ProtectedRoute><InternshipDefensePage /></ProtectedRoute>} />
-
-                    {/* Fallback */}
                     <Route path="*" element={<Navigate to="/dashboard" replace />} />
                 </Routes>
             </BrowserRouter>

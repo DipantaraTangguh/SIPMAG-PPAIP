@@ -21,18 +21,10 @@ class KaprodiStudentResource extends Resource
     protected static ?string $navigationGroup = 'Akademik';
     protected static ?int $navigationSort = 1;
     protected static ?string $slug = 'kaprodi/students';
-
-    /**
-     * Only Kaprodi can see this resource.
-     */
     public static function canAccess(): bool
     {
         return auth()->user()?->role === 'kaprodi';
     }
-
-    /**
-     * Scope queries to the Kaprodi's own study program.
-     */
     public static function getEloquentQuery(): Builder
     {
         $prodi = auth()->user()?->lecturer?->study_program;
@@ -133,7 +125,7 @@ class KaprodiStudentResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make(),
 
-                // ── Preview Transkrip (modal with iframe + download link) ──
+                // Preview transkrip via modal biar Kaprodi nggak perlu pindah tab.
                 Tables\Actions\Action::make('previewTranskrip')
                     ->label('Lihat Transkrip')
                     ->icon('heroicon-o-eye')
@@ -169,7 +161,7 @@ class KaprodiStudentResource extends Resource
                     ->modalCancelActionLabel('Tutup')
                     ->modalWidth('5xl'),
 
-                // ── Form 1: Approve ──
+                // Action approve Form 1.
                 Tables\Actions\Action::make('approveForm1')
                     ->label('Approve Form 1')
                     ->icon('heroicon-o-check-circle')
@@ -198,7 +190,7 @@ class KaprodiStudentResource extends Resource
                         ]);
                     }),
 
-                // ── Form 1: Reject ──
+                // Action reject Form 1.
                 Tables\Actions\Action::make('rejectForm1')
                     ->label('Reject Form 1')
                     ->icon('heroicon-o-x-circle')
@@ -212,9 +204,9 @@ class KaprodiStudentResource extends Resource
                         'form1_rejection_reason' => $data['reason'],
                     ])),
 
-                // ── Assign DPM ──
-                // Only visible when student has submitted a supervisor nomination
-                // (i.e. has a record in supervisor_applications) and doesn't have a DPM yet.
+                // Action assign DPM setelah pengajuan pembimbing masuk.
+                // Tombol ini muncul cuma kalau mahasiswa sudah submit pengajuan.
+                // Dan belum punya DPM supaya assign-nya nggak dobel.
                 Tables\Actions\Action::make('assignDpm')
                     ->label('Assign DPM')
                     ->icon('heroicon-o-user-plus')
@@ -228,7 +220,7 @@ class KaprodiStudentResource extends Resource
                         $supApp = $record->supervisorApplication;
                         $fields = [];
 
-                        // Show supervisor nomination context
+                        // Tampilkan konteks praktisi supaya Kaprodi yakin sebelum assign.
                         if ($supApp) {
                             $mulai = '-';
                             if ($supApp->mulai_magang) {
@@ -292,8 +284,8 @@ class KaprodiStudentResource extends Resource
                         'access_status' => 'HasDPM',
                     ])),
 
-                // ── Schedule Sidang ──
-                // Visible when student has submitted defense docs but not yet scheduled
+                // Action jadwalkan sidang.
+                // Muncul kalau berkas sidang sudah masuk tapi belum dijadwalkan.
                 Tables\Actions\Action::make('scheduleSidang')
                     ->label('Jadwalkan Sidang')
                     ->icon('heroicon-o-calendar-days')
@@ -359,8 +351,8 @@ class KaprodiStudentResource extends Resource
                             ->send();
                     }),
 
-                // ── Complete Sidang Cycle ──
-                // Only visible after sidang has been scheduled
+                // Action closing cycle magang.
+                // Baru muncul setelah jadwal sidang sudah ada.
                 Tables\Actions\Action::make('completeCycle')
                     ->label('Selesaikan Siklus')
                     ->icon('heroicon-o-arrow-path')
@@ -384,7 +376,7 @@ class KaprodiStudentResource extends Resource
                     ])),
             ])
             ->bulkActions([
-                // ── Bulk Download Transkrip ──
+                // Bulk download transkrip buat kebutuhan review.
                 Tables\Actions\BulkAction::make('bulkDownloadTranskrip')
                     ->label('Download Transkrip')
                     ->icon('heroicon-o-arrow-down-tray')
@@ -402,7 +394,7 @@ class KaprodiStudentResource extends Resource
                             return;
                         }
 
-                        // Single file — download directly
+                        // Kalau cuma satu, langsung download aja.
                         if ($students->count() === 1) {
                             $student = $students->first();
                             $path = storage_path('app/private/' . $student->form1_pdf_path);
@@ -413,7 +405,7 @@ class KaprodiStudentResource extends Resource
                             return;
                         }
 
-                        // Multiple files — create ZIP
+                        // Kalau banyak, zip dulu biar rapi.
                         $zipName = 'transkrip_' . now()->format('Ymd_His') . '.zip';
                         $zipPath = storage_path('app/private/temp/' . $zipName);
 

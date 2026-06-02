@@ -8,10 +8,6 @@ use Illuminate\Http\Request;
 
 class Form2Controller extends Controller
 {
-    /**
-     * GET /api/form2
-     * List current student's Form 2 submissions.
-     */
     public function index(Request $request)
     {
         $student = $request->user()->student;
@@ -22,11 +18,6 @@ class Form2Controller extends Controller
 
         return response()->json(['submissions' => $submissions]);
     }
-
-    /**
-     * POST /api/form2
-     * Submit a new Form 2 (Mandiri track).
-     */
     public function store(Request $request)
     {
         $student = $request->user()->student;
@@ -47,7 +38,7 @@ class Form2Controller extends Controller
 
         $submission = Form2Submission::create($validated);
 
-        // Mark Mandiri track. access_status stays at ApprovedForm1 until PPAIP approves.
+        // Tandai jalur mandiri, tapi akses belum naik sebelum PPAIP approve.
         if (!$student->is_independent) {
             $student->update(['is_independent' => true]);
         }
@@ -57,11 +48,6 @@ class Form2Controller extends Controller
             'submission' => $submission,
         ], 201);
     }
-
-    /**
-     * GET /api/ppaip/form2
-     * List all Form 2 submissions for PPAIP review.
-     */
     public function indexForPpaip()
     {
         $submissions = Form2Submission::with('student:id,nim,name,study_program')
@@ -70,10 +56,6 @@ class Form2Controller extends Controller
 
         return response()->json(['submissions' => $submissions]);
     }
-
-    /**
-     * POST /api/ppaip/form2/{id}/approve
-     */
     public function approve($id)
     {
         $submission = Form2Submission::where('id', $id)
@@ -85,7 +67,7 @@ class Form2Controller extends Controller
             'rejection_reason' => null,
         ]);
 
-        // Promote the student's access_status now that Form 2 is approved.
+        // Form 2 sudah aman, mahasiswa boleh lanjut ke tahap DPM.
         $student = $submission->student;
         if ($student && $student->access_status === 'ApprovedForm1') {
             $student->update(['access_status' => 'HasApplication']);
@@ -93,10 +75,6 @@ class Form2Controller extends Controller
 
         return response()->json(['message' => 'Form 2 disetujui.', 'submission' => $submission]);
     }
-
-    /**
-     * POST /api/ppaip/form2/{id}/reject
-     */
     public function reject(Request $request, $id)
     {
         $request->validate(['reason' => 'required|string|max:500']);

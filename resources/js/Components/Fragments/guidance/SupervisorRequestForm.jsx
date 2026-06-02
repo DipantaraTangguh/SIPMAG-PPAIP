@@ -1,8 +1,3 @@
-/**
- * components/guidance/SupervisorRequestForm.jsx
- * Pengajuan Pembimbing form with 8 fields + file upload.
- * Extracted from GuidancePage.jsx lines 469–856.
- */
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Lock, CloudUpload, ArrowRight, Info, BookOpen, FileSearch, X } from 'lucide-react';
@@ -86,7 +81,6 @@ export default function SupervisorRequestForm({ onSubmit }) {
 
     return (
         <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-[1fr_320px]">
-            {/* LEFT COLUMN: Form Card */}
             <div>
                 <div className="rounded-xl border border-gray-200 border-l-4 border-l-primary bg-white p-5 sm:p-8">
                     <h2 className="text-[20px] font-bold text-[#1A1A1A]">
@@ -97,7 +91,6 @@ export default function SupervisorRequestForm({ onSubmit }) {
                     </p>
 
                     <div className="mt-8 flex flex-col gap-5">
-                        {/* ROW 1: Nama & NIM */}
                         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                             <div>
                                 <label className="mb-1.5 block text-[11px] font-medium uppercase tracking-wider text-gray-400">
@@ -128,11 +121,7 @@ export default function SupervisorRequestForm({ onSubmit }) {
                                 </div>
                             </div>
                         </div>
-
-                        {/* Thin divider */}
                         <div className="border-b border-gray-100"></div>
-
-                        {/* ROW 2: Nama Perusahaan */}
                         <div>
                             <label className="mb-1.5 block text-[11px] font-medium uppercase tracking-wider text-gray-400">
                                 NAMA PERUSAHAAN
@@ -146,8 +135,6 @@ export default function SupervisorRequestForm({ onSubmit }) {
                                 className="h-11 w-full rounded-lg border border-gray-200 px-3 outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/10"
                             />
                         </div>
-
-                        {/* ROW 3: Praktisi & Jabatan */}
                         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                             <div>
                                 <label className="mb-1.5 block text-[11px] font-medium uppercase tracking-wider text-gray-400">
@@ -176,8 +163,6 @@ export default function SupervisorRequestForm({ onSubmit }) {
                                 />
                             </div>
                         </div>
-
-                        {/* ROW 4: Telepon Praktisi */}
                         <div>
                             <label className="mb-1.5 block text-[11px] font-medium uppercase tracking-wider text-gray-400">
                                 NOMOR TELEPON PRAKTISI PEMBIMBING MAGANG
@@ -191,8 +176,6 @@ export default function SupervisorRequestForm({ onSubmit }) {
                                 className="h-11 w-full rounded-lg border border-gray-200 px-3 outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/10"
                             />
                         </div>
-
-                        {/* ROW 5: Email Praktisi */}
                         <div>
                             <label className="mb-1.5 block text-[11px] font-medium uppercase tracking-wider text-gray-400">
                                 EMAIL PRAKTISI PEMBIMBING MAGANG
@@ -206,8 +189,6 @@ export default function SupervisorRequestForm({ onSubmit }) {
                                 className="h-11 w-full rounded-lg border border-gray-200 px-3 outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/10"
                             />
                         </div>
-
-                         {/* ROW 6: Tanggal */}
                          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                             <div>
                                 <label className="mb-1.5 block text-[11px] font-medium uppercase tracking-wider text-gray-400">
@@ -234,8 +215,6 @@ export default function SupervisorRequestForm({ onSubmit }) {
                                 />
                             </div>
                         </div>
-
-                        {/* ROW 7: Upload LoA */}
                         <div>
                             <label className="mb-1.5 block text-[11px] font-medium uppercase tracking-wider text-gray-400">
                                 UPLOAD LOA (LETTER OF ACCEPTANCE)
@@ -291,8 +270,6 @@ export default function SupervisorRequestForm({ onSubmit }) {
                         </div>
                     </div>
                 </div>
-
-                {/* Form Footer */}
                 <div className="mt-6 flex justify-stretch sm:justify-end">
                     <div className="flex w-full flex-col-reverse gap-3 sm:w-auto sm:flex-row sm:gap-4">
                         <button
@@ -318,10 +295,7 @@ export default function SupervisorRequestForm({ onSubmit }) {
                     </div>
                 </div>
             </div>
-
-            {/* RIGHT COLUMN: Side Panel */}
             <div className="self-start lg:sticky lg:top-6">
-                {/* Card 1 */}
                 <div className="rounded-xl border border-gray-200 bg-white p-5 hover:border-primary-pale hover:shadow-sm transition-all duration-300">
                     <div className="flex items-center gap-2 border-b-2 border-primary/10 pb-4">
                         <BookOpen className="h-[18px] w-[18px] text-primary" />
@@ -329,7 +303,6 @@ export default function SupervisorRequestForm({ onSubmit }) {
                     </div>
 
                     <div className="mt-5 flex flex-col">
-                        {/* Step 1 */}
                         <div className="flex">
                             <div className="mr-3 flex flex-col items-center">
                                 <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-primary text-xs font-bold text-white">
@@ -342,8 +315,6 @@ export default function SupervisorRequestForm({ onSubmit }) {
                                 <p className="mt-0.5 text-[12px] leading-relaxed text-gray-500">Lengkapi semua informasi perusahaan dan unggah bukti penerimaan magang (LoA).</p>
                             </div>
                         </div>
-
-                        {/* Step 2 */}
                         <div className="flex">
                             <div className="mr-3 flex flex-col items-center">
                                 <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-gray-200 text-xs font-bold text-gray-500">
@@ -356,8 +327,6 @@ export default function SupervisorRequestForm({ onSubmit }) {
                                 <p className="mt-0.5 text-[12px] leading-relaxed text-gray-500">Kepala Program Studi akan meninjau pengajuan dan menentukan Dosen Pembimbing Magang.</p>
                             </div>
                         </div>
-
-                        {/* Step 3 */}
                         <div className="flex">
                             <div className="mr-3 flex flex-col items-center">
                                 <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-gray-200 text-xs font-bold text-gray-500">
@@ -378,8 +347,6 @@ export default function SupervisorRequestForm({ onSubmit }) {
                         </p>
                     </div>
                 </div>
-
-                {/* Card 2 */}
                 <div className="mt-4 rounded-xl border border-gray-200 bg-gray-50 p-5">
                     <h3 className="text-[14px] font-bold text-[#1A1A1A]">Tips Mahasiswa</h3>
                     <p className="mt-2 text-[13px] text-gray-600">

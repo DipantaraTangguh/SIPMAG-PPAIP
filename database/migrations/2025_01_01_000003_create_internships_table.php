@@ -6,10 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * internships — vacancy listings managed by PPAIP.
-     * job_description stored as JSON array of bullet strings.
-     */
     public function up(): void
     {
         Schema::create('internships', function (Blueprint $table) {

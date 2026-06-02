@@ -1,12 +1,3 @@
-/**
- * Form1Page.jsx
- * Page for "Form Magang-01: Surat Keterangan Memenuhi Syarat Akademik".
- * Accessed from the Beranda quickaction "Isi Form 1".
- * The Profil nav item is active in the sidebar.
- *
- * Guard: If student has already submitted (status != Unverified/RejectedForm1),
- * redirect to the status page instead.
- */
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { useSimulation } from '../../context/SimulationContext';
@@ -19,13 +10,13 @@ export default function Form1Page() {
     const { student } = useSimulation();
     const form1 = useForm1();
 
-    // Guard: only allow filling if Unverified or RejectedForm1
+    // Form 1 cuma bisa diisi ulang kalau belum valid atau habis ditolak.
     const canFill = student?.accessStatus === 'Unverified' || student?.accessStatus === 'RejectedForm1';
     if (!canFill) {
         return <Navigate to="/form1/status" replace />;
     }
 
-    // Show full-screen spinner during submit
+    // Saat submit, kunci layar biar user nggak dobel klik.
     if (form1.isSubmitting) {
         return <FullScreenSpinner />;
     }

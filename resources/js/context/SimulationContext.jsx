@@ -1,11 +1,3 @@
-/**
- * context/SimulationContext.jsx
- * Single source of truth for the Portal Magang application state.
- *
- * All data is fetched from the real Laravel API via lib/api.js.
- * Consumer components destructure { student, login, logout, submitForm1, ... }
- * from useSimulation().
- */
 import React, { createContext, useContext, useState, useMemo, useCallback, useEffect } from 'react';
 import { api, getToken, clearToken } from '../lib/api';
 
@@ -27,10 +19,6 @@ const EMPTY_STATE = {
 
 export function SimulationProvider({ children }) {
     const [state, setState] = useState(EMPTY_STATE);
-
-    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-     * Boot: check if a token exists and fetch /me
-     * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
     useEffect(() => {
         const boot = async () => {
             const token = getToken();
@@ -46,7 +34,7 @@ export function SimulationProvider({ children }) {
                     isLoading: false,
                     student: mapStudent(user),
                 }));
-                // Fetch module data in parallel
+                // Ambil modul barengan biar dashboard nggak nunggu satu-satu.
                 if (user.role === 'mahasiswa') {
                     fetchAllStudentData();
                 }
@@ -57,12 +45,6 @@ export function SimulationProvider({ children }) {
         };
         boot();
     }, []);
-
-    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-     * Helpers
-     * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-
-    /** Map API user response to the state shape components expect */
     function mapStudent(user) {
         if (!user || !user.student) return null;
         const s = user.student;
@@ -85,8 +67,6 @@ export function SimulationProvider({ children }) {
             } : null,
         };
     }
-
-    /** Map API Form2Submission → shape expected by MandiriFilledState cards */
     function mapForm2Submission(s) {
         if (!s) return s;
         const statusMap = {
@@ -112,8 +92,6 @@ export function SimulationProvider({ children }) {
             pdfPath: s.pdf_path,
         };
     }
-
-    /** Refresh student profile from /me */
     const refreshProfile = useCallback(async () => {
         try {
             const { user } = await api.get('/me');
@@ -121,10 +99,8 @@ export function SimulationProvider({ children }) {
                 ...s,
                 student: mapStudent(user),
             }));
-        } catch { /* ignore */ }
+        } catch { /* aman di-skip */ }
     }, []);
-
-    /** Fetch all module data for mahasiswa after login */
     const fetchAllStudentData = useCallback(async () => {
         try {
             const [form1Res, appsRes, form2Res, logbookRes, sidangRes, supervisorRes] = await Promise.allSettled([
@@ -216,13 +192,8 @@ export function SimulationProvider({ children }) {
                     }
                     : null,
             }));
-        } catch { /* ignore partial failures */ }
+        } catch { /* biarin lanjut walau sebagian gagal */ }
     }, []);
-
-    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-     * Auth Actions
-     * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-
     const login = useCallback(async (loginId, password) => {
         try {
             const data = await api.login(loginId, password);
@@ -232,7 +203,7 @@ export function SimulationProvider({ children }) {
                 isLoggedIn: true,
                 student,
             }));
-            // Fetch all data after login
+            // Setelah login, refresh semua state utama.
             if (data.user.role === 'mahasiswa') {
                 setTimeout(() => fetchAllStudentData(), 100);
             }
@@ -247,11 +218,6 @@ export function SimulationProvider({ children }) {
         setState(EMPTY_STATE);
         setState((s) => ({ ...s, isLoading: false }));
     }, []);
-
-    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-     * Form 1 Actions
-     * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-
     const submitForm1 = useCallback(async (formData) => {
         try {
             await api.upload('/form1', formData);
@@ -293,11 +259,6 @@ export function SimulationProvider({ children }) {
             } : null,
         }));
     }, [refreshProfile]);
-
-    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-     * Application Actions (Portal Mitra)
-     * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-
     const applyToVacancy = useCallback(async (vacancyId, cvFile) => {
         const formData = new FormData();
         formData.append('internship_id', vacancyId);
@@ -323,11 +284,6 @@ export function SimulationProvider({ children }) {
         }));
         await refreshProfile();
     }, [refreshProfile]);
-
-    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-     * Form 2 Actions (Mandiri)
-     * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-
     const submitForm2 = useCallback(async (formData) => {
         const payload = {
             company_name:      formData.namaPerusahaan,
@@ -346,11 +302,6 @@ export function SimulationProvider({ children }) {
             ],
         }));
     }, []);
-
-    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-     * Pembimbing Actions
-     * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-
     const submitPengajuanPembimbing = useCallback(async (formData) => {
         const fd = new FormData();
         fd.append('company_name', formData.namaPerusahaan);
@@ -388,11 +339,6 @@ export function SimulationProvider({ children }) {
         await refreshProfile();
         await fetchAllStudentData();
     }, [refreshProfile, fetchAllStudentData]);
-
-    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-     * Logbook Actions
-     * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-
     const addLogbookEntry = useCallback(async (entry) => {
         const data = await api.post('/logbooks', {
             tanggal: entry.tanggal,
@@ -440,14 +386,9 @@ export function SimulationProvider({ children }) {
             ),
         }));
     }, []);
-
-    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-     * Defense (Sidang) Actions
-     * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-
     const submitSidang = useCallback(async (files) => {
         const fd = new FormData();
-        // Map frontend keys → backend field names
+        // Frontend pakai camelCase, backend minta field Laravel-style.
         fd.append('laporan', files.laporanAkhir || files.laporan);
         fd.append('poster', files.posterPresentasi || files.poster);
         fd.append('krs', files.krsMataKuliah || files.krs);
@@ -469,7 +410,7 @@ export function SimulationProvider({ children }) {
     const notifications = useMemo(() => {
         const list = [];
 
-        // 1. Form 1
+        // Form 1 jadi sumber status akademik awal.
         if (state.form1Submission) {
             const dateStr = state.form1Submission.submittedAt ? ` pada ${state.form1Submission.submittedAt}` : '';
             if (state.student?.accessStatus === 'PendingReview') {
@@ -494,7 +435,7 @@ export function SimulationProvider({ children }) {
             }
         }
 
-        // 2. Applications (Mitra)
+        // Lamaran mitra ikut nentuin akses ke DPM.
         if (state.activeApplications && state.activeApplications.length > 0) {
             state.activeApplications.forEach((app) => {
                 const dateStr = app.appliedAt ? new Date(app.appliedAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }) : '';
@@ -517,7 +458,7 @@ export function SimulationProvider({ children }) {
             });
         }
 
-        // 3. Form 2 (Mandiri)
+        // Jalur mandiri pakai Form 2 sebagai pengganti lamaran mitra.
         if (state.form2Submissions && state.form2Submissions.length > 0) {
             state.form2Submissions.forEach((sub) => {
                 const statusMap = {
@@ -532,7 +473,7 @@ export function SimulationProvider({ children }) {
             });
         }
 
-        // 4. Supervisor & DPM
+        // Bagian bimbingan mulai setelah perusahaan/praktisi valid.
         if (state.pengajuanPembimbing) {
             if (state.student?.dpm) {
                 list.push({
@@ -547,7 +488,7 @@ export function SimulationProvider({ children }) {
             }
         }
 
-        // 5. Logbooks
+        // Logbook jadi progress utama sebelum sidang.
         if (state.logbookEntries && state.logbookEntries.length > 0) {
             const rejected = state.logbookEntries.filter(e => e.status === 'Ditolak' || e.status === 'Rejected');
             if (rejected.length > 0) {
@@ -566,7 +507,7 @@ export function SimulationProvider({ children }) {
             }
         }
 
-        // 6. Sidang
+        // Sidang adalah state akhir cycle magang.
         if (state.sidangSubmission) {
             if (state.sidangSubmission.status === 'Scheduled' || state.sidangSchedule) {
                 list.push({
@@ -588,7 +529,7 @@ export function SimulationProvider({ children }) {
             });
         }
 
-        // Reverse to display newest notifications first
+        // Notifikasi terbaru lebih enak dibaca di paling atas.
         return list.reverse();
     }, [
         state.form1Submission,
@@ -600,11 +541,6 @@ export function SimulationProvider({ children }) {
         state.pengajuanPembimbing,
         state.student
     ]);
-
-    /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-     * Context Value
-     * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-
     const value = useMemo(() => ({
         ...state,
         notifications,
@@ -618,7 +554,7 @@ export function SimulationProvider({ children }) {
         addLogbookEntry,
         updateLogbookEntry,
         submitSidang,
-        // Utility: force refresh from API
+        // Dipakai saat UI butuh narik ulang data tanpa reload page.
         refreshProfile,
         fetchAllStudentData,
     }), [

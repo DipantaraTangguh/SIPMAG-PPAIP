@@ -1,15 +1,10 @@
-/**
- * context/AuthContext.jsx
- * Thin wrapper — delegates to SimulationContext for auth state.
- * Kept for backward compatibility with any component importing useAuth.
- */
 import React, { createContext, useContext } from 'react';
 import { useSimulation } from './SimulationContext';
 
 const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
-    // AuthProvider is now just a passthrough — SimulationProvider handles auth
+    // Auth lama tetap ada biar import nggak pecah, logic-nya sekarang di SimulationProvider.
     return children;
 }
 

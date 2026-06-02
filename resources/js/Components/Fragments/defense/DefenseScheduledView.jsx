@@ -1,8 +1,3 @@
-/**
- * components/defense/DefenseScheduledView.jsx
- * State 3: Schedule detail card + Persiapan Sidang panel.
- * Displays the defense schedule set by Kaprodi, including examiners.
- */
 import React from 'react';
 import { CalendarCheck } from 'lucide-react';
 import { useSimulation } from '../../../context/SimulationContext';
@@ -10,7 +5,7 @@ import { useSimulation } from '../../../context/SimulationContext';
 export default function DefenseScheduledView() {
     const { sidangSchedule } = useSimulation();
 
-    // Fallback if context is somehow null (shouldn't happen in normal flow)
+    // Safety net kalau context kosong di luar flow normal.
     const schedule = sidangSchedule || {
         tanggal: 'Belum ditetapkan',
         waktu: '-',
@@ -25,7 +20,6 @@ export default function DefenseScheduledView() {
                 Pengajuan verifikasi dokumen akhir dan jadwal sidang.
             </p>
             <div className="mx-auto max-w-[900px] rounded-2xl border border-gray-200 bg-white p-6 sm:p-[48px]">
-                {/* TOP SECTION */}
                 <div className="mx-auto w-[80px] h-[80px] rounded-full bg-primary-pale flex items-center justify-center">
                     <CalendarCheck className="w-[40px] h-[40px] text-primary" />
                 </div>
@@ -35,8 +29,6 @@ export default function DefenseScheduledView() {
                 <p className="text-center mt-[8px] text-gray-500 text-[14px] leading-relaxed max-w-[480px] mx-auto">
                     Berikut adalah detail jadwal pelaksanaan sidang magang Anda yang telah ditetapkan oleh Kepala Program Studi.
                 </p>
-
-                {/* BOTTOM SECTION */}
                 <div className="mt-[40px] w-full">
                     <h4 className="text-[11px] font-medium text-gray-400 uppercase tracking-wider mb-[16px]">
                         DETAIL PELAKSANAAN

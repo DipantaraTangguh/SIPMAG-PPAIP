@@ -1,8 +1,3 @@
-/**
- * DashboardPage.jsx (Beranda)
- * Main student dashboard page — assembles all dashboard widget components.
- * Reads all data from SimulationContext (no mock data, no API calls).
- */
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSimulation } from '../../context/SimulationContext';
@@ -20,8 +15,6 @@ const mockTips = [
     'Jangan lupa isi logbook sebagai syarat untuk bisa melakukan sidang magang.',
     'Gunakan foto profil profesional untuk meningkatkan kepercayaan mitra magang.',
 ];
-
-/* ── Derive stepper step from accessStatus ──────── */
 function deriveStep(status) {
     switch (status) {
         case 'Unverified':
@@ -82,21 +75,13 @@ export default function DashboardPage() {
     return (
         <DashboardLayout>
             <div className="flex flex-col gap-6">
-                {/* Full width — Welcome banner */}
                 <WelcomeBanner name={name} />
-
-                {/* Full width — Cycle stepper */}
                 <CycleStepper currentStep={currentStep} />
-
-                {/* Two-column layout */}
                 <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1fr_340px]">
-                    {/* Left column */}
                     <div className="flex flex-col gap-6">
                         <DpmCard dpm={dpm} />
                         <NotificationCard notifications={notifications} />
                     </div>
-
-                    {/* Right column */}
                     <div className="flex flex-col gap-6">
                         <QuickActionButton
                             accessStatus={accessStatus}

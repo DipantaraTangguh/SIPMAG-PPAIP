@@ -1,14 +1,3 @@
-/**
- * src/pages/InternshipDefensePage.jsx
- * Thin shell page component for Sidang Magang.
- * Handles access-gating and delegates to extracted view components.
- *
- * InternshipDefensePage — 4 States:
- *   State 1: FORM      → DefenseFormView
- *   State 2: SUCCESS    → DefenseSuccessView
- *   State 3: SCHEDULED  → DefenseScheduledView
- *   State 4: COMPLETED  → DefenseCompletedView
- */
 import React from 'react';
 import DashboardLayout from '../../Components/Layouts/DashboardLayout';
 import { useSimulation } from '../../context/SimulationContext';
@@ -23,7 +12,7 @@ export default function InternshipDefensePage() {
     const { student, sidangSubmission, sidangSchedule } = useSimulation();
     const accessStatus = student?.accessStatus;
 
-    // Derive the current view entirely from context — no local state
+    // View sidang cukup ngikut context biar state nggak dobel.
     const sidangView = (() => {
         if (accessStatus === 'SiklusSelesai') return 'completed';
         if (sidangSubmission?.status === 'Scheduled') return 'scheduled';

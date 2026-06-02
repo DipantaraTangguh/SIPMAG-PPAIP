@@ -1,15 +1,5 @@
-/**
- * components/portal/independent/IndependentFilledState.jsx
- * Filled state view showing the submission list and status cards.
- *
- * @prop {Array} submissions - Form 2 submissions from SimulationContext
- * @prop {function} onCreateNew - Callback to navigate to Form 2 creation page
- */
 import React from 'react';
 import { CheckCircle, Clock, XCircle, Download, FileEdit, Info } from 'lucide-react';
-
-/* ── Inline Sub-components ─────────────────────────────────── */
-
 function ApprovedCard({ data }) {
     return (
         <div className="flex flex-col gap-4 rounded-xl border border-gray-200 bg-white p-5 sm:flex-row sm:items-start sm:gap-4">
@@ -95,13 +85,9 @@ function RejectedCard({ data }) {
         </div>
     );
 }
-
-/* ────────────────────────────────────────────────────────── */
-
 export default function IndependentFilledState({ submissions = [], onCreateNew }) {
     return (
         <div className="flex flex-col">
-            {/* Header Row */}
             <div className="mb-4 mt-8 flex items-center justify-between">
                 <div className="flex items-center gap-2.5">
                     <h2 className="text-[18px] font-bold text-[#1A1A1A]">
@@ -120,8 +106,6 @@ export default function IndependentFilledState({ submissions = [], onCreateNew }
                     Ajukan Baru
                 </button>
             </div>
-
-            {/* Submission List */}
             <div className="flex flex-col gap-3">
                 {submissions.map((submission) => {
                     if (submission.status === 'Disetujui') {

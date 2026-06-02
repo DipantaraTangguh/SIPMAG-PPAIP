@@ -1,16 +1,9 @@
-/**
- * NotificationCard.jsx
- * Card showing a list of recent notifications.
- *
- * @prop {Array<{message: string, time: string}>} notifications — List of notification items.
- */
 import React from 'react';
 import { Info } from 'lucide-react';
 
 export default function NotificationCard({ notifications = [] }) {
     return (
         <div className="rounded-xl border border-gray-200 bg-white p-6">
-            {/* Header */}
             <div className="mb-4 flex items-center justify-between">
                 <h3 className="text-base font-bold text-gray-900">Notifikasi</h3>
                 <button
@@ -20,8 +13,6 @@ export default function NotificationCard({ notifications = [] }) {
                     Lihat Semua
                 </button>
             </div>
-
-            {/* Notification list */}
             {notifications.length === 0 ? (
                 <p className="py-4 text-center text-sm text-gray-400">
                     Belum ada notifikasi.

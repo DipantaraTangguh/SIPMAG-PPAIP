@@ -9,10 +9,6 @@ use Illuminate\Http\Request;
 
 class DefenseController extends Controller
 {
-    /**
-     * GET /api/defense
-     * Get current student's sidang submission (including schedule info).
-     */
     public function show(Request $request)
     {
         $student = $request->user()->student;
@@ -36,11 +32,6 @@ class DefenseController extends Controller
             'access_status' => $student->access_status,
         ]);
     }
-
-    /**
-     * POST /api/defense
-     * Submit sidang documents (3 PDFs). Requires LogbookComplete.
-     */
     public function store(Request $request)
     {
         $student = $request->user()->student;
@@ -78,11 +69,6 @@ class DefenseController extends Controller
             'access_status' => 'MenungguSidang',
         ], 201);
     }
-
-    /**
-     * GET /api/kaprodi/defense
-     * List students waiting for sidang — scoped to Kaprodi's prodi.
-     */
     public function indexForKaprodi(Request $request)
     {
         $lecturer = $request->user()->lecturer;
@@ -98,12 +84,6 @@ class DefenseController extends Controller
 
         return response()->json(['students' => $students]);
     }
-
-    /**
-     * POST /api/kaprodi/defense/{studentId}/schedule
-     * Schedule the sidang — Kaprodi sets date, time, room, and 2 examiners.
-     * Scoped to own prodi. Only when submission status is Pending.
-     */
     public function scheduleSidang(Request $request, $studentId)
     {
         $lecturer = $request->user()->lecturer;
@@ -141,12 +121,6 @@ class DefenseController extends Controller
             'message' => 'Jadwal sidang berhasil ditetapkan.',
         ]);
     }
-
-    /**
-     * POST /api/kaprodi/defense/{studentId}/complete
-     * Complete the internship cycle — only when sidang has been scheduled.
-     * Kaprodi only, scoped to own prodi.
-     */
     public function completeCycle(Request $request, $studentId)
     {
         $lecturer = $request->user()->lecturer;

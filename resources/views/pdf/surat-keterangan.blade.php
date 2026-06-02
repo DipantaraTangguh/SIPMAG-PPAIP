@@ -13,8 +13,6 @@
             line-height: 1.2;
             margin: 0;
         }
-
-        /* Document code: bottom-right footer, matches the source form */
         .doc-code {
             position: fixed;
             bottom: -0.8cm;
@@ -70,14 +68,10 @@
             font-weight: bold;
             margin: 0 0 4pt 0;
         }
-
-        /* Student signature: left-aligned, matches the source form */
         .sig-student {
             margin-top: 8pt;
         }
         .sig-student p { margin: 0; }
-
-        /* Kaprodi signature: left-indented block, matches the source form */
         .sig-kaprodi {
             margin-top: 8pt;
             padding-left: 28pt;

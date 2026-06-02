@@ -10,7 +10,6 @@ use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable, HasApiTokens;
 
     protected $fillable = [
@@ -32,9 +31,6 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
-
-    /* ── Role helpers ────────────────────────────── */
-
     public function isMahasiswa(): bool
     {
         return $this->role === 'mahasiswa';
@@ -54,9 +50,6 @@ class User extends Authenticatable
     {
         return $this->role === 'ppaip';
     }
-
-    /* ── Relationships ───────────────────────────── */
-
     public function student()
     {
         return $this->hasOne(Student::class);

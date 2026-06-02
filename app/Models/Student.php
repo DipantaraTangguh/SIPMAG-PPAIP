@@ -35,12 +35,6 @@ class Student extends Model
             'form1_approved_at'  => 'datetime',
         ];
     }
-
-    /**
-     * Get the dynamic academic year.
-     * Before August: (current year - 1) / current year
-     * After August: current year / (current year + 1)
-     */
     public function getTahunAkademikAttribute(): string
     {
         $now = now();

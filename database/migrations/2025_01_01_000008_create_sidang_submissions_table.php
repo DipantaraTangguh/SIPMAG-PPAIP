@@ -6,11 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * sidang_submissions — final document uploads before the offline defense.
-     * One record per student per cycle. No approval/rejection — stored immediately.
-     * PPAIP manually resets the cycle after confirming offline sidang.
-     */
     public function up(): void
     {
         Schema::create('sidang_submissions', function (Blueprint $table) {

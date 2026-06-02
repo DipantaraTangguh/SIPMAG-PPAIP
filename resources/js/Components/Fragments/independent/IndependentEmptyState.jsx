@@ -1,10 +1,3 @@
-/**
- * IndependentEmptyState.jsx
- * Displayed when user has no Form 2 submissions in the Independent tab.
- *
- * @prop {function} onCreateNew - Callback to navigate to Form 2 fill page.
- * @prop {boolean}  isLocked    - When true, disable the CTA button (Form 1 not approved).
- */
 import React from 'react';
 import { FileText, Plus } from 'lucide-react';
 

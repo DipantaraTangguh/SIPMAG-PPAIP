@@ -18,18 +18,10 @@ class DpmLogbookResource extends Resource
     protected static ?string $navigationGroup = 'Bimbingan';
     protected static ?int $navigationSort = 1;
     protected static ?string $slug = 'dpm/logbooks';
-
-    /**
-     * Only DPM can see this resource.
-     */
     public static function canAccess(): bool
     {
         return auth()->user()?->role === 'dpm';
     }
-
-    /**
-     * Scope to students assigned to this DPM.
-     */
     public static function getEloquentQuery(): Builder
     {
         $lecturerId = auth()->user()?->lecturer?->id;

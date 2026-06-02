@@ -1,10 +1,3 @@
-/**
- * VacancyDetailPage.jsx
- * "Info Lowongan Magang" detail page — shown when clicking
- * "Lihat Detail →" on a vacancy card.
- *
- * Route: /portal/vacancy/:id
- */
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Loader2, Search } from 'lucide-react';
@@ -16,8 +9,6 @@ import VacancyQualificationSection from '../../Components/Fragments/vacancy/Vaca
 import VacancyApplySidebar from '../../Components/Fragments/vacancy/VacancyApplySidebar';
 import useVacancyDetail from '../../hooks/useVacancyDetail';
 import { api } from '../../lib/api';
-
-/* Deterministic logo color from a small brand palette */
 const LOGO_PALETTE = ['#00AA5B', '#E02020', '#0194F3', '#F5A524', '#737373', '#682828', '#6F42C1'];
 function pickLogoColor(seed = '') {
     let h = 0;
@@ -40,8 +31,6 @@ function daysUntil(iso) {
     const date = new Date(iso.slice(0, 10));
     return Math.max(0, Math.ceil((date - new Date()) / (1000 * 60 * 60 * 24)));
 }
-
-/** Map API Internship → detail shape consumed by the page sub-components */
 function mapInternshipDetail(i) {
     if (!i) return null;
     const company = i.company_name || '';
@@ -65,8 +54,6 @@ function mapInternshipDetail(i) {
         persyaratan: Array.isArray(i.requirements) ? i.requirements : [],
     };
 }
-
-/** Map API Internship → compact shape for the "Lowongan Serupa" list */
 function mapSimilar(i) {
     const company = i.company_name || '';
     return {
@@ -78,8 +65,6 @@ function mapSimilar(i) {
         logoInitial: (company.trim()[0] || '?').toUpperCase(),
     };
 }
-
-/* ── Component ─────────────────────────────────────── */
 export default function VacancyDetailPage() {
     const { id } = useParams();
     const navigate = useNavigate();
@@ -164,10 +149,7 @@ export default function VacancyDetailPage() {
     return (
         <DashboardLayout pageTitle="Info Lowongan Magang">
             {BackButton}
-
-            {/* Two-column layout */}
             <div key={vacancy.id} className="grid grid-cols-1 items-start gap-6 animate-fadeIn xl:grid-cols-[1fr_340px]">
-                {/* Left: content sections */}
                 <div className="flex flex-col gap-5">
                     <VacancyDetailHeader vacancy={vacancy} />
                     <VacancyInfoSection vacancy={vacancy} />
@@ -176,8 +158,6 @@ export default function VacancyDetailPage() {
                     />
                     <VacancyQualificationSection vacancy={vacancy} />
                 </div>
-
-                {/* Right: sticky sidebar */}
                 <VacancyApplySidebar
                     vacancy={vacancy}
                     similarVacancies={similarVacancies}

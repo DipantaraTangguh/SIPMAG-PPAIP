@@ -10,10 +10,6 @@ use Illuminate\Support\Carbon;
 
 class Form1Controller extends Controller
 {
-    /**
-     * GET /api/form1
-     * Get current student's Form 1 submission data.
-     */
     public function show(Request $request)
     {
         $student = $request->user()->student;
@@ -21,7 +17,7 @@ class Form1Controller extends Controller
             return response()->json(['message' => 'Profil mahasiswa tidak ditemukan.'], 404);
         }
 
-        // Load the approver relationship
+        // Sekalian bawa data approver buat tampilan status.
         $student->load('form1Approver');
 
         $approver = null;
@@ -43,11 +39,6 @@ class Form1Controller extends Controller
             'submitted_at'     => $student->updated_at?->toIso8601String(),
         ]);
     }
-
-    /**
-     * POST /api/form1
-     * Submit Form 1 (mahasiswa only).
-     */
     public function store(Request $request)
     {
         $student = $request->user()->student;
@@ -69,13 +60,13 @@ class Form1Controller extends Controller
             'transkrip'    => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
         ]);
 
-        // Store transcript file if provided
+        // Simpan transkrip hanya kalau mahasiswa upload file.
         $transkripPath = null;
         if ($request->hasFile('transkrip')) {
             $transkripPath = $request->file('transkrip')->store('transkrip', 'local');
         }
 
-        // Remove transkrip from validated data before storing as JSON
+        // File transkrip jangan ikut masuk payload JSON form.
         unset($validated['transkrip']);
 
         $student->update([
@@ -90,11 +81,6 @@ class Form1Controller extends Controller
             'access_status' => 'PendingReview',
         ], 201);
     }
-
-    /**
-     * GET /api/kaprodi/form1
-     * List Form 1 submissions for Kaprodi review (scoped by study_program).
-     */
     public function indexForKaprodi(Request $request)
     {
         $lecturer = $request->user()->lecturer;
@@ -111,15 +97,11 @@ class Form1Controller extends Controller
 
         return response()->json(['submissions' => $students]);
     }
-
-    /**
-     * POST /api/kaprodi/form1/{studentId}/approve
-     */
     public function approve(Request $request, $studentId)
     {
         $lecturer = $request->user()->lecturer;
 
-        // Guard: Kaprodi must have uploaded their digital signature
+        // PDF butuh tanda tangan Kaprodi, jadi tahan dulu kalau belum ada.
         if (!$lecturer->signature_path) {
             return response()->json([
                 'message' => 'Anda harus mengunggah tanda tangan digital terlebih dahulu melalui menu "Profil Saya" sebelum dapat menyetujui Form 1.',
@@ -143,10 +125,6 @@ class Form1Controller extends Controller
             'access_status' => 'ApprovedForm1',
         ]);
     }
-
-    /**
-     * POST /api/kaprodi/form1/{studentId}/reject
-     */
     public function reject(Request $request, $studentId)
     {
         $request->validate(['reason' => 'required|string|max:500']);
@@ -167,12 +145,6 @@ class Form1Controller extends Controller
             'access_status' => 'RejectedForm1',
         ]);
     }
-
-    /**
-     * GET /api/form1/surat-keterangan
-     * Generate and stream the Form 1 "Surat Keterangan Memenuhi Syarat Akademik" PDF.
-     * Only available after Kaprodi has approved Form 1.
-     */
     public function downloadSuratKeterangan(Request $request)
     {
         $student = $request->user()->student;
@@ -220,11 +192,6 @@ class Form1Controller extends Controller
 
         return $pdf->download($filename);
     }
-
-    /**
-     * GET /api/kaprodi/students/{studentId}/transkrip
-     * Download/view student transcript — Kaprodi only, scoped to own prodi.
-     */
     public function downloadTranskrip(Request $request, $studentId)
     {
         $lecturer = $request->user()->lecturer;

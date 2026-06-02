@@ -1,11 +1,3 @@
-/**
- * CycleStepper.jsx
- * Horizontal 5-step progress indicator for the internship lifecycle.
- *
- * Steps: Syarat Akademik → Lamaran → Pengajuan Pembimbing → Logbook → Sidang
- *
- * @prop {number} currentStep — 1-based index of the active step (1–5).
- */
 import React from 'react';
 import {
     ClipboardCheck,
@@ -37,7 +29,6 @@ export default function CycleStepper({ currentStep = 1 }) {
 
                     return (
                         <React.Fragment key={step.key}>
-                            {/* Step node */}
                             <div className="flex min-w-[72px] flex-col items-center gap-2 sm:min-w-0">
                                 <div
                                     className={`
@@ -71,8 +62,6 @@ export default function CycleStepper({ currentStep = 1 }) {
                                     {step.label}
                                 </span>
                             </div>
-
-                            {/* Connector line (not after last step) */}
                             {idx < steps.length - 1 && (
                                 <div
                                     className={`

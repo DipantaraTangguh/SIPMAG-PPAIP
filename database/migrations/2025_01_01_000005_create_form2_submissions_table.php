@@ -6,15 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * form2_submissions — Mandiri track "Surat Pengantar Magang".
-     * Students may submit multiple Form 2s (one per target company).
-     * PPAIP reviews each one independently.
-     *
-     * Status lifecycle:
-     *   PendingReview → ApprovedForm2 (PDF auto-generated)
-     *                 → RejectedForm2 (student revises & resubmits)
-     */
     public function up(): void
     {
         Schema::create('form2_submissions', function (Blueprint $table) {

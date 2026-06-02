@@ -1,14 +1,3 @@
-/**
- * Sidebar.jsx
- * Responsive sidebar navigation for the Portal Magang dashboard.
- * Desktop uses a fixed 260px rail; mobile uses a bottom tab bar.
- *
- * Access to Sidang Magang is gated inside SidangPage itself.
- *
- * @prop {string}   nim        — Student NIM to display at the bottom.
- * @prop {function} onLogout   — Callback fired when "Keluar" is clicked.
- * @prop {string}   activePath — Optional override to force a specific nav item active.
- */
 import React from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import {
@@ -28,7 +17,6 @@ const navItems = [
     { to: '/form1', label: 'Profil', icon: User },
 ];
 
-
 export default function Sidebar({ nim = '—', onLogout, activePath }) {
     const location = useLocation();
 
@@ -39,15 +27,12 @@ export default function Sidebar({ nim = '—', onLogout, activePath }) {
 
     return (
         <aside className="fixed bottom-0 left-0 right-0 z-40 flex h-16 border-t border-primary-dark bg-primary shadow-[0_-8px_24px_rgba(0,0,0,0.12)] lg:bottom-auto lg:right-auto lg:top-0 lg:h-screen lg:w-[260px] lg:flex-col lg:border-t-0 lg:shadow-none">
-            {/* ── Logo ──────────────────────────── */}
             <div className="hidden px-6 pb-6 pt-8 lg:block">
                 <h1 className="text-2xl font-bold leading-tight text-white">
                     Portal Magang
                 </h1>
                 <span className="text-xs text-white/60">by PPAIP</span>
             </div>
-
-            {/* ── Navigation ────────────────────── */}
             <nav className="flex min-w-0 flex-1 items-stretch justify-around gap-0 overflow-x-auto px-1 lg:flex-col lg:justify-start lg:gap-1 lg:px-3">
                 {navItems.map(({ to, label, icon: Icon }) => {
                     const active = isActive(to);
@@ -72,8 +57,6 @@ export default function Sidebar({ nim = '—', onLogout, activePath }) {
                     );
                 })}
             </nav>
-
-            {/* ── Bottom section ─────────────────── */}
             <div className="mt-auto hidden border-t border-white/10 px-6 py-5 lg:block">
                 <div className="mb-3 flex items-center gap-2 text-xs text-white/60">
                     <Briefcase className="h-4 w-4" />

@@ -1,7 +1,3 @@
-/**
- * Form1BackButton.jsx
- * "Kembali ke Beranda" navigation card — always shown below the status panel.
- */
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';

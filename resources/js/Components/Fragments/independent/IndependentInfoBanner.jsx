@@ -1,7 +1,3 @@
-/**
- * IndependentInfoBanner.jsx
- * Banner containing instructions for the Independent tab.
- */
 import React from 'react';
 import { Info } from 'lucide-react';
 

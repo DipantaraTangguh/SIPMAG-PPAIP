@@ -1,9 +1,3 @@
-/**
- * IndependentSectionHeader.jsx
- * Header row for the Form 2 section, showing the count of submissions.
- *
- * @prop {number} count - the number of Form 2 submissions
- */
 import React from 'react';
 
 export default function IndependentSectionHeader({ count = 0 }) {
@@ -17,7 +11,6 @@ export default function IndependentSectionHeader({ count = 0 }) {
                     {count}
                 </div>
             </div>
-            {/* No button on the right for empty state */}
         </div>
     );
 }

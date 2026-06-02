@@ -1,8 +1,3 @@
-/**
- * components/guidance/LogbookTabContent.jsx
- * Logbook tab content — table, progress, add/edit modals.
- * Extracted from GuidancePage.jsx lines 859–1116.
- */
 import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
@@ -71,7 +66,7 @@ export default function LogbookTabContent() {
         setEditEntry(null);
     };
 
-    // Modal state helpers
+    // Helper kecil biar buka/tutup modal nggak nyebar ke JSX.
     const isEdit = editEntry !== null;
     const isModalOpen = showAddModal || isEdit;
     const modalTitle = isEdit ? 'Perbaiki Entri Logbook' : 'Tambah Entri Logbook';
@@ -82,9 +77,7 @@ export default function LogbookTabContent() {
 
     return (
         <div className="mt-8 animate-in fade-in duration-500">
-            {/* TOP ROW */}
             <div className="flex flex-col items-stretch gap-5 xl:flex-row">
-                {/* Left Card: Progress Info & Add Button */}
                 <div className={`flex flex-1 flex-col gap-5 rounded-xl border border-l-4 bg-white px-5 py-6 shadow-sm sm:flex-row sm:items-center sm:justify-between sm:px-7 ${isComplete ? 'border-green-200 border-l-green-500' : 'border-gray-200 border-l-primary'}`}>
                     <div>
                         <p className="mb-2.5 text-[12px] font-bold uppercase tracking-wider text-gray-500">
@@ -123,8 +116,6 @@ export default function LogbookTabContent() {
                         </button>
                     )}
                 </div>
-
-                {/* Right Card: Informasi Penting */}
                 <div className="relative w-full overflow-hidden rounded-xl bg-primary p-6 shadow-sm xl:w-[280px] xl:flex-shrink-0">
                     <h3 className="text-[15px] font-bold text-white">Informasi Penting</h3>
                     <p className="mt-2 text-[13px] leading-relaxed text-white opacity-90">
@@ -133,8 +124,6 @@ export default function LogbookTabContent() {
                     <Info className="absolute -bottom-4 -right-2 h-[100px] w-[100px] text-white opacity-10" />
                 </div>
             </div>
-
-            {/* LOGBOOK TABLE OR EMPTY STATE */}
             {logbookEntries.length === 0 ? (
                 <div className="mt-6 flex flex-col items-center justify-center rounded-xl border border-gray-200 bg-white p-6 text-center sm:p-12">
                     <BookOpen className="text-gray-300" size={48} />
@@ -185,9 +174,6 @@ export default function LogbookTabContent() {
                     </table>
                 </div>
             )}
-
-            {/* MODAL */}
-            {/* MODAL */}
             {isModalOpen && typeof document !== 'undefined' && createPortal(
                 <div
                     className="fixed inset-0 z-[99] flex items-center justify-center overflow-y-auto overflow-x-hidden bg-black/45 p-4 sm:p-0"

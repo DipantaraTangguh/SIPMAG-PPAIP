@@ -1,10 +1,3 @@
-/**
- * DpmCard.jsx
- * Card displaying the assigned Dosen Pembimbing Magang (DPM).
- * Shows a placeholder when no DPM has been assigned yet.
- *
- * @prop {object|null} dpm — { name: string, email: string } or null.
- */
 import React from 'react';
 import { UserCircle, Mail } from 'lucide-react';
 
@@ -14,12 +7,9 @@ export default function DpmCard({ dpm = null }) {
 
     return (
         <div className="flex items-center gap-5 rounded-xl border border-gray-200 bg-white p-6 border-l-4 border-l-primary">
-            {/* Avatar placeholder */}
             <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-full bg-gray-100">
                 <UserCircle className="h-8 w-8 text-gray-400" />
             </div>
-
-            {/* Info */}
             <div className="min-w-0 flex-1">
                 <p className="mb-1 text-[10px] font-bold uppercase tracking-wider text-gray-400">
                     Dosen Pembimbing Magang (DPM)

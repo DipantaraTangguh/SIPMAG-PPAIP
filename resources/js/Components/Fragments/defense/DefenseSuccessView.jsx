@@ -1,8 +1,3 @@
-/**
- * components/defense/DefenseSuccessView.jsx
- * State 2: Success confirmation after sidang documents submitted.
- * Extracted from InternshipDefensePage.jsx lines 403–461.
- */
 import React from 'react';
 import { Clock } from 'lucide-react';
 import { useSimulation } from '../../../context/SimulationContext';

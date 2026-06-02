@@ -8,10 +8,6 @@ use Illuminate\Http\Request;
 
 class InternshipController extends Controller
 {
-    /**
-     * GET /api/internships
-     * List active internship vacancies. Supports search by company/position.
-     */
     public function index(Request $request)
     {
         $query = Internship::where('is_active', true);
@@ -31,22 +27,12 @@ class InternshipController extends Controller
 
         return response()->json(['internships' => $internships]);
     }
-
-    /**
-     * GET /api/internships/{id}
-     * Get single internship detail.
-     */
     public function show($id)
     {
         $internship = Internship::findOrFail($id);
 
         return response()->json(['internship' => $internship]);
     }
-
-    /**
-     * POST /api/ppaip/internships
-     * Create new vacancy (PPAIP only).
-     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -71,10 +57,6 @@ class InternshipController extends Controller
 
         return response()->json(['internship' => $internship], 201);
     }
-
-    /**
-     * PUT /api/ppaip/internships/{id}
-     */
     public function update(Request $request, $id)
     {
         $internship = Internship::findOrFail($id);
@@ -101,10 +83,6 @@ class InternshipController extends Controller
 
         return response()->json(['internship' => $internship]);
     }
-
-    /**
-     * DELETE /api/ppaip/internships/{id}
-     */
     public function destroy($id)
     {
         Internship::findOrFail($id)->delete();

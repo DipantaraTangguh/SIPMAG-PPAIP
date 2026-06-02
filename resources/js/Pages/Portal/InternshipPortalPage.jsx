@@ -1,12 +1,3 @@
-/**
- * InternshipPortalPage.jsx
- * "Portal Magang" info page with Mitra vacancy grid,
- * search/filter, active applications sidebar, and FAB.
- * Accessible to all logged-in students (browsing allowed
- * regardless of Form 1 status).
- *
- * Route: /portal
- */
 import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useSimulation } from '../../context/SimulationContext';
@@ -19,16 +10,12 @@ import SearchFilterBar from '../../Components/Fragments/portal/SearchFilterBar';
 import VacancyGrid from '../../Components/Fragments/portal/VacancyGrid';
 import ActiveApplicationsSidebar from '../../Components/Fragments/portal/ActiveApplicationsSidebar';
 import IndependentTabContent from '../../Components/Fragments/independent/IndependentTabContent';
-
-/* Deterministic logo color from a small brand palette */
 const LOGO_PALETTE = ['#00AA5B', '#E02020', '#0194F3', '#F5A524', '#737373', '#682828', '#6F42C1'];
 function pickLogoColor(seed = '') {
     let h = 0;
     for (let i = 0; i < seed.length; i++) h = (h * 31 + seed.charCodeAt(i)) >>> 0;
     return LOGO_PALETTE[h % LOGO_PALETTE.length];
 }
-
-/** Map API Internship → shape expected by VacancyCard */
 function mapInternship(i) {
     const company = i.company_name || '';
     const deadlineDate = i.deadline ? i.deadline.slice(0, 10) : null;
@@ -68,15 +55,13 @@ const mockActiveApplications = [
         appliedAt: '28 Apr 2024',
     },
 ];
-
-/* ── Component ───────────────────────────────────── */
 export default function InternshipPortalPage() {
     const { student, activeApplications } = useSimulation();
     const navigate = useNavigate();
     const location = useLocation();
     const accessStatus = student?.accessStatus;
 
-    // Restore active tab from navigation state (e.g. after Form 2 submit)
+    // Balik dari Form 2 harus tetap mendarat di tab Mandiri.
     const [activeTab, setActiveTab] = useState(
         location.state?.activeTab || 'mitra'
     );
@@ -84,14 +69,14 @@ export default function InternshipPortalPage() {
     const [sortBy, setSortBy] = useState('terbaru');
     const [vacancies, setVacancies] = useState([]);
 
-    // Clear navigation state after reading to prevent stale tab on refresh
+    // State navigasi dibersihin supaya refresh nggak maksa tab lama.
     useEffect(() => {
         if (location.state?.activeTab) {
             window.history.replaceState({}, '');
         }
     }, []);
 
-    // Fetch active vacancies from the backend
+    // Lowongan aktif tetap ambil dari backend biar datanya fresh.
     useEffect(() => {
         let cancelled = false;
         api.get('/internships')
@@ -99,11 +84,9 @@ export default function InternshipPortalPage() {
                 if (cancelled) return;
                 setVacancies((data.internships || []).map(mapInternship));
             })
-            .catch(() => { /* ignore — empty list */ });
+            .catch(() => { /* kalau gagal, UI cukup tampil empty state */ });
         return () => { cancelled = true; };
     }, []);
-
-    /* Derived filtered list */
     const filteredVacancies = useMemo(() => {
         let result = [...vacancies];
 
@@ -131,21 +114,17 @@ export default function InternshipPortalPage() {
         navigate(`/portal/vacancy/${id}`);
     };
 
-    const showAccessBanner = !canAccessPortal(accessStatus); // FIXED
+    const showAccessBanner = !canAccessPortal(accessStatus); // Status ini sudah ikut helper akses terbaru.
 
     return (
         <DashboardLayout pageTitle="Portal Magang">
             <div className="flex flex-col gap-5">
-                {/* Tab navigation */}
                 <TabNavigation
                     activeTab={activeTab}
                     onTabChange={setActiveTab}
                 />
-
-                {/* Active Tab Content */}
                 {activeTab === 'mitra' ? (
                     <>
-                        {/* Access status banner */}
                         {showAccessBanner && (
                             <div className="flex flex-col gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 sm:flex-row sm:items-center">
                                 <Info className="h-[18px] w-[18px] flex-shrink-0 text-amber-500" />
@@ -162,25 +141,18 @@ export default function InternshipPortalPage() {
                                 </button>
                             </div>
                         )}
-
-                        {/* Search + filter */}
                         <SearchFilterBar
                             searchQuery={searchQuery}
                             onSearchChange={setSearchQuery}
                             sortBy={sortBy}
                             onSortChange={setSortBy}
                         />
-
-                        {/* Main content grid */}
                         <div className="grid grid-cols-1 items-start gap-6 xl:grid-cols-[1fr_300px]">
-                            {/* Left: vacancy grid */}
                             <VacancyGrid
                                 vacancies={filteredVacancies}
                                 accessStatus={accessStatus}
                                 onCardClick={handleCardClick}
                             />
-
-                            {/* Right: sidebar — pushed down to align with first card row */}
                             <div className="pt-0 xl:pt-10">
                                 <ActiveApplicationsSidebar
                                     applications={activeApplications}

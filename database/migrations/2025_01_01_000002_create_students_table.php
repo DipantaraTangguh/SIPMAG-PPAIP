@@ -6,15 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * students — mahasiswa profile table.
-     * Stores academic data, current lifecycle status, and DPM assignment.
-     *
-     * access_status lifecycle:
-     *   Unverified → PendingReview → ApprovedForm1 / RejectedForm1
-     *   → HasApplication → HasDPM → LogbookComplete
-     *   → MenungguSidang → SiklusSelesai
-     */
     public function up(): void
     {
         Schema::create('students', function (Blueprint $table) {

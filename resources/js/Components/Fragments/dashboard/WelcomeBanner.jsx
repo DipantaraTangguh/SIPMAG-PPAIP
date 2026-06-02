@@ -1,9 +1,3 @@
-/**
- * WelcomeBanner.jsx
- * Full-width welcome card displayed at the top of the Beranda page.
- *
- * @prop {string} name — Student's name shown in the greeting.
- */
 import React from 'react';
 
 export default function WelcomeBanner({ name = '—' }) {

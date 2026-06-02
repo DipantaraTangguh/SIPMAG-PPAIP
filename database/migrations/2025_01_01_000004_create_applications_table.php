@@ -6,15 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * applications — Portal Mitra track applications.
-     * Each row = one student applying to one internship vacancy.
-     *
-     * Status lifecycle:
-     *   Applied → Accepted (triggers auto-cancel of others)
-     *           → RejectedByCompany
-     *           → Canceled (auto-cancel by observer)
-     */
     public function up(): void
     {
         Schema::create('applications', function (Blueprint $table) {

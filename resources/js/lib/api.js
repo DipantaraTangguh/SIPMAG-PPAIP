@@ -1,9 +1,3 @@
-/**
- * lib/api.js
- * Centralized API client for Portal Magang.
- * Uses Sanctum Bearer token stored in localStorage.
- */
-
 const API_BASE = '/api';
 const TOKEN_KEY = 'portal_magang_token';
 
@@ -18,11 +12,6 @@ export function setToken(token) {
 export function clearToken() {
     localStorage.removeItem(TOKEN_KEY);
 }
-
-/**
- * Generic fetch wrapper with Bearer token auth.
- * Automatically handles JSON parsing and error responses.
- */
 async function request(endpoint, options = {}) {
     const token = getToken();
     const headers = {
@@ -30,7 +19,7 @@ async function request(endpoint, options = {}) {
         ...options.headers,
     };
 
-    // Don't set Content-Type for FormData (file uploads)
+    // Jangan paksa Content-Type, browser yang set boundary upload file.
     if (!(options.body instanceof FormData)) {
         headers['Content-Type'] = 'application/json';
     }
@@ -44,7 +33,7 @@ async function request(endpoint, options = {}) {
         headers,
     });
 
-    // Handle 401 — token expired
+    // Token mati, langsung bersihin session user.
     if (response.status === 401) {
         clearToken();
         window.location.href = '/login';
@@ -65,19 +54,12 @@ async function request(endpoint, options = {}) {
 
     return data;
 }
-
-/* ── Convenience methods ──────────────────────────── */
-
 export const api = {
     get:    (url)        => request(url, { method: 'GET' }),
     post:   (url, body)  => request(url, { method: 'POST', body: JSON.stringify(body) }),
     put:    (url, body)  => request(url, { method: 'PUT', body: JSON.stringify(body) }),
     delete: (url)        => request(url, { method: 'DELETE' }),
-
-    /** POST with FormData (file uploads) */
     upload: (url, formData) => request(url, { method: 'POST', body: formData }),
-
-    /** Fetch a binary file (e.g. PDF) and trigger a browser download. */
     download: async (url, filename) => {
         const token = getToken();
         const response = await fetch(`${API_BASE}${url}`, {
@@ -105,8 +87,6 @@ export const api = {
         a.remove();
         URL.revokeObjectURL(objectUrl);
     },
-
-    /** Auth-specific: login returns token */
     login: async (login, password) => {
         const data = await request('/login', {
             method: 'POST',
@@ -117,12 +97,10 @@ export const api = {
         }
         return data;
     },
-
-    /** Auth-specific: logout and clear token */
     logout: async () => {
         try {
             await request('/logout', { method: 'POST' });
-        } catch { /* ignore */ }
+        } catch { /* aman di-skip */ }
         clearToken();
     },
 };

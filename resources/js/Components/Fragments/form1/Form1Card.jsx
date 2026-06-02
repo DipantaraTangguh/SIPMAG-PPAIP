@@ -1,23 +1,3 @@
-/**
- * Form1Card.jsx
- * Main form card for "Form Magang-01: Surat Keterangan Memenuhi Syarat Akademik".
- * Renders all form fields, file upload dropzone, radio group, declaration checkbox,
- * and footer action buttons. All state is passed in via props from the useForm1 hook.
- *
- * @prop {object}   readOnlyFields — { nama, nim, programStudi }
- * @prop {object}   formData       — Current form state from useForm1.
- * @prop {object}   errors         — Per-field validation errors.
- * @prop {string}   fileError      — File-specific validation error.
- * @prop {boolean}  isSubmitting   — Whether a submission is in progress.
- * @prop {boolean}  isDragging     — Whether a file is being dragged over the dropzone.
- * @prop {function} setIsDragging  — Setter for isDragging.
- * @prop {boolean}  isFormValid    — Whether all required fields are filled.
- * @prop {function} updateField    — (field, value) => void.
- * @prop {function} handleFileChange — (file) => void.
- * @prop {function} removeFile     — () => void.
- * @prop {function} handleSubmit   — Form submit handler.
- * @prop {function} handleCancel   — Cancel / go-back handler.
- */
 import React, { useRef } from 'react';
 import {
     Lock,
@@ -28,10 +8,6 @@ import {
     FileText,
     Loader2,
 } from 'lucide-react';
-
-/* ── Reusable sub-components ─────────────────────── */
-
-/** Field label (uppercase, small, gray) */
 function FieldLabel({ children, htmlFor }) {
     return (
         <label
@@ -42,14 +18,10 @@ function FieldLabel({ children, htmlFor }) {
         </label>
     );
 }
-
-/** Inline error message shown below a field */
 function FieldError({ message }) {
     if (!message) return null;
     return <p className="mt-1 text-xs text-red-500">{message}</p>;
 }
-
-/** Read-only text input with lock icon */
 function ReadOnlyInput({ id, value }) {
     return (
         <div className="relative">
@@ -64,22 +36,16 @@ function ReadOnlyInput({ id, value }) {
         </div>
     );
 }
-
-/** Helper / hint text below a field */
 function HelperText({ children }) {
     return (
         <p className="mt-1 text-xs italic text-black">{children}</p>
     );
 }
-
-/* ── Format file size for display ────────────────── */
 function formatFileSize(bytes) {
     if (bytes < 1024) return `${bytes} B`;
     if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
     return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
-
-/* ── Main Component ──────────────────────────────── */
 export default function Form1Card({
     readOnlyFields,
     formData,
@@ -96,8 +62,6 @@ export default function Form1Card({
     handleCancel,
 }) {
     const fileInputRef = useRef(null);
-
-    /* ── Drag & drop handlers ────────────────────── */
     const onDragOver = (e) => {
         e.preventDefault();
         setIsDragging(true);
@@ -114,8 +78,6 @@ export default function Form1Card({
         if (file) handleFileChange(file);
         e.target.value = '';
     };
-
-    /* ── Input base classes ──────────────────────── */
     const inputBase =
         'w-full rounded-lg border px-4 py-3 text-sm text-gray-800 outline-none transition-colors duration-150 placeholder:text-gray-400';
     const inputNormal = `${inputBase} border-gray-200 bg-white focus:border-primary focus:ring-2 focus:ring-primary/20`;
@@ -123,7 +85,6 @@ export default function Form1Card({
 
     return (
         <form onSubmit={handleSubmit} className="rounded-xl border border-gray-200 bg-white p-5 sm:p-8">
-            {/* ── Card header ──────────────────── */}
             <div className="mb-8">
                 <h3 className="text-xl font-bold text-gray-900">
                     Isi Form Magang-01
@@ -132,8 +93,6 @@ export default function Form1Card({
                     Lengkapi data di bawah ini untuk mengajukan surat keterangan akademik.
                 </p>
             </div>
-
-            {/* ── Submit-level error ────────────── */}
             {errors.submit && (
                 <div className="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
                     {errors.submit}
@@ -141,7 +100,6 @@ export default function Form1Card({
             )}
 
             <div className="flex flex-col gap-6">
-                {/* ── ROW 1: Nama + NIM (read-only) ── */}
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                     <div>
                         <FieldLabel htmlFor="nama">Nama Lengkap</FieldLabel>
@@ -152,14 +110,10 @@ export default function Form1Card({
                         <ReadOnlyInput id="nim" value={readOnlyFields.nim} />
                     </div>
                 </div>
-
-                {/* ── ROW 2: Program Studi (read-only) ── */}
                 <div>
                     <FieldLabel htmlFor="programStudi">Program Studi</FieldLabel>
                     <ReadOnlyInput id="programStudi" value={readOnlyFields.programStudi} />
                 </div>
-
-                {/* ── ROW 3: Semester + Tahun Akademik (read-only) ── */}
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                     <div>
                         <FieldLabel htmlFor="semester">Semester</FieldLabel>
@@ -170,8 +124,6 @@ export default function Form1Card({
                         <ReadOnlyInput id="tahunAkademik" value={readOnlyFields.tahunAkademik} />
                     </div>
                 </div>
-
-                {/* ── ROW 4: Jumlah SKS + IPK (read-only) ── */}
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                     <div>
                         <FieldLabel htmlFor="jumlahSks">Jumlah SKS</FieldLabel>
@@ -182,8 +134,6 @@ export default function Form1Card({
                         <ReadOnlyInput id="ipk" value={readOnlyFields.ipk} />
                     </div>
                 </div>
-
-                {/* ── ROW 5: Rencana Skema Magang ── */}
                 <div className="w-full sm:w-1/2">
                     <FieldLabel htmlFor="rencanaSkema">Rencana Skema Magang</FieldLabel>
                     <div className="relative">
@@ -207,8 +157,6 @@ export default function Form1Card({
                     </div>
                     <FieldError message={errors.rencanaSkema} />
                 </div>
-
-                {/* ── ROW 6: Topik / Tempat Magang ── */}
                 <div>
                     <FieldLabel htmlFor="topikTempat">Topik / Tempat Magang</FieldLabel>
                     <textarea
@@ -231,13 +179,10 @@ export default function Form1Card({
                     )}
                     <FieldError message={errors.topikTempat} />
                 </div>
-
-                {/* ── ROW 7: Upload Transkrip ── */}
                 <div>
                     <FieldLabel>Upload Transkrip Nilai Terbaru</FieldLabel>
 
                     {formData.transkripFile ? (
-                        /* File selected state */
                         <div className="flex items-center gap-3 rounded-xl border border-primary bg-primary-pale px-5 py-4">
                             <FileText className="h-6 w-6 flex-shrink-0 text-primary" />
                             <div className="min-w-0 flex-1">
@@ -258,7 +203,6 @@ export default function Form1Card({
                             </button>
                         </div>
                     ) : (
-                        /* Dropzone */
                         <div
                             onDragOver={onDragOver}
                             onDragLeave={onDragLeave}
@@ -301,8 +245,6 @@ export default function Form1Card({
                     )}
                     <FieldError message={errors.transkripFile} />
                 </div>
-
-                {/* ── ROW 8: Output (radio group) ── */}
                 <div>
                     <FieldLabel>Output</FieldLabel>
                     <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:gap-6">
@@ -339,8 +281,6 @@ export default function Form1Card({
                     </div>
                     <FieldError message={errors.output} />
                 </div>
-
-                {/* ── ROW 9: Declaration checkbox ── */}
                 <label className="flex cursor-pointer items-start gap-3">
                     <input
                         type="checkbox"
@@ -364,8 +304,6 @@ export default function Form1Card({
                     </span>
                 </label>
             </div>
-
-            {/* ── Form footer ────────────────────── */}
             <div className="mt-8 flex flex-col-reverse items-stretch justify-end gap-3 border-t border-gray-100 pt-6 sm:flex-row sm:items-center sm:gap-4">
                 <button
                     type="button"

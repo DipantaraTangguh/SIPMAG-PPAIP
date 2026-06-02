@@ -20,10 +20,6 @@ class PpaipStudentResource extends Resource
     {
         return auth()->user()?->role === 'ppaip';
     }
-
-    /**
-     * PPAIP cannot create or edit students — read-only.
-     */
     public static function canCreate(): bool
     {
         return false;

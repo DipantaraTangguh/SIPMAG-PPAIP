@@ -1,8 +1,3 @@
-/**
- * constants/statusConstants.js
- * All accessStatus values as named constants.
- * Prevents typo bugs from raw string comparisons.
- */
 export const ACCESS_STATUS = {
     UNVERIFIED: 'Unverified',
     PENDING_REVIEW: 'PendingReview',

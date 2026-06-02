@@ -1,8 +1,3 @@
-/**
- * components/guidance/GuidanceLockedState.jsx
- * Locked state display for Bimbingan page when prerequisites are not met.
- * Extracted from GuidancePage.jsx lines 37–116.
- */
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Lock, Clock, FileSearch } from 'lucide-react';
@@ -10,7 +5,7 @@ import { Lock, Clock, FileSearch } from 'lucide-react';
 export default function GuidanceLockedState({ accessStatus }) {
     const navigate = useNavigate();
 
-    // Configuration for different locked states
+    // Copywriting lock screen dibedain sesuai tahap yang nyangkut.
     const states = {
         Unverified: {
             icon: <Lock className="h-14 w-14 text-gray-400" />,

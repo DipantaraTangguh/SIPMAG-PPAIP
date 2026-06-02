@@ -9,10 +9,6 @@ use Illuminate\Http\Request;
 
 class SupervisorController extends Controller
 {
-    /**
-     * GET /api/supervisor-application
-     * Get current student's supervisor application.
-     */
     public function show(Request $request)
     {
         $student = $request->user()->student;
@@ -28,18 +24,13 @@ class SupervisorController extends Controller
             ] : null,
         ]);
     }
-
-    /**
-     * POST /api/supervisor-application
-     * Submit supervisor application form with LoA.
-     */
     public function store(Request $request)
     {
         $student = $request->user()->student;
 
-        // Guard: student must have completed prior steps
-        // Mitra: Form1 Approved → Applied to vacancy (HasApplication)
-        // Mandiri: Form1 Approved → Form2 submitted & approved (HasApplication)
+        // Request DPM baru masuk kalau tahap perusahaan sudah valid.
+        // Jalur mitra: harus sudah punya lamaran aktif.
+        // Jalur mandiri: Form 2 approved dihitung setara lamaran.
         if (!in_array($student->access_status, ['HasApplication'])) {
             return response()->json(['message' => 'Anda belum menyelesaikan tahap sebelumnya.'], 403);
         }
@@ -77,11 +68,6 @@ class SupervisorController extends Controller
 
         return response()->json(['message' => 'Pengajuan pembimbing berhasil dikirim.'], 201);
     }
-
-    /**
-     * GET /api/kaprodi/supervisor-applications
-     * List supervisor applications for Kaprodi (scoped by study_program).
-     */
     public function indexForKaprodi(Request $request)
     {
         $lecturer = $request->user()->lecturer;
@@ -95,11 +81,6 @@ class SupervisorController extends Controller
 
         return response()->json(['applications' => $applications]);
     }
-
-    /**
-     * POST /api/kaprodi/assign-dpm
-     * Assign a DPM lecturer to a student.
-     */
     public function assignDpm(Request $request)
     {
         $request->validate([
@@ -112,14 +93,14 @@ class SupervisorController extends Controller
             ->where('study_program', $lecturer->study_program)
             ->firstOrFail();
 
-        // Guard: student must have submitted a supervisor nomination
+        // Kaprodi baru bisa proses kalau pengajuan pembimbing sudah ada.
         if (!$student->supervisorApplication()->exists()) {
             return response()->json([
                 'message' => 'Mahasiswa belum mengajukan pengajuan pembimbing.',
             ], 422);
         }
 
-        // Guard: student must not already have a DPM
+        // Jangan assign ulang kalau mahasiswa sudah punya DPM.
         if ($student->dpm_id) {
             return response()->json([
                 'message' => 'DPM sudah ditugaskan untuk mahasiswa ini.',
@@ -136,11 +117,6 @@ class SupervisorController extends Controller
             'access_status' => 'HasDPM',
         ]);
     }
-
-    /**
-     * GET /api/supervisor-application/loa
-     * Download/view supervisor application LoA file.
-     */
     public function downloadLoa(Request $request)
     {
         $student = $request->user()->student;
@@ -158,11 +134,6 @@ class SupervisorController extends Controller
 
         return response()->file($path);
     }
-
-    /**
-     * GET /api/kaprodi/supervisor-applications/{studentId}/loa
-     * Download/view student's LoA for Kaprodi.
-     */
     public function downloadLoaForKaprodi(Request $request, $studentId)
     {
         $lecturer = $request->user()->lecturer;

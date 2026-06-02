@@ -4,15 +4,9 @@ use Illuminate\Support\Facades\Route;
 use App\Models\Student;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-
-/*
-|--------------------------------------------------------------------------
-| Transcript file routes (Filament / session auth)
-|--------------------------------------------------------------------------
-*/
 Route::middleware(['web', 'auth'])->prefix('admin/transkrip')->group(function () {
 
-    // Inline preview (opens in iframe)
+    // Preview PDF langsung di iframe.
     Route::get('/{student}/preview', function (Student $student) {
         $user = Auth::user();
         if (!in_array($user->role, ['kaprodi', 'ppaip'])) {
@@ -36,7 +30,7 @@ Route::middleware(['web', 'auth'])->prefix('admin/transkrip')->group(function ()
         ]);
     })->name('transkrip.preview');
 
-    // Force download
+    // Download satu file tanpa render preview.
     Route::get('/{student}/download', function (Student $student) {
         $user = Auth::user();
         if (!in_array($user->role, ['kaprodi', 'ppaip'])) {
@@ -59,7 +53,7 @@ Route::middleware(['web', 'auth'])->prefix('admin/transkrip')->group(function ()
         return response()->download($path, "transkrip_{$student->nim}.{$ext}");
     })->name('transkrip.download');
 
-    // Bulk download as ZIP
+    // Paketkan semua transkrip jadi ZIP.
     Route::post('/bulk-download', function (Request $request) {
         $user = Auth::user();
         if (!in_array($user->role, ['kaprodi', 'ppaip'])) {
@@ -83,7 +77,7 @@ Route::middleware(['web', 'auth'])->prefix('admin/transkrip')->group(function ()
         $zipName = 'transkrip_' . now()->format('Ymd_His') . '.zip';
         $zipPath = storage_path('app/private/temp/' . $zipName);
 
-        // Ensure temp directory exists
+        // Folder temp kadang belum ada di fresh install.
         if (!is_dir(dirname($zipPath))) {
             mkdir(dirname($zipPath), 0755, true);
         }
@@ -105,7 +99,7 @@ Route::middleware(['web', 'auth'])->prefix('admin/transkrip')->group(function ()
     })->name('transkrip.bulk-download');
 });
 
-// React SPA Catch-all Route
+// Sisanya lempar ke React router.
 Route::get('/{any}', function () {
     return view('app');
 })->where('any', '^(?!api|admin|filament|_debugbar).*$');

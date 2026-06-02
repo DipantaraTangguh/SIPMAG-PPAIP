@@ -1,11 +1,3 @@
-/**
- * VacancyGrid.jsx
- * 2-column grid listing of vacancy cards with results header + empty state.
- *
- * @prop {Array}    vacancies    — Filtered vacancy list.
- * @prop {string}   accessStatus — Student access status.
- * @prop {function} onCardClick  — Callback with vacancy id.
- */
 import React from 'react';
 import { Search } from 'lucide-react';
 import VacancyCard from './VacancyCard';
@@ -13,7 +5,6 @@ import VacancyCard from './VacancyCard';
 export default function VacancyGrid({ vacancies, accessStatus, onCardClick }) {
     return (
         <div>
-            {/* Header row */}
             <div className="mb-4 flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between">
                 <h3 className="text-base font-bold text-gray-900">
                     Lowongan Tersedia
@@ -22,8 +13,6 @@ export default function VacancyGrid({ vacancies, accessStatus, onCardClick }) {
                     {vacancies.length} Hasil Ditemukan
                 </span>
             </div>
-
-            {/* Grid or empty state */}
             {vacancies.length > 0 ? (
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                     {vacancies.map((v) => (

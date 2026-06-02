@@ -1,13 +1,3 @@
-/**
- * src/pages/GuidancePage.jsx
- * Thin shell page component for Bimbingan & Logbook.
- * Handles access-gating and delegates to extracted components.
- *
- * View routing is driven by SimulationContext state:
- *   pengajuanPembimbing == null           → SupervisorRequestForm
- *   pengajuanPembimbing && !student.dpm   → RequestSubmittedView
- *   student.dpm && accessStatus=="HasDPM" → DpmAssignedView
- */
 import React from 'react';
 import DashboardLayout from '../../Components/Layouts/DashboardLayout';
 import { useSimulation } from '../../context/SimulationContext';

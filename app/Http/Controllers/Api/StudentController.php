@@ -8,10 +8,6 @@ use Illuminate\Http\Request;
 
 class StudentController extends Controller
 {
-    /**
-     * GET /api/ppaip/students
-     * Read-only list of ALL students across all programs (PPAIP).
-     */
     public function indexForPpaip()
     {
         $students = Student::with(['dpm:id,lecturer_name'])
@@ -25,11 +21,6 @@ class StudentController extends Controller
 
         return response()->json(['students' => $students]);
     }
-
-    /**
-     * GET /api/kaprodi/students
-     * Students scoped to Kaprodi's own study program.
-     */
     public function indexForKaprodi(Request $request)
     {
         $lecturer = $request->user()->lecturer;
@@ -49,11 +40,6 @@ class StudentController extends Controller
 
         return response()->json(['students' => $students]);
     }
-
-    /**
-     * GET /api/dpm/students
-     * Students assigned to this DPM only.
-     */
     public function indexForDpm(Request $request)
     {
         $lecturer = $request->user()->lecturer;

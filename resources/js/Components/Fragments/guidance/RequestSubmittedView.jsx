@@ -1,8 +1,3 @@
-/**
- * components/guidance/RequestSubmittedView.jsx
- * Submitted pengajuan view — shows readonly data + side panel.
- * Extracted from GuidancePage.jsx lines 256–466.
- */
 import React from 'react';
 import { BookOpen, Check, Info, Eye, Calendar } from 'lucide-react';
 import { api } from '../../../lib/api';
@@ -10,7 +5,6 @@ import { api } from '../../../lib/api';
 export default function RequestSubmittedView({ data, studentName, studentNim }) {
     return (
         <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-[1fr_320px]">
-            {/* LEFT COLUMN: Data Pengajuan Card */}
             <div>
                 <div className="rounded-xl border border-gray-200 border-l-4 border-l-primary bg-white p-5 sm:p-8">
                     <div className="mb-6">
@@ -21,8 +15,6 @@ export default function RequestSubmittedView({ data, studentName, studentNim }) 
                             Rincian permohonan magang mahasiswa
                         </p>
                     </div>
-
-                    {/* ROW 1: Nama & NIM */}
                     <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                         <div>
                             <p className="mb-1 text-[11px] font-medium uppercase tracking-wider text-gray-400">
@@ -43,8 +35,6 @@ export default function RequestSubmittedView({ data, studentName, studentNim }) 
                     </div>
 
                     <div className="my-5 border-b border-gray-100"></div>
-
-                    {/* ROW 2: Nama Perusahaan */}
                     <div>
                         <p className="mb-1 text-[11px] font-medium uppercase tracking-wider text-gray-400">
                             NAMA PERUSAHAAN
@@ -55,8 +45,6 @@ export default function RequestSubmittedView({ data, studentName, studentNim }) 
                     </div>
 
                     <div className="my-5 border-b border-gray-100"></div>
-
-                    {/* ROW 3: Praktisi & Jabatan */}
                     <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                         <div>
                             <p className="mb-1 text-[11px] font-medium uppercase tracking-wider text-gray-400">
@@ -77,8 +65,6 @@ export default function RequestSubmittedView({ data, studentName, studentNim }) 
                     </div>
 
                     <div className="my-5 border-b border-gray-100"></div>
-
-                    {/* ROW 4: Telepon & Email */}
                     <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                         <div>
                             <p className="mb-1 text-[11px] font-medium uppercase tracking-wider text-gray-400">
@@ -99,8 +85,6 @@ export default function RequestSubmittedView({ data, studentName, studentNim }) 
                     </div>
 
                     <div className="my-5 border-b border-gray-100"></div>
-
-                    {/* ROW 5: Periode */}
                     <div>
                         <p className="mb-1 text-[11px] font-medium uppercase tracking-wider text-gray-400">
                             PERIODE MAGANG
@@ -111,8 +95,6 @@ export default function RequestSubmittedView({ data, studentName, studentNim }) 
                     </div>
 
                     <div className="my-5 border-b border-gray-100"></div>
-
-                    {/* ROW 6: LoA File */}
                     <div
                         onClick={() => api.download('/supervisor-application/loa', 'Letter-Of-Acceptance.pdf')}
                         className="flex items-center gap-3 rounded-xl border border-gray-200 bg-gray-50 px-4 py-3.5 cursor-pointer hover:bg-gray-100 hover:border-gray-300 transition-all duration-200"
@@ -141,8 +123,6 @@ export default function RequestSubmittedView({ data, studentName, studentNim }) 
                     </p>
                 </div>
             </div>
-
-            {/* RIGHT COLUMN: Side Panel */}
             <div className="self-start lg:sticky lg:top-6">
                 <div className="rounded-xl border border-gray-200 bg-white p-5 transition-all duration-300 hover:border-primary-pale hover:shadow-sm">
                     <div className="flex items-center gap-2 border-b-2 border-primary/10 pb-4">
@@ -151,7 +131,6 @@ export default function RequestSubmittedView({ data, studentName, studentNim }) 
                     </div>
 
                     <div className="mt-5 flex flex-col">
-                        {/* Step 1 */}
                         <div className="flex">
                             <div className="mr-3 flex flex-col items-center">
                                 <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-primary text-white">
@@ -164,8 +143,6 @@ export default function RequestSubmittedView({ data, studentName, studentNim }) 
                                 <p className="mt-0.5 text-[12px] leading-relaxed text-gray-500">Lengkapi semua informasi perusahaan dan unggah bukti penerimaan magang (LoA).</p>
                             </div>
                         </div>
-
-                        {/* Step 2 */}
                         <div className="flex">
                             <div className="mr-3 flex flex-col items-center">
                                 <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-primary text-xs font-bold text-white">
@@ -178,8 +155,6 @@ export default function RequestSubmittedView({ data, studentName, studentNim }) 
                                 <p className="mt-0.5 text-[12px] leading-relaxed text-gray-500">Kepala Program Studi akan meninjau pengajuan dan menentukan Dosen Pembimbing Magang.</p>
                             </div>
                         </div>
-
-                        {/* Step 3 */}
                         <div className="flex">
                             <div className="mr-3 flex flex-col items-center">
                                 <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-gray-200 text-xs font-bold text-gray-500">

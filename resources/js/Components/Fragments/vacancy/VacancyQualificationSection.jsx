@@ -1,16 +1,9 @@
-/**
- * VacancyQualificationSection.jsx
- * "Kualifikasi & Persyaratan" card with education, skills, and requirements.
- *
- * @prop {object} vacancy — Vacancy detail with pendidikanMinimal, keahlianUtama, persyaratan.
- */
 import React from 'react';
 import { CheckSquare, CheckCircle } from 'lucide-react';
 
 export default function VacancyQualificationSection({ vacancy }) {
     return (
         <div className="rounded-xl border border-gray-200 border-l-4 border-l-primary bg-white p-6">
-            {/* Header */}
             <div className="flex items-center gap-2">
                 <CheckSquare className="h-[18px] w-[18px] text-primary" />
                 <h3 className="text-base font-bold text-gray-900">
@@ -19,8 +12,6 @@ export default function VacancyQualificationSection({ vacancy }) {
             </div>
 
             <hr className="my-4 border-gray-100" />
-
-            {/* Pendidikan Minimal */}
             <p className="text-[11px] font-bold uppercase tracking-wider text-primary">
                 Pendidikan Minimal
             </p>
@@ -29,8 +20,6 @@ export default function VacancyQualificationSection({ vacancy }) {
             </p>
 
             <hr className="my-4 border-gray-100" />
-
-            {/* Keahlian Utama */}
             <p className="mb-2.5 text-[11px] font-bold uppercase tracking-wider text-primary">
                 Keahlian Utama
             </p>
@@ -46,8 +35,6 @@ export default function VacancyQualificationSection({ vacancy }) {
             </div>
 
             <hr className="my-4 border-gray-100" />
-
-            {/* Persyaratan checklist */}
             <ul className="flex flex-col gap-2.5">
                 {vacancy.persyaratan.map((item, idx) => (
                     <li key={idx} className="flex gap-2.5">

@@ -11,9 +11,6 @@ import {
     Loader2,
     XCircle,
 } from 'lucide-react';
-
-
-/* ── Main Component ──────────────────────────────── */
 export default function LoginPage() {
     const { login } = useSimulation();
     const navigate = useNavigate();
@@ -56,14 +53,12 @@ export default function LoginPage() {
 
     return (
         <div className="login-page">
-            {/* ── Left Panel: Hero ──────────────── */}
             <div
                 className="login-hero"
                 style={{ backgroundImage: "url('/assets/images/plaza-festival.png')", backgroundSize: 'cover', backgroundPosition: 'center' }}
             >
                 <div className="login-hero__overlay" />
                 <div className="login-hero__content">
-                    {/* Logo */}
                     <div className="login-hero__logo">
                         <div className="login-hero__logo-ubakrie">
                             <img src="/assets/images/logo-ubakrie.png" alt="Logo Universitas Bakrie" />
@@ -78,32 +73,22 @@ export default function LoginPage() {
                     </p>
                 </div>
             </div>
-
-            {/* ── Right Panel: Form ─────────────── */}
             <div className="login-form-panel">
                 <div className="login-form-wrapper">
-                    {/* Header */}
                     <div className="login-form__header">
                         <h2 className="login-form__title">Selamat Datang</h2>
                         <p className="login-form__subtitle">Masuk dengan akun BIG Anda.</p>
                     </div>
-
-                    {/* Hint for demo login */}
                     <div className="mb-4 rounded-lg bg-blue-50 border border-blue-200 px-4 py-3 text-xs text-blue-700">
                         <strong>Demo:</strong> NIM <code className="rounded bg-blue-100 px-1 font-mono">1101214230</code> · Password <code className="rounded bg-blue-100 px-1 font-mono">password</code>
                     </div>
-
-                    {/* Error Alert */}
                     {error && (
                         <div className="login-form__error" role="alert">
                             <XCircle className="w-4 h-4 flex-shrink-0" />
                             <span>{error}</span>
                         </div>
                     )}
-
-                    {/* Form */}
                     <form onSubmit={handleSubmit} className="login-form" id="login-form" autoComplete="off">
-                        {/* NIM Field */}
                         <div className="login-field">
                             <label htmlFor="nim" className="login-field__label">
                                 Nomor Induk Mahasiswa (NIM)
@@ -122,8 +107,6 @@ export default function LoginPage() {
                                 />
                             </div>
                         </div>
-
-                        {/* Password Field */}
                         <div className="login-field">
                             <div className="login-field__label-row">
                                 <label htmlFor="password" className="login-field__label">
@@ -156,8 +139,6 @@ export default function LoginPage() {
                                 </button>
                             </div>
                         </div>
-
-                        {/* Remember Me */}
                         <label className="login-form__remember" htmlFor="remember">
                             <input
                                 id="remember"
@@ -168,8 +149,6 @@ export default function LoginPage() {
                             />
                             <span>Ingat saya</span>
                         </label>
-
-                        {/* Submit */}
                         <button
                             type="submit"
                             className="login-form__submit group"
@@ -189,8 +168,6 @@ export default function LoginPage() {
                             )}
                         </button>
                     </form>
-
-                    {/* Footer */}
                     <div className="login-form__footer">
                         <p>
                             Belum memiliki akses?{' '}

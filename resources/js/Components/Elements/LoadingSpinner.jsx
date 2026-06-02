@@ -1,12 +1,5 @@
-/**
- * LoadingSpinner.jsx
- * Full-screen overlay spinner for simulated API delays,
- * plus an inline variant for button loading states.
- */
 import React from 'react';
 import { Loader2 } from 'lucide-react';
-
-/** Full-screen overlay with centered spinner */
 export function FullScreenSpinner() {
     return (
         <div className="fixed inset-0 z-[9998] flex flex-col items-center justify-center bg-white/80 backdrop-blur-sm">
@@ -15,8 +8,6 @@ export function FullScreenSpinner() {
         </div>
     );
 }
-
-/** Small inline spinner (for buttons, white color) */
 export function InlineSpinner({ className = 'h-[18px] w-[18px]' }) {
     return (
         <Loader2 className={`animate-spin ${className}`} />

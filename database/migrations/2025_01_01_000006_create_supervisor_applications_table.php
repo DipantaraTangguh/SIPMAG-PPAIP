@@ -6,11 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * supervisor_applications — "Pengajuan Dosen Pembimbing Magang" form.
-     * Submitted by both Mitra and Mandiri students after securing an LoA.
-     * No approve/reject — goes straight to admin panel for Kaprodi to action.
-     */
     public function up(): void
     {
         Schema::create('supervisor_applications', function (Blueprint $table) {

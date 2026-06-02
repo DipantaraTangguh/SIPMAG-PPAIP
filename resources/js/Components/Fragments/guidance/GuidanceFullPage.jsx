@@ -1,8 +1,3 @@
-/**
- * components/guidance/GuidanceFullPage.jsx
- * Tab switcher between Pengajuan Pembimbing and Logbook.
- * Extracted from GuidancePage.jsx lines 1118–1219.
- */
 import React, { useState } from 'react';
 import { Clock } from 'lucide-react';
 import { useSimulation } from '../../../context/SimulationContext';
@@ -26,7 +21,7 @@ export default function GuidanceFullPage() {
         student?.accessStatus === 'MenungguSidang' || 
         student?.accessStatus === 'SiklusSelesai';
 
-    // Determine which view to show based on context state
+    // State context nentuin layar bimbingan yang tampil.
     const pengajuanView = (() => {
         if (student?.dpm && (
             student?.accessStatus === 'HasDPM' || 

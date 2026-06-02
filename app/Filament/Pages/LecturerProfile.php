@@ -9,12 +9,6 @@ use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
-
-/**
- * LecturerProfile — self-service profile page for Kaprodi / DPM lecturers.
- * Allows them to view their own data and upload their digital signature
- * (previously managed by PPAIP admin).
- */
 class LecturerProfile extends Page implements HasForms
 {
     use InteractsWithForms;
@@ -28,19 +22,11 @@ class LecturerProfile extends Page implements HasForms
     protected static string $view = 'filament.pages.lecturer-profile';
 
     public ?array $data = [];
-
-    /**
-     * Only Kaprodi and DPM can see this page.
-     */
     public static function canAccess(): bool
     {
         $role = auth()->user()?->role;
         return in_array($role, ['kaprodi', 'dpm']);
     }
-
-    /**
-     * Load the current lecturer's data into the form on mount.
-     */
     public function mount(): void
     {
         $lecturer = $this->getLecturer();
@@ -53,10 +39,6 @@ class LecturerProfile extends Page implements HasForms
             'signature_path' => $lecturer->signature_path,
         ]);
     }
-
-    /**
-     * Define the form schema.
-     */
     public function form(Form $form): Form
     {
         return $form
@@ -96,10 +78,6 @@ class LecturerProfile extends Page implements HasForms
             ])
             ->statePath('data');
     }
-
-    /**
-     * Handle form submission — only save signature_path.
-     */
     public function save(): void
     {
         $data = $this->form->getState();
@@ -114,10 +92,6 @@ class LecturerProfile extends Page implements HasForms
             ->success()
             ->send();
     }
-
-    /**
-     * Get the authenticated user's associated Lecturer record.
-     */
     private function getLecturer(): Lecturer
     {
         return auth()->user()->lecturer;

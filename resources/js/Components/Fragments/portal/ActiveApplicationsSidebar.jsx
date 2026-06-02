@@ -1,10 +1,3 @@
-/**
- * ActiveApplicationsSidebar.jsx
- * Right sidebar showing active applications + tips card.
- *
- * @prop {Array}    applications  — List of active application objects.
- * @prop {function} onTrackStatus — Callback for "Lacak Status" click.
- */
 import React from 'react';
 import { ClipboardList } from 'lucide-react';
 
@@ -21,7 +14,6 @@ export default function ActiveApplicationsSidebar({
 }) {
     return (
         <div className="flex flex-col gap-4">
-            {/* ── Lamaran Aktif ──────────────── */}
             <div className="rounded-xl border border-gray-200 bg-white p-5">
                 <h3 className="mb-4 text-base font-bold text-gray-900">
                     Lamaran Aktif
@@ -45,7 +37,6 @@ export default function ActiveApplicationsSidebar({
                                         : ''
                                 }`}
                             >
-                                {/* Top: company + badge */}
                                 <div className="flex items-start justify-between gap-2">
                                     <div className="min-w-0 flex-1">
                                         <p className="text-sm font-bold text-gray-900">
@@ -69,8 +60,6 @@ export default function ActiveApplicationsSidebar({
                     </div>
                 )}
             </div>
-
-            {/* ── Tips Mahasiswa ─────────────── */}
             <div className="rounded-xl border border-gray-200 bg-gray-50 p-5">
                 <h4 className="text-sm font-bold text-primary">
                     Tips Mahasiswa

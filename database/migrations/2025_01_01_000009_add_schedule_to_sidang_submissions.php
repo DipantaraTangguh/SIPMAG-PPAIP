@@ -6,11 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Add scheduling & examiner columns to sidang_submissions.
-     * Kaprodi schedules the defense (date, time, room, 2 examiners)
-     * before the cycle can be completed.
-     */
     public function up(): void
     {
         Schema::table('sidang_submissions', function (Blueprint $table) {

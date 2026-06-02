@@ -1,15 +1,9 @@
-/**
- * components/guidance/DpmAssignedView.jsx
- * DPM assigned view for Bimbingan page — shows DPM profile, info, and action buttons.
- * Extracted from GuidancePage.jsx lines 119–253.
- */
 import React from 'react';
 import { CheckCircle, BookOpen, Check, Info, Mail } from 'lucide-react';
 
 export default function DpmAssignedView({ dpm, onGoToLogbook }) {
     return (
         <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-[1fr_320px]">
-            {/* LEFT COLUMN: Success Card */}
             <div>
                 <div className="rounded-xl border border-gray-200 border-l-4 border-l-green-500 bg-white p-5 sm:p-10">
                     <div className="mx-auto flex h-[72px] w-[72px] items-center justify-center rounded-full bg-green-100">
@@ -24,8 +18,6 @@ export default function DpmAssignedView({ dpm, onGoToLogbook }) {
                     </p>
 
                     <div className="my-6 border-b border-gray-100"></div>
-
-                    {/* DPM Profile Card */}
                     <div className="flex flex-col items-center gap-4 rounded-xl border border-gray-200 bg-gray-50 p-5 text-center sm:flex-row sm:items-center sm:text-left">
                         <div className="flex h-[52px] w-[52px] flex-shrink-0 items-center justify-center rounded-full bg-primary text-lg font-bold text-white">
                             {dpm.initials}
@@ -50,16 +42,12 @@ export default function DpmAssignedView({ dpm, onGoToLogbook }) {
                     </div>
 
                     <div className="my-5 border-b border-gray-100"></div>
-
-                    {/* Info Box */}
                     <div className="flex items-start gap-2 rounded-lg border border-green-200 bg-green-50 px-4 py-3">
                         <Info className="mt-0.5 h-4 w-4 flex-shrink-0 text-green-500" />
                         <p className="text-[13px] leading-relaxed text-green-700">
                             DPM Anda telah ditetapkan. Silakan mulai mengisi logbook bimbingan secara berkala sesuai ketentuan.
                         </p>
                     </div>
-
-                    {/* Action Buttons */}
                     <div className="mt-5 flex flex-col gap-3">
                         <button
                             type="button"
@@ -78,8 +66,6 @@ export default function DpmAssignedView({ dpm, onGoToLogbook }) {
                     </div>
                 </div>
             </div>
-
-            {/* RIGHT COLUMN: Side Panel */}
             <div className="self-start flex-shrink-0 lg:sticky lg:top-6 lg:w-[320px]">
                 <div className="rounded-xl border border-gray-200 bg-white p-5 transition-all duration-300 hover:border-primary-pale hover:shadow-sm">
                     <div className="flex items-center gap-2 border-b-2 border-primary/10 pb-4">
@@ -88,7 +74,6 @@ export default function DpmAssignedView({ dpm, onGoToLogbook }) {
                     </div>
 
                     <div className="mt-5 flex flex-col">
-                        {/* Step 1 */}
                         <div className="flex">
                             <div className="mr-3 flex flex-col items-center">
                                 <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-primary text-white">
@@ -101,8 +86,6 @@ export default function DpmAssignedView({ dpm, onGoToLogbook }) {
                                 <p className="mt-0.5 text-[12px] leading-relaxed text-gray-500">Lengkapi semua informasi perusahaan dan unggah bukti penerimaan magang (LoA).</p>
                             </div>
                         </div>
-
-                        {/* Step 2 */}
                         <div className="flex">
                             <div className="mr-3 flex flex-col items-center">
                                 <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-primary text-white">
@@ -115,8 +98,6 @@ export default function DpmAssignedView({ dpm, onGoToLogbook }) {
                                 <p className="mt-0.5 text-[12px] leading-relaxed text-gray-500">Kepala Program Studi akan meninjau pengajuan dan menentukan Dosen Pembimbing Magang.</p>
                             </div>
                         </div>
-
-                        {/* Step 3 */}
                         <div className="flex">
                             <div className="mr-3 flex flex-col items-center">
                                 <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-primary text-white">

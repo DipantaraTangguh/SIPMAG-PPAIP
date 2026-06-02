@@ -1,9 +1,3 @@
-/**
- * LogbookProgressCard.jsx
- * Card displaying the student's logbook completion progress (0–6).
- *
- * @prop {number} approvedCount — Number of approved logbook entries (0–6).
- */
 import React from 'react';
 import { BookMarked } from 'lucide-react';
 
@@ -16,7 +10,6 @@ export default function LogbookProgressCard({ approvedCount = 0 }) {
 
     return (
         <div className="rounded-xl border border-gray-200 bg-white p-6">
-            {/* Header */}
             <div className="mb-1 flex items-center justify-between">
                 <h3 className="text-base font-bold text-gray-900">
                     Progress Logbook
@@ -26,8 +19,6 @@ export default function LogbookProgressCard({ approvedCount = 0 }) {
             <p className="mb-5 text-xs text-gray-400">
                 Lengkapi {REQUIRED} laporan wajib
             </p>
-
-            {/* Large count */}
             <div className="mb-4 text-center">
                 <span className="block text-5xl font-bold text-primary">
                     {clamped}
@@ -36,16 +27,12 @@ export default function LogbookProgressCard({ approvedCount = 0 }) {
                     Laporan Selesai
                 </span>
             </div>
-
-            {/* Progress bar */}
             <div className="mb-3 h-2 w-full overflow-hidden rounded-full bg-gray-100">
                 <div
                     className="h-full rounded-full bg-primary transition-all duration-500"
                     style={{ width: `${pct}%` }}
                 />
             </div>
-
-            {/* Footer */}
             <p className="text-right text-xs text-gray-400">
                 Sisa {remaining} laporan lagi
             </p>

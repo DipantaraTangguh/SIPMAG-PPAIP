@@ -1,8 +1,3 @@
-/**
- * components/defense/DefenseCompletedView.jsx
- * State 4: Graduation card + Ringkasan Magang summary.
- * Extracted from InternshipDefensePage.jsx lines 252–310.
- */
 import React from 'react';
 import { GraduationCap } from 'lucide-react';
 import { useSimulation } from '../../../context/SimulationContext';
@@ -22,7 +17,6 @@ export default function DefenseCompletedView() {
                 Pengajuan verifikasi dokumen akhir dan jadwal sidang.
             </p>
             <div className="mx-auto mt-8 max-w-[860px] rounded-2xl border border-gray-200 bg-white p-6 sm:p-[48px] md:px-[56px]">
-                {/* TOP SECTION */}
                 <div className="mx-auto w-[80px] h-[80px] rounded-full bg-primary-pale flex items-center justify-center">
                     <GraduationCap className="w-[40px] h-[40px] text-primary" />
                 </div>
@@ -32,8 +26,6 @@ export default function DefenseCompletedView() {
                 <p className="text-center mt-[12px] text-gray-500 text-[15px] leading-relaxed max-w-[520px] mx-auto">
                     Siklus magang Anda telah berhasil diselesaikan dengan predikat yang memuaskan. Terima kasih atas dedikasi dan kerja keras Anda selama program berlangsung.
                 </p>
-
-                {/* BOTTOM SECTION */}
                 <div className="mt-[40px] w-full">
                     <h4 className="text-[11px] font-medium text-gray-400 uppercase tracking-wider mb-[16px]">
                         RINGKASAN MAGANG

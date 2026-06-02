@@ -1,8 +1,3 @@
-/**
- * IndependentSidePanel.jsx
- * The right side sticky panel displaying instructions and important notes
- * for the Independent track.
- */
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BookOpen, CheckSquare } from 'lucide-react';
@@ -12,7 +7,6 @@ export default function IndependentSidePanel() {
 
     return (
         <div className="self-start lg:sticky lg:top-6">
-            {/* Card 1 — Cara Kerja Form 2 */}
             <div className="rounded-xl border border-gray-200 bg-white p-5">
                 <div className="mb-4 flex items-center gap-2">
                     <BookOpen className="h-[18px] w-[18px] text-primary" />
@@ -22,7 +16,6 @@ export default function IndependentSidePanel() {
                 </div>
 
                 <div className="flex flex-col">
-                    {/* Step 1 */}
                     <div className="flex">
                         <div className="mr-3 flex flex-col items-center">
                             <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-primary text-xs font-bold text-white">
@@ -40,8 +33,6 @@ export default function IndependentSidePanel() {
                             </p>
                         </div>
                     </div>
-
-                    {/* Step 2 */}
                     <div className="flex">
                         <div className="mr-3 flex flex-col items-center">
                             <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-primary text-xs font-bold text-white">
@@ -59,14 +50,11 @@ export default function IndependentSidePanel() {
                             </p>
                         </div>
                     </div>
-
-                    {/* Step 3 */}
                     <div className="flex">
                         <div className="mr-3 flex flex-col items-center">
                             <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-primary text-xs font-bold text-white">
                                 3
                             </div>
-                            {/* No line after the last step */}
                         </div>
                         <div className="flex-1 pb-1">
                             <p className="text-[14px] font-bold text-[#1A1A1A]">
@@ -80,8 +68,6 @@ export default function IndependentSidePanel() {
                     </div>
                 </div>
             </div>
-
-            {/* Card 2 — Catatan Penting */}
             <div className="mt-4 rounded-xl border border-primary/20 bg-primary-pale p-5">
                 <div className="mb-2.5 flex items-center gap-2">
                     <CheckSquare className="h-4 w-4 text-primary" />

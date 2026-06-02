@@ -1,7 +1,3 @@
-/**
- * src/pages/Form2NewPage.jsx
- * Page component for creating a new Form 2 submission (Surat Pengantar Magang).
- */
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -21,7 +17,7 @@ export default function Form2NewPage() {
     const navigate = useNavigate();
     const { submitForm2, student } = useSimulation();
 
-    // Hard gate — redirect if Form 1 not approved
+    // Guard keras: Form 2 jangan kebuka sebelum Form 1 approved.
     useEffect(() => {
         if (!canSubmitForm2(student?.accessStatus)) {
             navigate('/portal', {
@@ -33,7 +29,7 @@ export default function Form2NewPage() {
         }
     }, [student?.accessStatus, navigate]);
 
-    // Local state for form data
+    // Draft form disimpan lokal sampai submit.
     const [formData, setFormData] = useState({
         namaPerusahaan: '',
         alamatPerusahaan: '',
@@ -45,11 +41,11 @@ export default function Form2NewPage() {
     const [errors, setErrors] = useState({});
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    // Read-only user data
+    // Data profil dikunci, mahasiswa nggak edit di form ini.
     const studentName = 'Tangguh Dipantara';
     const studentNim = '2021031045';
 
-    // Validation check
+    // Validasi ringan sebelum data dilempar ke context/API.
     const isFormValid =
         formData.namaPerusahaan.trim() !== '' &&
         formData.alamatPerusahaan.trim() !== '' &&
@@ -57,12 +53,12 @@ export default function Form2NewPage() {
         formData.tanggalSelesai !== '' &&
         formData.lingkupMagang.trim() !== '';
 
-    // Handle input changes
+    // Satu handler cukup buat semua field text/date.
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData((prev) => ({ ...prev, [name]: value }));
 
-        // Clear error when user types
+        // Begitu user edit, error field itu kita bersihin.
         if (errors[name]) {
             setErrors((prev) => ({ ...prev, [name]: null }));
         }
@@ -97,7 +93,6 @@ export default function Form2NewPage() {
 
     return (
         <DashboardLayout pageTitle="Portal Magang">
-            {/* Kembali Button */}
             <button
                 type="button"
                 onClick={() => navigate(-1)}
@@ -106,8 +101,6 @@ export default function Form2NewPage() {
                 <ArrowLeft className="h-4 w-4" />
                 Kembali
             </button>
-
-            {/* Page Heading */}
             <div className="mb-6">
                 <h1 className="text-2xl font-bold leading-tight text-[#1A1A1A] sm:text-[28px]">
                     Ajukan Form 2 — Surat Pengantar Magang
@@ -117,15 +110,10 @@ export default function Form2NewPage() {
                     surat pengantar resmi dari Universitas.
                 </p>
             </div>
-
-            {/* Two-Column Layout */}
             <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_320px]">
-                {/* LEFT COLUMN: Form Container */}
                 <div>
                     <div className="rounded-xl border border-gray-200 border-l-4 border-l-primary bg-white p-5 sm:p-8">
-                        {/* ROW 1: Read-only student info */}
                         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-                            {/* NAMA LENGKAP */}
                             <div>
                                 <label className="mb-2 block text-[11px] font-bold uppercase tracking-wider text-gray-400">
                                     NAMA LENGKAP
@@ -140,8 +128,6 @@ export default function Form2NewPage() {
                                     <Lock className="absolute right-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
                                 </div>
                             </div>
-
-                            {/* NIM / ID MAHASISWA */}
                             <div>
                                 <label className="mb-2 block text-[11px] font-bold uppercase tracking-wider text-gray-400">
                                     NIM / ID MAHASISWA
@@ -157,11 +143,7 @@ export default function Form2NewPage() {
                                 </div>
                             </div>
                         </div>
-
-                        {/* Thin divider */}
                         <div className="my-5 border-b border-gray-100"></div>
-
-                        {/* ROW 2: NAMA PERUSAHAAN */}
                         <div className="mb-5">
                             <label className="mb-2 block text-[11px] font-bold uppercase tracking-wider text-gray-400">
                                 NAMA PERUSAHAAN / INSTANSI
@@ -184,8 +166,6 @@ export default function Form2NewPage() {
                                 </p>
                             )}
                         </div>
-
-                        {/* ROW 3: ALAMAT LENGKAP */}
                         <div className="mb-5">
                             <label className="mb-2 block text-[11px] font-bold uppercase tracking-wider text-gray-400">
                                 ALAMAT LENGKAP PERUSAHAAN DAN KODE POS
@@ -208,8 +188,6 @@ export default function Form2NewPage() {
                                 </p>
                             )}
                         </div>
-
-                        {/* ROW 4: TANGGAL MULAI & TANGGAL SELESAI */}
                         <div className="mb-5 grid grid-cols-1 gap-5 sm:grid-cols-2">
                             <div>
                                 <label className="mb-2 block text-[11px] font-bold uppercase tracking-wider text-gray-400">
@@ -254,8 +232,6 @@ export default function Form2NewPage() {
                                 )}
                             </div>
                         </div>
-
-                        {/* ROW 5: LINGKUP MAGANG */}
                         <div>
                             <label className="mb-2 block text-[11px] font-bold uppercase tracking-wider text-gray-400">
                                 LINGKUP MAGANG
@@ -277,8 +253,6 @@ export default function Form2NewPage() {
                                     {errors.lingkupMagang}
                                 </p>
                             )}
-
-                            {/* Helper Text */}
                             <div className="mt-2 flex items-center gap-1.5 text-gray-400">
                                 <Info className="h-3 w-3 flex-shrink-0" />
                                 <span className="text-[12px] italic text-gray-400">
@@ -288,8 +262,6 @@ export default function Form2NewPage() {
                             </div>
                         </div>
                     </div>
-
-                    {/* Submit Button */}
                     <div className="mt-6 flex justify-stretch sm:justify-end">
                         <button
                             type="button"
@@ -315,10 +287,7 @@ export default function Form2NewPage() {
                         </button>
                     </div>
                 </div>
-
-                {/* RIGHT COLUMN: Side Panel */}
                 <div className="self-start lg:sticky lg:top-6">
-                    {/* Card 1 — Alur Form 2 */}
                     <div className="rounded-xl border border-gray-200 bg-white p-5 hover:border-primary-pale hover:shadow-sm transition-all duration-300">
                         <div className="flex items-center gap-2 border-b-2 border-primary/10 pb-4">
                             <BookOpen className="h-[18px] w-[18px] text-primary" />
@@ -328,7 +297,6 @@ export default function Form2NewPage() {
                         </div>
 
                         <div className="mt-5 flex flex-col">
-                            {/* Step 1 */}
                             <div className="flex">
                                 <div className="mr-3 flex flex-col items-center">
                                     <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-primary text-xs font-bold text-white">
@@ -346,8 +314,6 @@ export default function Form2NewPage() {
                                     </p>
                                 </div>
                             </div>
-
-                            {/* Step 2 */}
                             <div className="flex">
                                 <div className="mr-3 flex flex-col items-center">
                                     <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-primary text-xs font-bold text-white">
@@ -365,8 +331,6 @@ export default function Form2NewPage() {
                                     </p>
                                 </div>
                             </div>
-
-                            {/* Step 3 */}
                             <div className="flex">
                                 <div className="mr-3 flex flex-col items-center">
                                     <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-primary text-xs font-bold text-white">
@@ -385,8 +349,6 @@ export default function Form2NewPage() {
                             </div>
                         </div>
                     </div>
-
-                    {/* Card 2 — Panduan Pengisian */}
                     <div className="mt-4 rounded-xl border border-primary/20 bg-primary-pale p-5">
                         <div className="mb-5 flex items-center gap-2">
                             <Lightbulb className="h-4 w-4 text-primary" />
@@ -396,7 +358,6 @@ export default function Form2NewPage() {
                         </div>
 
                         <div className="flex flex-col gap-2.5">
-                            {/* Guide item 1 */}
                             <div className="flex items-start gap-2.5">
                                 <div className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-primary text-[11px] font-bold text-white">
                                     1
@@ -406,8 +367,6 @@ export default function Form2NewPage() {
                                     Akta atau Web Profil mereka.
                                 </p>
                             </div>
-
-                            {/* Guide item 2 */}
                             <div className="flex items-start gap-2.5">
                                 <div className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-primary text-[11px] font-bold text-white">
                                     2

@@ -6,11 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * lecturers — shared table for Kaprodi and DPM roles.
-     * A lecturer can be a Kaprodi (has study_program, scoped access)
-     * or a DPM (assigned to supervise students).
-     */
     public function up(): void
     {
         Schema::create('lecturers', function (Blueprint $table) {
@@ -18,9 +13,9 @@ return new class extends Migration
             $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
             $table->string('nidn')->unique();
             $table->string('lecturer_name');
-            $table->string('contact')->nullable();          // email or phone
-            $table->string('study_program')->nullable();    // set for Kaprodi scoping
-            $table->string('signature_path')->nullable();   // uploaded signature image (for Form 1 PDF)
+            $table->string('contact')->nullable();          // Kontak dosen bisa email atau nomor HP.
+            $table->string('study_program')->nullable();    // Dipakai buat batasin data Kaprodi per prodi.
+            $table->string('signature_path')->nullable();   // Tanda tangan ini ditempel ke PDF Form 1.
             $table->timestamps();
         });
     }

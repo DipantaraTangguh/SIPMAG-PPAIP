@@ -9,11 +9,11 @@ class LecturerSeeder extends Seeder
 {
     public function run(): void
     {
-        // user_id 2 = Prof. Dr. Hoga Saragih, ST, MT (Kaprodi SI)
-        // user_id 3 = Dr. Budi Santoso (Kaprodi IF)
-        // user_id 4 = Dita Nurmadewi (DPM)
-        // user_id 5 = Dr. Ahmad Fauzi (DPM)
-        // user_id 6 = Siti Aminah (DPM)
+        // Mapping user Kaprodi SI ke record lecturer.
+        // Mapping user Kaprodi IF ke record lecturer.
+        // DPM demo pertama.
+        // DPM demo kedua.
+        // DPM demo ketiga.
 
         DB::table('lecturers')->insert([
             [

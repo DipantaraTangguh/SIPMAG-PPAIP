@@ -13,7 +13,7 @@ class UserSeeder extends Seeder
         $password = Hash::make('password');
 
         DB::table('users')->insert([
-            // PPAIP (admin)
+            // Akun admin PPAIP buat manage data lintas prodi.
             [
                 'name'     => 'Dr. Rizki Maryam Astuti, M.Si.',
                 'email'    => 'ppaip@bakrie.ac.id',
@@ -22,7 +22,7 @@ class UserSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
-            // Kaprodi — Sistem Informasi
+            // Kaprodi demo untuk prodi Sistem Informasi.
             [
                 'name'     => 'Prof. Dr. Hoga Saragih, ST, MT',
                 'email'    => 'hoga.saragih@bakrie.ac.id',
@@ -31,7 +31,7 @@ class UserSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
-            // Kaprodi — Informatika
+            // Kaprodi demo untuk prodi Informatika.
             [
                 'name'     => 'Dr. Budi Santoso, M.T.',
                 'email'    => 'budi.santoso@bakrie.ac.id',
@@ -40,7 +40,7 @@ class UserSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
-            // DPM 1
+            // Akun DPM demo pertama.
             [
                 'name'     => 'Dita Nurmadewi, S.Kom.',
                 'email'    => 'dita.nurmadewi@bakrie.ac.id',
@@ -49,7 +49,7 @@ class UserSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
-            // DPM 2
+            // Akun DPM demo kedua.
             [
                 'name'     => 'Dr. Ahmad Fauzi, M.T.',
                 'email'    => 'ahmad.fauzi@bakrie.ac.id',
@@ -58,7 +58,7 @@ class UserSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
-            // DPM 3
+            // Akun DPM demo ketiga.
             [
                 'name'     => 'Siti Aminah, M.Kom.',
                 'email'    => 'siti.aminah@bakrie.ac.id',
@@ -67,7 +67,7 @@ class UserSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
-            // Mahasiswa 1 — Tangguh (main demo user, Unverified)
+            // Mahasiswa demo utama, mulai dari status Unverified.
             [
                 'name'     => 'Tangguh Dipantara',
                 'email'    => 'tangguh@student.bakrie.ac.id',
