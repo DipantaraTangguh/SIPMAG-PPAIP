@@ -29,8 +29,16 @@ const buttonStyles = {
 export default function QuickActionButton({
     accessStatus = 'Unverified',
     onClick,
+    label,
+    disabled,
+    style,
 }) {
-    const config = statusConfig[accessStatus] ?? statusConfig.Unverified;
+    const baseConfig = statusConfig[accessStatus] ?? statusConfig.Unverified;
+    const config = {
+        label: label ?? baseConfig.label,
+        disabled: disabled ?? baseConfig.disabled,
+        style: style ?? baseConfig.style,
+    };
     const styleClass = buttonStyles[config.style] || buttonStyles.primary;
 
     return (

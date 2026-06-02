@@ -20,11 +20,20 @@ export default function GuidanceFullPage() {
 
     const [activeTab, setActiveTab] = useState('pengajuan');
 
-    const canAccessLogbook = student?.accessStatus === 'HasDPM' || student?.accessStatus === 'LogbookComplete';
+    const canAccessLogbook = 
+        student?.accessStatus === 'HasDPM' || 
+        student?.accessStatus === 'LogbookComplete' || 
+        student?.accessStatus === 'MenungguSidang' || 
+        student?.accessStatus === 'SiklusSelesai';
 
     // Determine which view to show based on context state
     const pengajuanView = (() => {
-        if (student?.dpm && (student?.accessStatus === 'HasDPM' || student?.accessStatus === 'LogbookComplete')) {
+        if (student?.dpm && (
+            student?.accessStatus === 'HasDPM' || 
+            student?.accessStatus === 'LogbookComplete' || 
+            student?.accessStatus === 'MenungguSidang' || 
+            student?.accessStatus === 'SiklusSelesai'
+        )) {
             return 'dpm_assigned';
         }
         if (pengajuanPembimbing && !student?.dpm) {

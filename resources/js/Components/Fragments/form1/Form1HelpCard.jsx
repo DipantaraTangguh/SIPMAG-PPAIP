@@ -14,8 +14,7 @@ export default function Form1HelpCard() {
             </div>
             <p className="text-[13px] leading-relaxed text-gray-600">
                 Jika pengajuan Anda belum mendapatkan pembaruan lebih dari 3 hari
-                kerja, silakan hubungi Sekretariat Program Studi atau melalui Pusat
-                Bantuan.
+                kerja, silakan hubungi PPAIP.
             </p>
         </div>
     );

@@ -18,7 +18,12 @@ export default function GuidancePage() {
     const { student } = useSimulation();
     const accessStatus = student?.accessStatus;
 
-    const hasAccess = accessStatus === 'HasApplication' || accessStatus === 'HasDPM' || accessStatus === 'LogbookComplete';
+    const hasAccess = 
+        accessStatus === 'HasApplication' || 
+        accessStatus === 'HasDPM' || 
+        accessStatus === 'LogbookComplete' || 
+        accessStatus === 'MenungguSidang' || 
+        accessStatus === 'SiklusSelesai';
 
     if (!hasAccess) {
         return (

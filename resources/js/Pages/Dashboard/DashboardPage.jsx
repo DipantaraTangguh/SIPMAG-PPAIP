@@ -45,7 +45,7 @@ function deriveStep(status) {
 }
 
 export default function DashboardPage() {
-    const { student, notifications, logbookEntries } = useSimulation();
+    const { student, notifications, logbookEntries, sidangSchedule } = useSimulation();
     const navigate = useNavigate();
 
     const name = student?.name;
@@ -68,6 +68,7 @@ export default function DashboardPage() {
                 navigate('/guidance');
                 break;
             case 'LogbookComplete':
+            case 'MenungguSidang':
                 navigate('/defense');
                 break;
             case 'SiklusSelesai':
@@ -100,6 +101,9 @@ export default function DashboardPage() {
                         <QuickActionButton
                             accessStatus={accessStatus}
                             onClick={handleQuickAction}
+                            label={accessStatus === 'MenungguSidang' && sidangSchedule ? 'Lihat Jadwal Sidang' : undefined}
+                            disabled={accessStatus === 'MenungguSidang' && sidangSchedule ? false : undefined}
+                            style={accessStatus === 'MenungguSidang' && sidangSchedule ? 'primary' : undefined}
                         />
                         <LogbookProgressCard approvedCount={logbookCount} />
                         <TipsMagangCard tips={mockTips} />
