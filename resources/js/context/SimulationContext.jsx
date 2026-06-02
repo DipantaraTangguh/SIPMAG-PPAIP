@@ -169,7 +169,7 @@ export function SimulationProvider({ children }) {
                         tanggal: l.tanggal,
                         kegiatanHarian: l.kegiatan_harian,
                         hasil: l.hasil,
-                        status: l.status,
+                        status: { Approved: 'Disetujui', PendingReview: 'Menunggu Review', Rejected: 'Ditolak' }[l.status] || l.status,
                         dpmNote: l.dpm_note,
                     }))
                     : [],
@@ -383,7 +383,7 @@ export function SimulationProvider({ children }) {
             tanggal: data.logbook.tanggal,
             kegiatanHarian: data.logbook.kegiatan_harian,
             hasil: data.logbook.hasil,
-            status: data.logbook.status,
+            status: { Approved: 'Disetujui', PendingReview: 'Menunggu Review', Rejected: 'Ditolak' }[data.logbook.status] || data.logbook.status,
             dpmNote: null,
         };
 
@@ -412,7 +412,7 @@ export function SimulationProvider({ children }) {
                     tanggal: data.logbook.tanggal,
                     kegiatanHarian: data.logbook.kegiatan_harian,
                     hasil: data.logbook.hasil,
-                    status: 'PendingReview',
+                    status: 'Menunggu Review',
                     dpmNote: null,
                 } : e
             ),

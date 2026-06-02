@@ -154,7 +154,6 @@ export default function LogbookTabContent() {
                                 <th className="px-5 py-3.5 text-[11px] font-medium uppercase tracking-wider text-gray-400">Kegiatan Harian</th>
                                 <th className="w-[180px] px-5 py-3.5 text-[11px] font-medium uppercase tracking-wider text-gray-400">Hasil</th>
                                 <th className="w-[140px] px-5 py-3.5 text-center text-[11px] font-medium uppercase tracking-wider text-gray-400">Status</th>
-                                <th className="w-[80px] px-5 py-3.5 text-right text-[11px] font-medium uppercase tracking-wider text-gray-400">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -179,18 +178,6 @@ export default function LogbookTabContent() {
                                         }`}>
                                             {entry.status}
                                         </span>
-                                    </td>
-                                    <td className="px-5 py-4 text-right align-top">
-                                        {entry.status === 'Disetujui' && (
-                                            <button onClick={() => console.log('view detail', entry.id)} className="text-[13px] font-bold text-primary hover:underline">
-                                                Detail
-                                            </button>
-                                        )}
-                                        {entry.status === 'Ditolak' && (
-                                            <button onClick={() => setEditEntry(entry)} className="text-[13px] font-bold text-primary hover:underline">
-                                                Perbaiki
-                                            </button>
-                                        )}
                                     </td>
                                 </tr>
                             ))}
