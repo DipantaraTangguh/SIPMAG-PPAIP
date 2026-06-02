@@ -30,6 +30,7 @@ class AdminPanelProvider extends PanelProvider
             ->colors([
                 'primary' => Color::hex('#682828'),
             ])
+            ->favicon(asset('assets/images/favicon.ico'))
             // Discover resources in subdirectories (Kaprodi/, Dpm/, Ppaip/)
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
