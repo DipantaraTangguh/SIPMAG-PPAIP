@@ -270,9 +270,15 @@ class KaprodiStudentResource extends Resource
                                 ));
                         }
 
+                        $kaprodiProdi = auth()->user()?->lecturer?->study_program;
+
                         $fields[] = Forms\Components\Select::make('dpm_id')
                             ->label('Pilih DPM')
-                            ->options(Lecturer::whereNotNull('user_id')->pluck('lecturer_name', 'id'))
+                            ->options(
+                                Lecturer::whereNotNull('user_id')
+                                    ->when($kaprodiProdi, fn ($q) => $q->where('study_program', $kaprodiProdi))
+                                    ->pluck('lecturer_name', 'id')
+                            )
                             ->searchable()
                             ->preload()
                             ->required();
