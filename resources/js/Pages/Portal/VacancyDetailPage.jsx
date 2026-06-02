@@ -166,7 +166,7 @@ export default function VacancyDetailPage() {
             {BackButton}
 
             {/* Two-column layout */}
-            <div key={vacancy.id} className="grid grid-cols-[1fr_340px] items-start gap-6 animate-fadeIn">
+            <div key={vacancy.id} className="grid grid-cols-1 items-start gap-6 animate-fadeIn xl:grid-cols-[1fr_340px]">
                 {/* Left: content sections */}
                 <div className="flex flex-col gap-5">
                     <VacancyDetailHeader vacancy={vacancy} />

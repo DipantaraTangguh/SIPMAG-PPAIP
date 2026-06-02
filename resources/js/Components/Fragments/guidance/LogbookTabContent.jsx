@@ -85,7 +85,7 @@ export default function LogbookTabContent() {
             {/* TOP ROW */}
             <div className="flex flex-col items-stretch gap-5 xl:flex-row">
                 {/* Left Card: Progress Info & Add Button */}
-                <div className={`flex flex-1 items-center justify-between rounded-xl border border-l-4 bg-white px-7 py-6 shadow-sm ${isComplete ? 'border-green-200 border-l-green-500' : 'border-gray-200 border-l-primary'}`}>
+                <div className={`flex flex-1 flex-col gap-5 rounded-xl border border-l-4 bg-white px-5 py-6 shadow-sm sm:flex-row sm:items-center sm:justify-between sm:px-7 ${isComplete ? 'border-green-200 border-l-green-500' : 'border-gray-200 border-l-primary'}`}>
                     <div>
                         <p className="mb-2.5 text-[12px] font-bold uppercase tracking-wider text-gray-500">
                             PROGRESS PERSETUJUAN
@@ -109,7 +109,7 @@ export default function LogbookTabContent() {
                     {isComplete ? (
                         <button
                             onClick={() => navigate('/defense')}
-                            className="ml-4 flex items-center justify-center gap-2 rounded-lg bg-green-500 px-5 py-2.5 text-[14px] font-bold text-white transition-colors hover:bg-green-600"
+                            className="flex w-full items-center justify-center gap-2 rounded-lg bg-green-500 px-5 py-2.5 text-[14px] font-bold text-white transition-colors hover:bg-green-600 sm:ml-4 sm:w-auto"
                         >
                             <GraduationCap className="h-[18px] w-[18px]" />
                             <span>Daftar Sidang →</span>
@@ -117,7 +117,7 @@ export default function LogbookTabContent() {
                     ) : (
                         <button
                             onClick={() => setShowAddModal(true)}
-                            className="ml-4 flex items-center justify-center rounded-lg bg-primary px-5 py-2.5 text-[14px] font-bold text-white transition-colors hover:bg-primary-hover"
+                            className="flex w-full items-center justify-center rounded-lg bg-primary px-5 py-2.5 text-[14px] font-bold text-white transition-colors hover:bg-primary-hover sm:ml-4 sm:w-auto"
                         >
                             <span>+ Tambah Entri</span>
                         </button>
@@ -136,7 +136,7 @@ export default function LogbookTabContent() {
 
             {/* LOGBOOK TABLE OR EMPTY STATE */}
             {logbookEntries.length === 0 ? (
-                <div className="mt-6 flex flex-col items-center justify-center rounded-xl border border-gray-200 bg-white p-12 text-center">
+                <div className="mt-6 flex flex-col items-center justify-center rounded-xl border border-gray-200 bg-white p-6 text-center sm:p-12">
                     <BookOpen className="text-gray-300" size={48} />
                     <h3 className="mt-3 text-[16px] font-bold text-gray-400">
                         Belum Ada Entri Logbook
@@ -146,8 +146,8 @@ export default function LogbookTabContent() {
                     </p>
                 </div>
             ) : (
-                <div className="mt-6 overflow-hidden rounded-xl border border-gray-200 bg-white">
-                    <table className="w-full text-left">
+                <div className="mt-6 overflow-x-auto rounded-xl border border-gray-200 bg-white">
+                    <table className="min-w-[720px] w-full text-left">
                         <thead>
                             <tr className="border-b border-gray-200 bg-gray-50">
                                 <th className="w-[140px] px-5 py-3.5 text-[11px] font-medium uppercase tracking-wider text-gray-400">Tanggal</th>
@@ -197,7 +197,7 @@ export default function LogbookTabContent() {
                         className="relative w-full max-w-[560px] transform rounded-xl bg-white text-left shadow-xl transition-all sm:my-8"
                         onClick={(e) => e.stopPropagation()}
                     >
-                        <div className="flex items-center justify-between border-b border-gray-100 px-6 py-5">
+                        <div className="flex items-center justify-between border-b border-gray-100 px-5 py-5 sm:px-6">
                             <h2 className="text-[17px] font-bold text-[#1A1A1A]">{modalTitle}</h2>
                             <button
                                 type="button"
@@ -208,7 +208,7 @@ export default function LogbookTabContent() {
                             </button>
                         </div>
                         
-                        <div className="max-h-[calc(100vh-160px)] overflow-y-auto px-6 py-5">
+                        <div className="max-h-[calc(100vh-160px)] overflow-y-auto px-5 py-5 sm:px-6">
                             <div className="flex flex-col gap-5">
                                 <div>
                                     <label className="mb-2 block text-[13px] font-bold text-[#1A1A1A]">Tanggal</label>
@@ -256,7 +256,7 @@ export default function LogbookTabContent() {
                             </div>
                         </div>
 
-                        <div className="flex items-center justify-end gap-2 rounded-b-xl border-t border-gray-100 bg-white px-6 py-4">
+                        <div className="flex flex-col-reverse items-stretch justify-end gap-2 rounded-b-xl border-t border-gray-100 bg-white px-5 py-4 sm:flex-row sm:items-center sm:px-6">
                             <button
                                 type="button"
                                 onClick={closeAllModals}

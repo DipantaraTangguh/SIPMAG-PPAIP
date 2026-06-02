@@ -19,7 +19,7 @@ export default function DefenseLockedState({ accessStatus }) {
             buttons: (
                 <button
                     onClick={() => navigate('/form1')}
-                    className="mt-6 rounded-lg bg-primary px-6 py-3 font-bold text-white hover:bg-primary-hover transition-colors"
+                    className="mt-6 w-full rounded-lg bg-primary px-6 py-3 font-bold text-white transition-colors hover:bg-primary-hover sm:w-auto"
                 >
                     Isi Form 1 Sekarang →
                 </button>
@@ -33,7 +33,7 @@ export default function DefenseLockedState({ accessStatus }) {
             buttons: (
                 <button
                     onClick={() => navigate('/dashboard')}
-                    className="mt-6 rounded-lg bg-primary px-6 py-3 font-bold text-white hover:bg-primary-hover transition-colors"
+                    className="mt-6 w-full rounded-lg bg-primary px-6 py-3 font-bold text-white transition-colors hover:bg-primary-hover sm:w-auto"
                 >
                     Kembali ke Beranda
                 </button>
@@ -47,7 +47,7 @@ export default function DefenseLockedState({ accessStatus }) {
             buttons: (
                 <button
                     onClick={() => navigate('/guidance')}
-                    className="mt-6 rounded-lg bg-primary px-6 py-3 font-bold text-white hover:bg-primary-hover transition-colors"
+                    className="mt-6 w-full rounded-lg bg-primary px-6 py-3 font-bold text-white transition-colors hover:bg-primary-hover sm:w-auto"
                 >
                     Lanjutkan Mengisi Logbook →
                 </button>
@@ -63,7 +63,7 @@ export default function DefenseLockedState({ accessStatus }) {
         buttons: (
             <button
                 onClick={() => navigate('/dashboard')}
-                className="mt-6 rounded-lg bg-primary px-6 py-3 font-bold text-white hover:bg-primary-hover transition-colors"
+                className="mt-6 w-full rounded-lg bg-primary px-6 py-3 font-bold text-white transition-colors hover:bg-primary-hover sm:w-auto"
             >
                 Kembali ke Beranda
             </button>
@@ -72,7 +72,7 @@ export default function DefenseLockedState({ accessStatus }) {
 
     return (
         <div className="mx-auto mt-12 w-full max-w-[560px]">
-            <div className="rounded-xl border border-gray-200 bg-white p-12 text-center shadow-sm">
+            <div className="rounded-xl border border-gray-200 bg-white p-6 text-center shadow-sm sm:p-12">
                 <div className={`mx-auto flex h-[56px] w-[56px] items-center justify-center rounded-full ${config.iconBg}`}>
                     {config.icon}
                 </div>

@@ -109,7 +109,7 @@ export default function Form2NewPage() {
 
             {/* Page Heading */}
             <div className="mb-6">
-                <h1 className="text-[28px] font-bold text-[#1A1A1A]">
+                <h1 className="text-2xl font-bold leading-tight text-[#1A1A1A] sm:text-[28px]">
                     Ajukan Form 2 — Surat Pengantar Magang
                 </h1>
                 <p className="mt-1 text-[14px] leading-relaxed text-gray-500">
@@ -122,9 +122,9 @@ export default function Form2NewPage() {
             <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_320px]">
                 {/* LEFT COLUMN: Form Container */}
                 <div>
-                    <div className="rounded-xl border border-gray-200 border-l-4 border-l-primary bg-white p-8">
+                    <div className="rounded-xl border border-gray-200 border-l-4 border-l-primary bg-white p-5 sm:p-8">
                         {/* ROW 1: Read-only student info */}
-                        <div className="grid grid-cols-2 gap-5">
+                        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                             {/* NAMA LENGKAP */}
                             <div>
                                 <label className="mb-2 block text-[11px] font-bold uppercase tracking-wider text-gray-400">
@@ -210,7 +210,7 @@ export default function Form2NewPage() {
                         </div>
 
                         {/* ROW 4: TANGGAL MULAI & TANGGAL SELESAI */}
-                        <div className="mb-5 grid grid-cols-2 gap-5">
+                        <div className="mb-5 grid grid-cols-1 gap-5 sm:grid-cols-2">
                             <div>
                                 <label className="mb-2 block text-[11px] font-bold uppercase tracking-wider text-gray-400">
                                     TANGGAL MULAI
@@ -290,12 +290,12 @@ export default function Form2NewPage() {
                     </div>
 
                     {/* Submit Button */}
-                    <div className="mt-6 flex justify-end">
+                    <div className="mt-6 flex justify-stretch sm:justify-end">
                         <button
                             type="button"
                             onClick={handleSubmit}
                             disabled={!isFormValid || isSubmitting}
-                            className={`flex items-center gap-2 rounded-xl px-8 py-3.5 text-[15px] font-bold transition-colors ${
+                            className={`flex w-full items-center justify-center gap-2 rounded-xl px-8 py-3.5 text-[15px] font-bold transition-colors sm:w-auto ${
                                 isSubmitting || !isFormValid
                                     ? 'cursor-not-allowed bg-gray-300 text-gray-400'
                                     : 'bg-primary text-white hover:bg-primary-hover'
@@ -317,7 +317,7 @@ export default function Form2NewPage() {
                 </div>
 
                 {/* RIGHT COLUMN: Side Panel */}
-                <div className="sticky top-6 self-start">
+                <div className="self-start lg:sticky lg:top-6">
                     {/* Card 1 — Alur Form 2 */}
                     <div className="rounded-xl border border-gray-200 bg-white p-5 hover:border-primary-pale hover:shadow-sm transition-all duration-300">
                         <div className="flex items-center gap-2 border-b-2 border-primary/10 pb-4">

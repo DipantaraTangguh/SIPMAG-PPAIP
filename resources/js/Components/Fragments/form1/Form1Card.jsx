@@ -122,7 +122,7 @@ export default function Form1Card({
     const inputError = `${inputBase} border-red-500 bg-white focus:border-red-500 focus:ring-2 focus:ring-red-500/20`;
 
     return (
-        <form onSubmit={handleSubmit} className="rounded-xl border border-gray-200 bg-white p-8">
+        <form onSubmit={handleSubmit} className="rounded-xl border border-gray-200 bg-white p-5 sm:p-8">
             {/* ── Card header ──────────────────── */}
             <div className="mb-8">
                 <h3 className="text-xl font-bold text-gray-900">
@@ -142,7 +142,7 @@ export default function Form1Card({
 
             <div className="flex flex-col gap-6">
                 {/* ── ROW 1: Nama + NIM (read-only) ── */}
-                <div className="grid grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                     <div>
                         <FieldLabel htmlFor="nama">Nama Lengkap</FieldLabel>
                         <ReadOnlyInput id="nama" value={readOnlyFields.nama} />
@@ -160,7 +160,7 @@ export default function Form1Card({
                 </div>
 
                 {/* ── ROW 3: Semester + Tahun Akademik (read-only) ── */}
-                <div className="grid grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                     <div>
                         <FieldLabel htmlFor="semester">Semester</FieldLabel>
                         <ReadOnlyInput id="semester" value={readOnlyFields.semester} />
@@ -172,7 +172,7 @@ export default function Form1Card({
                 </div>
 
                 {/* ── ROW 4: Jumlah SKS + IPK (read-only) ── */}
-                <div className="grid grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                     <div>
                         <FieldLabel htmlFor="jumlahSks">Jumlah SKS</FieldLabel>
                         <ReadOnlyInput id="jumlahSks" value={readOnlyFields.jumlahSks} />
@@ -184,7 +184,7 @@ export default function Form1Card({
                 </div>
 
                 {/* ── ROW 5: Rencana Skema Magang ── */}
-                <div className="w-1/2">
+                <div className="w-full sm:w-1/2">
                     <FieldLabel htmlFor="rencanaSkema">Rencana Skema Magang</FieldLabel>
                     <div className="relative">
                         <select
@@ -305,7 +305,7 @@ export default function Form1Card({
                 {/* ── ROW 8: Output (radio group) ── */}
                 <div>
                     <FieldLabel>Output</FieldLabel>
-                    <div className="flex items-center gap-6">
+                    <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:gap-6">
                         {['Produk', 'Prototype', 'Laporan'].map((opt) => (
                             <label
                                 key={opt}
@@ -366,7 +366,7 @@ export default function Form1Card({
             </div>
 
             {/* ── Form footer ────────────────────── */}
-            <div className="mt-8 flex items-center justify-end gap-4 border-t border-gray-100 pt-6">
+            <div className="mt-8 flex flex-col-reverse items-stretch justify-end gap-3 border-t border-gray-100 pt-6 sm:flex-row sm:items-center sm:gap-4">
                 <button
                     type="button"
                     onClick={handleCancel}
@@ -379,7 +379,7 @@ export default function Form1Card({
                     type="submit"
                     disabled={!isFormValid || isSubmitting}
                     className={`
-                        flex items-center gap-2 rounded-lg px-6 py-3 text-sm font-bold
+                        flex items-center justify-center gap-2 rounded-lg px-6 py-3 text-sm font-bold
                         transition-all duration-200
                         ${isFormValid && !isSubmitting
                             ? 'bg-primary text-white shadow hover:bg-primary-hover hover:shadow-md'

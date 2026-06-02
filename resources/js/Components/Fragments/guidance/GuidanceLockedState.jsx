@@ -20,7 +20,7 @@ export default function GuidanceLockedState({ accessStatus }) {
             buttons: (
                 <button
                     onClick={() => navigate('/form1')}
-                    className="mt-6 rounded-lg bg-primary px-6 py-3 font-bold text-white hover:bg-primary-hover"
+                    className="mt-6 w-full rounded-lg bg-primary px-6 py-3 font-bold text-white hover:bg-primary-hover sm:w-auto"
                 >
                     Isi Form 1 Sekarang →
                 </button>
@@ -34,7 +34,7 @@ export default function GuidanceLockedState({ accessStatus }) {
             buttons: (
                 <button
                     onClick={() => navigate('/form1/status')}
-                    className="mt-6 rounded-lg bg-primary px-6 py-3 font-bold text-white hover:bg-primary-hover"
+                    className="mt-6 w-full rounded-lg bg-primary px-6 py-3 font-bold text-white hover:bg-primary-hover sm:w-auto"
                 >
                     Lihat Status Form 1 →
                 </button>
@@ -46,7 +46,7 @@ export default function GuidanceLockedState({ accessStatus }) {
             title: 'Belum Ada Lamaran Aktif',
             description: 'Anda perlu mengajukan lamaran magang terlebih dahulu, baik melalui Portal Mitra maupun Magang Mandiri, sebelum dapat mengakses fitur Bimbingan dan Logbook.',
             buttons: (
-                <div className="mt-6 flex justify-center gap-4">
+                <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row sm:gap-4">
                     <button
                         onClick={() => navigate('/portal')}
                         className="rounded-lg bg-primary px-5 py-3 font-bold text-white hover:bg-primary-hover"
@@ -68,7 +68,7 @@ export default function GuidanceLockedState({ accessStatus }) {
 
     return (
         <div className="mx-auto mt-12 w-full max-w-[560px]">
-            <div className="rounded-xl border border-gray-200 bg-white p-12 text-center">
+            <div className="rounded-xl border border-gray-200 bg-white p-6 text-center sm:p-12">
                 <div className={`mx-auto flex h-[56px] w-[56px] items-center justify-center rounded-full ${config.iconBg}`}>
                     {config.icon}
                 </div>

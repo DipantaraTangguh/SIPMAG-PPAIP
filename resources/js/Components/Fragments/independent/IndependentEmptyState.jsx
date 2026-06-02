@@ -10,7 +10,7 @@ import { FileText, Plus } from 'lucide-react';
 
 export default function IndependentEmptyState({ onCreateNew, isLocked = false }) {
     return (
-        <div className="rounded-xl border border-gray-200 bg-white p-12 text-center">
+        <div className="rounded-xl border border-gray-200 bg-white p-6 text-center sm:p-12">
             <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-gray-100">
                 <FileText className="h-9 w-9 text-gray-400" />
             </div>
@@ -29,7 +29,7 @@ export default function IndependentEmptyState({ onCreateNew, isLocked = false })
                 type="button"
                 onClick={isLocked ? undefined : onCreateNew}
                 disabled={isLocked}
-                className={`mx-auto mt-6 flex items-center gap-2 rounded-lg px-6 py-2.5 font-bold transition-colors ${
+                className={`mx-auto mt-6 flex w-full items-center justify-center gap-2 rounded-lg px-6 py-2.5 font-bold transition-colors sm:w-auto ${
                     isLocked
                         ? 'cursor-not-allowed bg-gray-200 text-gray-400'
                         : 'bg-primary-pale text-primary hover:bg-primary/20'

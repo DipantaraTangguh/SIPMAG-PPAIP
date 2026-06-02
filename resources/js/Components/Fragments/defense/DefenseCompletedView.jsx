@@ -21,12 +21,12 @@ export default function DefenseCompletedView() {
             <p className="mb-6 text-[14px] text-gray-500">
                 Pengajuan verifikasi dokumen akhir dan jadwal sidang.
             </p>
-            <div className="bg-white rounded-2xl p-[48px] md:px-[56px] max-w-[860px] border border-gray-200 mx-auto mt-8">
+            <div className="mx-auto mt-8 max-w-[860px] rounded-2xl border border-gray-200 bg-white p-6 sm:p-[48px] md:px-[56px]">
                 {/* TOP SECTION */}
                 <div className="mx-auto w-[80px] h-[80px] rounded-full bg-primary-pale flex items-center justify-center">
                     <GraduationCap className="w-[40px] h-[40px] text-primary" />
                 </div>
-                <h2 className="text-center mt-[24px] font-bold text-[30px] text-[#1A1A1A]">
+                <h2 className="mt-[24px] text-center text-2xl font-bold leading-tight text-[#1A1A1A] sm:text-[30px]">
                     Selamat! Magang Anda Telah Selesai
                 </h2>
                 <p className="text-center mt-[12px] text-gray-500 text-[15px] leading-relaxed max-w-[520px] mx-auto">
@@ -46,7 +46,7 @@ export default function DefenseCompletedView() {
                         ].map((row, idx) => (
                             <div 
                                 key={idx} 
-                                className="flex justify-between items-center py-[20px] px-[28px] border-b border-primary/10"
+                                className="flex flex-col gap-1 border-b border-primary/10 px-5 py-[20px] sm:flex-row sm:items-center sm:justify-between sm:px-[28px]"
                             >
                                 <span className="text-gray-500 text-[14px] font-normal">{row.label}</span>
                                 <span className="font-bold text-[15px] text-[#1A1A1A] text-right">
@@ -54,7 +54,7 @@ export default function DefenseCompletedView() {
                                 </span>
                             </div>
                         ))}
-                        <div className="flex justify-between items-center py-[20px] px-[28px]">
+                        <div className="flex flex-col gap-2 px-5 py-[20px] sm:flex-row sm:items-center sm:justify-between sm:px-[28px]">
                             <span className="text-gray-500 text-[14px] font-normal">Total Logbook</span>
                             <span className="bg-primary text-white text-[13px] font-bold rounded-full px-4 py-1.5 inline-block text-right">
                                 {approvedLogbook}/{totalRequired} Entri Disetujui

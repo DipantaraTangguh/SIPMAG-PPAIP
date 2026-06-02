@@ -11,7 +11,7 @@ export default function IndependentSidePanel() {
     const navigate = useNavigate();
 
     return (
-        <div className="sticky top-6 self-start">
+        <div className="self-start lg:sticky lg:top-6">
             {/* Card 1 — Cara Kerja Form 2 */}
             <div className="rounded-xl border border-gray-200 bg-white p-5">
                 <div className="mb-4 flex items-center gap-2">

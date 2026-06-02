@@ -26,8 +26,8 @@ const steps = [
 
 export default function CycleStepper({ currentStep = 1 }) {
     return (
-        <div className="rounded-xl border border-gray-200 bg-white px-8 py-7">
-            <div className="flex items-center justify-between">
+        <div className="rounded-xl border border-gray-200 bg-white px-4 py-5 sm:px-8 sm:py-7">
+            <div className="flex items-start justify-between gap-2 overflow-x-auto pb-1 sm:items-center">
                 {steps.map((step, idx) => {
                     const stepNum = idx + 1;
                     const isCompleted = stepNum < currentStep;
@@ -38,10 +38,10 @@ export default function CycleStepper({ currentStep = 1 }) {
                     return (
                         <React.Fragment key={step.key}>
                             {/* Step node */}
-                            <div className="flex flex-col items-center gap-2">
+                            <div className="flex min-w-[72px] flex-col items-center gap-2 sm:min-w-0">
                                 <div
                                     className={`
-                                        flex h-11 w-11 items-center justify-center rounded-full
+                                        flex h-10 w-10 items-center justify-center rounded-full sm:h-11 sm:w-11
                                         transition-colors duration-200
                                         ${isCompleted
                                             ? 'bg-primary text-white'
@@ -76,7 +76,7 @@ export default function CycleStepper({ currentStep = 1 }) {
                             {idx < steps.length - 1 && (
                                 <div
                                     className={`
-                                        mx-2 mb-6 h-[2px] flex-1
+                                        mx-1 mt-5 h-[2px] min-w-6 flex-1 sm:mx-2 sm:mb-6 sm:mt-0
                                         ${stepNum < currentStep
                                             ? 'bg-primary'
                                             : 'bg-gray-200'

@@ -34,20 +34,20 @@ export default function DashboardLayout({
             {/* Sidebar */}
             <Sidebar nim={nim} onLogout={logout} activePath={activePath} />
 
-            {/* Main area — offset by sidebar width */}
-            <div className="ml-[260px] min-h-screen">
+            {/* Main area — offset by sidebar width on desktop */}
+            <div className="min-h-screen lg:ml-[260px]">
                 {/* Top header bar */}
-                <header className="flex items-center justify-between px-10 py-7">
-                    <h2 className="text-[1.75rem] font-bold text-gray-900">
+                <header className="flex items-center justify-between gap-4 px-4 py-5 sm:px-6 lg:px-10 lg:py-7">
+                    <h2 className="min-w-0 text-xl font-bold leading-tight text-gray-900 sm:text-2xl lg:text-[1.75rem]">
                         {pageTitle}
                     </h2>
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-sm font-semibold text-white">
+                    <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-primary text-sm font-semibold text-white">
                         {initials}
                     </div>
                 </header>
 
                 {/* Page content with fade-in transition */}
-                <main className="px-10 pb-10">
+                <main className="px-4 pb-24 sm:px-6 lg:px-10 lg:pb-10">
                     <PageTransition>{children}</PageTransition>
                 </main>
             </div>

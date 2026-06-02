@@ -44,8 +44,8 @@ export default function GuidanceFullPage() {
 
     return (
         <div className="animate-in fade-in duration-500">
-            <div className="border-b border-gray-200">
-                <nav className="-mb-px flex space-x-8">
+            <div className="overflow-x-auto border-b border-gray-200">
+                <nav className="-mb-px flex min-w-max space-x-6 sm:space-x-8">
                     <button
                         onClick={() => setActiveTab('pengajuan')}
                         className={`whitespace-nowrap border-b-2 px-1 py-4 text-sm font-bold ${
@@ -99,7 +99,7 @@ export default function GuidanceFullPage() {
                     <LogbookTabContent />
                 ) : (
                     <div className="mx-auto mt-12 w-full max-w-[560px]">
-                        <div className="rounded-xl border border-gray-200 bg-white p-12 text-center">
+                        <div className="rounded-xl border border-gray-200 bg-white p-6 text-center sm:p-12">
                             <div className="mx-auto flex h-[56px] w-[56px] items-center justify-center rounded-full bg-amber-100">
                                 <Clock className="h-10 w-10 text-amber-500" />
                             </div>
@@ -111,7 +111,7 @@ export default function GuidanceFullPage() {
                             </p>
                             <button
                                 onClick={() => setActiveTab('pengajuan')}
-                                className="mt-6 rounded-lg bg-primary px-6 py-3 font-bold text-white hover:bg-primary-hover"
+                                className="mt-6 w-full rounded-lg bg-primary px-6 py-3 font-bold text-white hover:bg-primary-hover sm:w-auto"
                             >
                                 Lihat Status Pengajuan →
                             </button>

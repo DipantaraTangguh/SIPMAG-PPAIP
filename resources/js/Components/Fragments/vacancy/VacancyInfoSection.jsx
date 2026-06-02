@@ -34,7 +34,7 @@ export default function VacancyInfoSection({ vacancy }) {
             <hr className="my-4 border-gray-100" />
 
             {/* Info grid */}
-            <div className="grid grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
                 <InfoItem label="Kapasitas" value={vacancy.kapasitas} />
                 <InfoItem label="Sistem Kerja" value={vacancy.sistemKerja} />
                 <InfoItem label="Durasi" value={vacancy.durasi} />

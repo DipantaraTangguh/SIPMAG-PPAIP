@@ -73,7 +73,7 @@ function UploadField({ label, hint, icon: Icon, fieldKey, files, setFiles, fileE
                     handleFile(droppedFile);
                 }}
                 onClick={onClick}
-                className={`border-2 rounded-xl p-8 text-center cursor-pointer transition-colors duration-200 ${
+                className={`border-2 rounded-xl p-5 text-center cursor-pointer transition-colors duration-200 sm:p-8 ${
                     dragOver === fieldKey 
                     ? 'border-primary bg-primary-pale/50' 
                     : file
@@ -184,8 +184,8 @@ export default function DefenseFormView() {
                 Pengajuan verifikasi dokumen akhir dan jadwal sidang.
             </p>
 
-            <div className="flex flex-col lg:flex-row gap-8 items-start">
-                <div className="w-full lg:w-[280px] flex-shrink-0 bg-white border border-gray-200 rounded-xl p-6 border-l-4 border-l-primary sticky top-6 shadow-sm">
+            <div className="flex flex-col items-start gap-8 lg:flex-row">
+                <div className="w-full flex-shrink-0 rounded-xl border border-l-4 border-gray-200 border-l-primary bg-white p-6 shadow-sm lg:sticky lg:top-6 lg:w-[280px]">
                     <h3 className="font-bold text-[15px] text-primary mb-4">
                         Persyaratan Umum
                     </h3>
@@ -217,7 +217,7 @@ export default function DefenseFormView() {
                     </div>
                 </div>
 
-                <div className="flex-1 w-full bg-white border border-gray-200 rounded-xl p-8 shadow-sm">
+                <div className="w-full flex-1 rounded-xl border border-gray-200 bg-white p-5 shadow-sm sm:p-8">
                     <h2 className="font-bold text-[20px] text-[#1A1A1A] mb-6">
                         Lengkapi Dokumen Sidang
                     </h2>

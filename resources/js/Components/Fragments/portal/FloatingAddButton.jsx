@@ -23,7 +23,7 @@ export default function FloatingAddButton({ accessStatus, onClick }) {
     };
 
     return (
-        <div className="fixed bottom-6 right-6 z-50">
+        <div className="fixed bottom-24 right-4 z-50 sm:right-6 lg:bottom-6">
             {/* Tooltip */}
             {showTooltip && (
                 <div className="absolute -top-12 right-0 whitespace-nowrap rounded-lg bg-gray-900 px-3 py-2 text-xs font-medium text-white shadow-lg">

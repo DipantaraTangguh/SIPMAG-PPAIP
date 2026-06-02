@@ -11,7 +11,7 @@ export default function DpmAssignedView({ dpm, onGoToLogbook }) {
         <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-[1fr_320px]">
             {/* LEFT COLUMN: Success Card */}
             <div>
-                <div className="rounded-xl border border-gray-200 border-l-4 border-l-green-500 bg-white p-10">
+                <div className="rounded-xl border border-gray-200 border-l-4 border-l-green-500 bg-white p-5 sm:p-10">
                     <div className="mx-auto flex h-[72px] w-[72px] items-center justify-center rounded-full bg-green-100">
                         <CheckCircle className="h-10 w-10 text-green-500" />
                     </div>
@@ -26,7 +26,7 @@ export default function DpmAssignedView({ dpm, onGoToLogbook }) {
                     <div className="my-6 border-b border-gray-100"></div>
 
                     {/* DPM Profile Card */}
-                    <div className="flex items-center gap-4 rounded-xl border border-gray-200 bg-gray-50 p-5">
+                    <div className="flex flex-col items-center gap-4 rounded-xl border border-gray-200 bg-gray-50 p-5 text-center sm:flex-row sm:items-center sm:text-left">
                         <div className="flex h-[52px] w-[52px] flex-shrink-0 items-center justify-center rounded-full bg-primary text-lg font-bold text-white">
                             {dpm.initials}
                         </div>
@@ -80,7 +80,7 @@ export default function DpmAssignedView({ dpm, onGoToLogbook }) {
             </div>
 
             {/* RIGHT COLUMN: Side Panel */}
-            <div className="sticky top-6 self-start flex-shrink-0 lg:w-[320px]">
+            <div className="self-start flex-shrink-0 lg:sticky lg:top-6 lg:w-[320px]">
                 <div className="rounded-xl border border-gray-200 bg-white p-5 transition-all duration-300 hover:border-primary-pale hover:shadow-sm">
                     <div className="flex items-center gap-2 border-b-2 border-primary/10 pb-4">
                         <BookOpen className="h-[18px] w-[18px] text-primary" />

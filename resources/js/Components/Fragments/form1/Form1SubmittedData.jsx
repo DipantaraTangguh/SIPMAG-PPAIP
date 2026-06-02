@@ -24,7 +24,7 @@ function DataField({ label, value, valueClassName = '' }) {
 
 export default function Form1SubmittedData({ formData }) {
     return (
-        <div className="flex flex-col rounded-xl border border-gray-200 bg-white p-8">
+        <div className="flex flex-col rounded-xl border border-gray-200 bg-white p-5 sm:p-8">
             {/* Card header */}
             <div className="mb-6 flex items-center gap-2">
                 <FileText className="h-5 w-5 text-primary" />
@@ -34,7 +34,7 @@ export default function Form1SubmittedData({ formData }) {
             </div>
 
             {/* Data grid */}
-            <div className="grid grid-cols-2 gap-x-8 gap-y-6">
+            <div className="grid grid-cols-1 gap-x-8 gap-y-6 sm:grid-cols-2">
                 {/* Row 1 */}
                 <DataField label="Nama Lengkap" value={formData.nama} />
                 <DataField label="NIM" value={formData.nim} />

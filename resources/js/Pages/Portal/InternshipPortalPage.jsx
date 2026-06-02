@@ -147,7 +147,7 @@ export default function InternshipPortalPage() {
                     <>
                         {/* Access status banner */}
                         {showAccessBanner && (
-                            <div className="flex items-center gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3">
+                            <div className="flex flex-col gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 sm:flex-row sm:items-center">
                                 <Info className="h-[18px] w-[18px] flex-shrink-0 text-amber-500" />
                                 <p className="flex-1 text-[13px] leading-relaxed text-amber-700">
                                     Anda dapat melihat lowongan, namun belum bisa
@@ -156,7 +156,7 @@ export default function InternshipPortalPage() {
                                 <button
                                     type="button"
                                     onClick={() => navigate('/form1')}
-                                    className="flex-shrink-0 rounded-lg bg-primary px-3.5 py-1.5 text-xs font-bold text-white hover:bg-primary-hover"
+                                    className="w-full flex-shrink-0 rounded-lg bg-primary px-3.5 py-2 text-xs font-bold text-white hover:bg-primary-hover sm:w-auto sm:py-1.5"
                                 >
                                     Isi Form 1 →
                                 </button>
@@ -172,7 +172,7 @@ export default function InternshipPortalPage() {
                         />
 
                         {/* Main content grid */}
-                        <div className="grid grid-cols-[1fr_300px] items-start gap-6">
+                        <div className="grid grid-cols-1 items-start gap-6 xl:grid-cols-[1fr_300px]">
                             {/* Left: vacancy grid */}
                             <VacancyGrid
                                 vacancies={filteredVacancies}
@@ -181,7 +181,7 @@ export default function InternshipPortalPage() {
                             />
 
                             {/* Right: sidebar — pushed down to align with first card row */}
-                            <div className="pt-10">
+                            <div className="pt-0 xl:pt-10">
                                 <ActiveApplicationsSidebar
                                     applications={activeApplications}
                                 />

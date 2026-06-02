@@ -12,7 +12,7 @@ export default function RequestSubmittedView({ data, studentName, studentNim }) 
         <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-[1fr_320px]">
             {/* LEFT COLUMN: Data Pengajuan Card */}
             <div>
-                <div className="rounded-xl border border-gray-200 border-l-4 border-l-primary bg-white p-8">
+                <div className="rounded-xl border border-gray-200 border-l-4 border-l-primary bg-white p-5 sm:p-8">
                     <div className="mb-6">
                         <h2 className="text-[20px] font-bold text-[#1A1A1A]">
                             Data Pengajuan
@@ -143,7 +143,7 @@ export default function RequestSubmittedView({ data, studentName, studentNim }) 
             </div>
 
             {/* RIGHT COLUMN: Side Panel */}
-            <div className="sticky top-6 self-start">
+            <div className="self-start lg:sticky lg:top-6">
                 <div className="rounded-xl border border-gray-200 bg-white p-5 transition-all duration-300 hover:border-primary-pale hover:shadow-sm">
                     <div className="flex items-center gap-2 border-b-2 border-primary/10 pb-4">
                         <BookOpen className="h-[18px] w-[18px] text-primary" />

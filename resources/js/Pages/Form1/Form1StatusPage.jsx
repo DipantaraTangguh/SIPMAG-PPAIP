@@ -71,7 +71,7 @@ export default function Form1StatusPage() {
             </p>
 
             {/* Two-column layout */}
-            <div className="grid grid-cols-[1fr_420px] items-start gap-6">
+            <div className="grid grid-cols-1 items-start gap-6 xl:grid-cols-[1fr_420px]">
                 {/* Left: submitted data */}
                 <Form1SubmittedData formData={formData} />
 

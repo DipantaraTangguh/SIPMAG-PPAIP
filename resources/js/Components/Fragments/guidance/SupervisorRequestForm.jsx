@@ -88,7 +88,7 @@ export default function SupervisorRequestForm({ onSubmit }) {
         <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-[1fr_320px]">
             {/* LEFT COLUMN: Form Card */}
             <div>
-                <div className="rounded-xl border border-gray-200 border-l-4 border-l-primary bg-white p-8">
+                <div className="rounded-xl border border-gray-200 border-l-4 border-l-primary bg-white p-5 sm:p-8">
                     <h2 className="text-[20px] font-bold text-[#1A1A1A]">
                         Form Pengajuan Pembimbing Magang
                     </h2>
@@ -246,7 +246,7 @@ export default function SupervisorRequestForm({ onSubmit }) {
                                         onDrop={handleDrop}
                                         onDragOver={handleDragOver}
                                         onDragLeave={handleDragLeave}
-                                        className={`flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed p-8 text-center transition-colors ${
+                                        className={`flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed p-6 text-center transition-colors sm:p-8 ${
                                             isDragging ? 'border-primary bg-primary-pale' : 'border-gray-300 bg-white hover:border-primary hover:bg-primary-pale'
                                         }`}
                                     >
@@ -293,8 +293,8 @@ export default function SupervisorRequestForm({ onSubmit }) {
                 </div>
 
                 {/* Form Footer */}
-                <div className="mt-6 flex justify-end">
-                    <div className="flex gap-4">
+                <div className="mt-6 flex justify-stretch sm:justify-end">
+                    <div className="flex w-full flex-col-reverse gap-3 sm:w-auto sm:flex-row sm:gap-4">
                         <button
                             type="button"
                             onClick={() => navigate('/')}
@@ -306,7 +306,7 @@ export default function SupervisorRequestForm({ onSubmit }) {
                             type="button"
                             onClick={handleSubmit}
                             disabled={!isFormValid || isSubmitting}
-                            className={`flex items-center gap-2 rounded-xl px-7 py-3 font-bold transition-all ${
+                            className={`flex items-center justify-center gap-2 rounded-xl px-7 py-3 font-bold transition-all ${
                                 isFormValid && !isSubmitting
                                     ? 'bg-primary text-white hover:bg-primary-hover'
                                     : 'cursor-not-allowed bg-gray-300 text-gray-400'
@@ -320,7 +320,7 @@ export default function SupervisorRequestForm({ onSubmit }) {
             </div>
 
             {/* RIGHT COLUMN: Side Panel */}
-            <div className="sticky top-6 self-start">
+            <div className="self-start lg:sticky lg:top-6">
                 {/* Card 1 */}
                 <div className="rounded-xl border border-gray-200 bg-white p-5 hover:border-primary-pale hover:shadow-sm transition-all duration-300">
                     <div className="flex items-center gap-2 border-b-2 border-primary/10 pb-4">

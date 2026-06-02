@@ -21,7 +21,7 @@ export default function DefenseSuccessView() {
             <p className="mb-6 text-[14px] text-gray-500">
                 Pengajuan verifikasi dokumen akhir dan jadwal sidang.
             </p>
-            <div className="bg-white rounded-2xl p-12 max-w-[800px] border border-gray-150 shadow-sm mx-auto flex flex-col items-center mt-2">
+            <div className="mx-auto mt-2 flex max-w-[800px] flex-col items-center rounded-2xl border border-gray-150 bg-white p-6 shadow-sm sm:p-12">
                 <div className="w-[68px] h-[68px] rounded-full bg-amber-100 flex items-center justify-center mb-8">
                     <div className="w-[34px] h-[34px] bg-amber-500 rounded-full flex items-center justify-center">
                         <Clock className="w-5 h-5 text-white" />
@@ -41,20 +41,20 @@ export default function DefenseSuccessView() {
                         RINGKASAN MAGANG
                     </h4>
                     
-                    <div className="bg-primary-pale/30 rounded-xl px-6 py-2">
-                        <div className="flex justify-between items-center py-4 border-b border-primary-pale/50">
+                    <div className="rounded-xl bg-primary-pale/30 px-4 py-2 sm:px-6">
+                        <div className="flex flex-col gap-1 border-b border-primary-pale/50 py-4 sm:flex-row sm:items-center sm:justify-between">
                             <span className="text-gray-500 text-[13px] font-medium">Perusahaan</span>
                             <span className="text-[#1A1A1A] text-[14px] font-bold">{acceptedApp.company || acceptedApp.companyName}</span>
                         </div>
-                        <div className="flex justify-between items-center py-4 border-b border-primary-pale/50">
+                        <div className="flex flex-col gap-1 border-b border-primary-pale/50 py-4 sm:flex-row sm:items-center sm:justify-between">
                             <span className="text-gray-500 text-[13px] font-medium">Posisi</span>
                             <span className="text-[#1A1A1A] text-[14px] font-bold">{acceptedApp.position}</span>
                         </div>
-                        <div className="flex justify-between items-center py-4 border-b border-primary-pale/50">
+                        <div className="flex flex-col gap-1 border-b border-primary-pale/50 py-4 sm:flex-row sm:items-center sm:justify-between">
                             <span className="text-gray-500 text-[13px] font-medium">Dosen Pembimbing</span>
                             <span className="text-[#1A1A1A] text-[14px] font-bold">{dpmName}</span>
                         </div>
-                        <div className="flex justify-between items-center py-4">
+                        <div className="flex flex-col gap-2 py-4 sm:flex-row sm:items-center sm:justify-between">
                             <span className="text-gray-500 text-[13px] font-medium">Total Logbook</span>
                             <span className="bg-primary text-white px-3 py-1 rounded-full text-[11px] font-bold">
                                 6/6 Entri Disetujui

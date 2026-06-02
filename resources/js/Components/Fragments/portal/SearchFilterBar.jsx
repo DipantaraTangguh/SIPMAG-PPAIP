@@ -17,7 +17,7 @@ export default function SearchFilterBar({
     onSortChange,
 }) {
     return (
-        <div className="flex items-center gap-3">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
             {/* Search input */}
             <div className="relative flex-1">
                 <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
@@ -33,7 +33,7 @@ export default function SearchFilterBar({
             {/* Filter button (visual only) */}
             <button
                 type="button"
-                className="flex h-12 items-center gap-2 rounded-xl border border-gray-200 bg-white px-5 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-50"
+                className="flex h-12 w-full items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-5 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-50 sm:w-auto"
             >
                 <SlidersHorizontal className="h-4 w-4" />
                 Filter
@@ -45,7 +45,7 @@ export default function SearchFilterBar({
                 onClick={() =>
                     onSortChange(sortBy === 'terbaru' ? 'deadline' : 'terbaru')
                 }
-                className="flex h-12 items-center gap-2 rounded-xl bg-primary px-5 text-sm font-semibold text-white transition-colors hover:bg-primary-hover"
+                className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-primary px-5 text-sm font-semibold text-white transition-colors hover:bg-primary-hover sm:w-auto"
             >
                 <SlidersHorizontal className="h-4 w-4" />
                 {sortBy === 'terbaru' ? 'Terbaru' : 'Deadline'}

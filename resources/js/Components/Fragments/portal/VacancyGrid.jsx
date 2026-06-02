@@ -14,7 +14,7 @@ export default function VacancyGrid({ vacancies, accessStatus, onCardClick }) {
     return (
         <div>
             {/* Header row */}
-            <div className="mb-4 flex items-baseline justify-between">
+            <div className="mb-4 flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between">
                 <h3 className="text-base font-bold text-gray-900">
                     Lowongan Tersedia
                 </h3>
@@ -25,7 +25,7 @@ export default function VacancyGrid({ vacancies, accessStatus, onCardClick }) {
 
             {/* Grid or empty state */}
             {vacancies.length > 0 ? (
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                     {vacancies.map((v) => (
                         <VacancyCard
                             key={v.id}

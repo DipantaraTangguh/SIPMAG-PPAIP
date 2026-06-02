@@ -63,7 +63,7 @@ export default function VacancyApplySidebar({
     };
 
     return (
-        <div className="sticky top-6 self-start">
+        <div className="self-start xl:sticky xl:top-6">
             {/* ── Card 1: Apply ──────────────── */}
             <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
                 {/* Deadline banner */}
