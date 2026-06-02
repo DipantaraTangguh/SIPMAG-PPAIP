@@ -466,12 +466,148 @@ export function SimulationProvider({ children }) {
         }));
     }, [refreshProfile]);
 
+    const notifications = useMemo(() => {
+        const list = [];
+
+        // 1. Form 1
+        if (state.form1Submission) {
+            const dateStr = state.form1Submission.submittedAt ? ` pada ${state.form1Submission.submittedAt}` : '';
+            if (state.student?.accessStatus === 'PendingReview') {
+                list.push({
+                    message: `Form 1 Anda berhasil diajukan${dateStr}. Menunggu persetujuan Kaprodi.`,
+                    time: state.form1Submission.submittedAt || 'Baru saja',
+                });
+            } else if (state.student?.accessStatus === 'RejectedForm1') {
+                list.push({
+                    message: `Form 1 Anda ditolak/perlu direvisi oleh Kaprodi${state.form1Submission.rejectionReason ? `: "${state.form1Submission.rejectionReason}"` : '.'}`,
+                    time: 'Baru saja',
+                });
+            } else if (
+                state.student?.accessStatus !== 'Unverified' &&
+                state.student?.accessStatus !== 'RejectedForm1' &&
+                state.student?.accessStatus !== 'PendingReview'
+            ) {
+                list.push({
+                    message: 'Form 1 Anda telah disetujui oleh Kaprodi. Surat keterangan siap diunduh.',
+                    time: state.form1Submission.submittedAt || 'Beberapa hari lalu',
+                });
+            }
+        }
+
+        // 2. Applications (Mitra)
+        if (state.activeApplications && state.activeApplications.length > 0) {
+            state.activeApplications.forEach((app) => {
+                const dateStr = app.appliedAt ? new Date(app.appliedAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }) : '';
+                if (app.status === 'Diterima' || app.status === 'Accepted') {
+                    list.push({
+                        message: `Selamat! Lamaran Anda sebagai ${app.position} di ${app.companyName} telah Diterima.`,
+                        time: dateStr || 'Baru saja',
+                    });
+                } else if (app.status === 'Ditolak' || app.status === 'Rejected') {
+                    list.push({
+                        message: `Lamaran Anda sebagai ${app.position} di ${app.companyName} ditolak.`,
+                        time: dateStr || 'Baru saja',
+                    });
+                } else {
+                    list.push({
+                        message: `Lamaran Anda sebagai ${app.position} di ${app.companyName} berhasil dikirim.`,
+                        time: dateStr || 'Baru saja',
+                    });
+                }
+            });
+        }
+
+        // 3. Form 2 (Mandiri)
+        if (state.form2Submissions && state.form2Submissions.length > 0) {
+            state.form2Submissions.forEach((sub) => {
+                const statusMap = {
+                    'Menunggu Review': 'sedang ditinjau.',
+                    'Disetujui': 'telah disetujui oleh PPAIP.',
+                    'Ditolak': `ditolak oleh PPAIP${sub.rejectionReason ? `: "${sub.rejectionReason}"` : '.'}`,
+                };
+                list.push({
+                    message: `Pengajuan Magang Mandiri di ${sub.companyName} sebagai ${sub.position} ${statusMap[sub.status] || sub.status}`,
+                    time: sub.submittedAt || 'Baru saja',
+                });
+            });
+        }
+
+        // 4. Supervisor & DPM
+        if (state.pengajuanPembimbing) {
+            if (state.student?.dpm) {
+                list.push({
+                    message: `Dosen Pembimbing Magang (DPM) Anda telah ditetapkan: ${state.student.dpm.name}.`,
+                    time: state.pengajuanPembimbing.submittedAt || 'Baru saja',
+                });
+            } else {
+                list.push({
+                    message: `Pengajuan Pembimbing Magang di ${state.pengajuanPembimbing.namaPerusahaan} berhasil dikirim. Menunggu penetapan DPM.`,
+                    time: state.pengajuanPembimbing.submittedAt || 'Baru saja',
+                });
+            }
+        }
+
+        // 5. Logbooks
+        if (state.logbookEntries && state.logbookEntries.length > 0) {
+            const rejected = state.logbookEntries.filter(e => e.status === 'Ditolak' || e.status === 'Rejected');
+            if (rejected.length > 0) {
+                list.push({
+                    message: `Terdapat ${rejected.length} entri logbook yang ditolak/perlu revisi oleh DPM.`,
+                    time: 'Baru saja',
+                });
+            }
+
+            const approvedCount = state.logbookEntries.filter(e => e.status === 'Disetujui' || e.status === 'Approved').length;
+            if (approvedCount >= 6) {
+                list.push({
+                    message: 'Logbook magang lengkap (6/6 disetujui). Silakan mengajukan Sidang Magang.',
+                    time: 'Baru saja',
+                });
+            }
+        }
+
+        // 6. Sidang
+        if (state.sidangSubmission) {
+            if (state.sidangSubmission.status === 'Scheduled' || state.sidangSchedule) {
+                list.push({
+                    message: `Jadwal Sidang Magang Anda telah ditetapkan pada ${state.sidangSchedule?.tanggal || state.sidangSubmission.scheduledDate} pukul ${state.sidangSchedule?.waktu || state.sidangSubmission.scheduledTime} di ${state.sidangSchedule?.ruangan || state.sidangSubmission.room}.`,
+                    time: 'Baru saja',
+                });
+            } else if (state.sidangSubmission.status === 'Pending') {
+                list.push({
+                    message: 'Dokumen sidang magang berhasil dikirim. Menunggu verifikasi dokumen dan penjadwalan oleh Kaprodi.',
+                    time: 'Baru saja',
+                });
+            }
+        }
+
+        if (state.student?.accessStatus === 'SiklusSelesai') {
+            list.push({
+                message: 'Selamat! Siklus magang Anda telah selesai. Terima kasih atas dedikasi Anda.',
+                time: 'Baru saja',
+            });
+        }
+
+        // Reverse to display newest notifications first
+        return list.reverse();
+    }, [
+        state.form1Submission,
+        state.activeApplications,
+        state.form2Submissions,
+        state.logbookEntries,
+        state.sidangSubmission,
+        state.sidangSchedule,
+        state.pengajuanPembimbing,
+        state.student
+    ]);
+
     /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
      * Context Value
      * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
     const value = useMemo(() => ({
         ...state,
+        notifications,
         login,
         logout,
         submitForm1,
@@ -486,7 +622,7 @@ export function SimulationProvider({ children }) {
         refreshProfile,
         fetchAllStudentData,
     }), [
-        state, login, logout, submitForm1, resetForm1,
+        state, notifications, login, logout, submitForm1, resetForm1,
         applyToVacancy, submitForm2, submitPengajuanPembimbing,
         addLogbookEntry, updateLogbookEntry, submitSidang,
         refreshProfile, fetchAllStudentData,
