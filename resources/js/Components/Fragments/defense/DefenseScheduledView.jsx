@@ -1,7 +1,7 @@
 /**
  * components/defense/DefenseScheduledView.jsx
  * State 3: Schedule detail card + Persiapan Sidang panel.
- * Extracted from InternshipDefensePage.jsx lines 313–400.
+ * Displays the defense schedule set by Kaprodi, including examiners.
  */
 import React from 'react';
 import { CalendarCheck, Monitor } from 'lucide-react';
@@ -17,7 +17,6 @@ export default function DefenseScheduledView() {
         ruangan: '-',
         dosenPenguji1: '-',
         dosenPenguji2: '-',
-        panduanLink: '#',
     };
 
     return (
@@ -34,7 +33,7 @@ export default function DefenseScheduledView() {
                     Jadwal Sidang Magang Anda
                 </h2>
                 <p className="text-center mt-[8px] text-gray-500 text-[14px] leading-relaxed max-w-[480px] mx-auto">
-                    Berikut adalah detail jadwal pelaksanaan sidang magang Anda yang telah divalidasi oleh UPT PPAIP.
+                    Berikut adalah detail jadwal pelaksanaan sidang magang Anda yang telah ditetapkan oleh Kepala Program Studi.
                 </p>
 
                 {/* BOTTOM SECTION */}
@@ -83,7 +82,7 @@ export default function DefenseScheduledView() {
                                 </div>
                             </div>
                             <button
-                                onClick={() => window.open(schedule.panduanLink, '_blank')}
+                                onClick={() => window.open('#', '_blank')}
                                 className="mt-[16px] w-full bg-primary text-white rounded-lg py-[10px] font-bold text-[13px] text-center hover:bg-primary-hover transition-colors"
                             >
                                 Lihat Panduan

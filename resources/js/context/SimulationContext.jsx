@@ -173,8 +173,30 @@ export function SimulationProvider({ children }) {
                         dpmNote: l.dpm_note,
                     }))
                     : [],
-                sidangSubmission: sidangRes.status === 'fulfilled'
-                    ? sidangRes.value.submission
+                sidangSubmission: sidangRes.status === 'fulfilled' && sidangRes.value.submission
+                    ? {
+                        id: sidangRes.value.submission.id,
+                        status: sidangRes.value.submission.status,
+                        submittedAt: sidangRes.value.submission.submitted_at,
+                        scheduledDate: sidangRes.value.submission.scheduled_date,
+                        scheduledTime: sidangRes.value.submission.scheduled_time,
+                        room: sidangRes.value.submission.room,
+                        dosenPenguji1: sidangRes.value.submission.dosen_penguji_1,
+                        dosenPenguji2: sidangRes.value.submission.dosen_penguji_2,
+                    }
+                    : null,
+                sidangSchedule: sidangRes.status === 'fulfilled'
+                    && sidangRes.value.submission
+                    && sidangRes.value.submission.status === 'Scheduled'
+                    ? {
+                        tanggal: sidangRes.value.submission.scheduled_date
+                            ? new Date(sidangRes.value.submission.scheduled_date).toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
+                            : 'Belum ditetapkan',
+                        waktu: sidangRes.value.submission.scheduled_time || '-',
+                        ruangan: sidangRes.value.submission.room || '-',
+                        dosenPenguji1: sidangRes.value.submission.dosen_penguji_1 || '-',
+                        dosenPenguji2: sidangRes.value.submission.dosen_penguji_2 || '-',
+                    }
                     : null,
                 pengajuanPembimbing: supervisorRes.status === 'fulfilled' && supervisorRes.value.application
                     ? {
@@ -436,7 +458,7 @@ export function SimulationProvider({ children }) {
         setState((s) => ({
             ...s,
             student: { ...s.student, accessStatus: 'MenungguSidang' },
-            sidangSubmission: { submittedAt: new Date().toISOString() },
+            sidangSubmission: { status: 'Pending', submittedAt: new Date().toISOString() },
             notifications: [
                 { id: Date.now(), message: 'Dokumen sidang berhasil dikirim.', time: 'Baru saja' },
                 ...s.notifications,

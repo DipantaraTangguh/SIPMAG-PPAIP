@@ -11,14 +11,28 @@ class DefenseController extends Controller
 {
     /**
      * GET /api/defense
-     * Get current student's sidang submission.
+     * Get current student's sidang submission (including schedule info).
      */
     public function show(Request $request)
     {
         $student = $request->user()->student;
 
+        $submission = $student->sidangSubmission;
+
         return response()->json([
-            'submission'    => $student->sidangSubmission,
+            'submission'    => $submission ? [
+                'id'              => $submission->id,
+                'laporan_path'    => $submission->laporan_path,
+                'poster_path'     => $submission->poster_path,
+                'krs_path'        => $submission->krs_path,
+                'status'          => $submission->status,
+                'scheduled_date'  => $submission->scheduled_date?->format('Y-m-d'),
+                'scheduled_time'  => $submission->scheduled_time,
+                'room'            => $submission->room,
+                'dosen_penguji_1' => $submission->dosen_penguji_1,
+                'dosen_penguji_2' => $submission->dosen_penguji_2,
+                'submitted_at'    => $submission->submitted_at,
+            ] : null,
             'access_status' => $student->access_status,
         ]);
     }
@@ -54,6 +68,7 @@ class DefenseController extends Controller
             'laporan_path' => $laporanPath,
             'poster_path'  => $posterPath,
             'krs_path'     => $krsPath,
+            'status'       => 'Pending',
         ]);
 
         $student->update(['access_status' => 'MenungguSidang']);
@@ -86,9 +101,10 @@ class DefenseController extends Controller
 
     /**
      * POST /api/kaprodi/defense/{studentId}/schedule
-     * Set sidang schedule — Kaprodi only, scoped to own prodi.
+     * Schedule the sidang — Kaprodi sets date, time, room, and 2 examiners.
+     * Scoped to own prodi. Only when submission status is Pending.
      */
-    public function setSchedule(Request $request, $studentId)
+    public function scheduleSidang(Request $request, $studentId)
     {
         $lecturer = $request->user()->lecturer;
 
@@ -97,14 +113,28 @@ class DefenseController extends Controller
             ->where('access_status', 'MenungguSidang')
             ->firstOrFail();
 
+        $submission = $student->sidangSubmission;
+        if (!$submission || $submission->status !== 'Pending') {
+            return response()->json(['message' => 'Submission tidak valid untuk dijadwalkan.'], 422);
+        }
+
         $request->validate([
-            'scheduled_date' => 'required|date|after:today',
-            'room'           => 'nullable|string|max:100',
+            'scheduled_date'  => 'required|date|after:today',
+            'scheduled_time'  => 'nullable|string|max:10',
+            'room'            => 'nullable|string|max:100',
+            'dosen_penguji_1' => 'required|string|max:255',
+            'dosen_penguji_2' => 'required|string|max:255',
         ]);
 
-        $student->sidangSubmission?->update([
-            'scheduled_date' => $request->scheduled_date,
-            'room'           => $request->room,
+        $submission->update([
+            'status'          => 'Scheduled',
+            'scheduled_date'  => $request->scheduled_date,
+            'scheduled_time'  => $request->scheduled_time,
+            'room'            => $request->room,
+            'dosen_penguji_1' => $request->dosen_penguji_1,
+            'dosen_penguji_2' => $request->dosen_penguji_2,
+            'scheduled_by'    => $lecturer->id,
+            'scheduled_at'    => now(),
         ]);
 
         return response()->json([
@@ -114,7 +144,8 @@ class DefenseController extends Controller
 
     /**
      * POST /api/kaprodi/defense/{studentId}/complete
-     * Complete the internship cycle — Kaprodi only, scoped to own prodi.
+     * Complete the internship cycle — only when sidang has been scheduled.
+     * Kaprodi only, scoped to own prodi.
      */
     public function completeCycle(Request $request, $studentId)
     {
@@ -124,6 +155,11 @@ class DefenseController extends Controller
             ->where('study_program', $lecturer->study_program)
             ->where('access_status', 'MenungguSidang')
             ->firstOrFail();
+
+        $submission = $student->sidangSubmission;
+        if (!$submission || $submission->status !== 'Scheduled') {
+            return response()->json(['message' => 'Sidang belum dijadwalkan.'], 422);
+        }
 
         $student->update([
             'access_status'          => 'SiklusSelesai',

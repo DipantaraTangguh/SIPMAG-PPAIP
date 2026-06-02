@@ -37,7 +37,9 @@ class KaprodiStudentResource extends Resource
     {
         $prodi = auth()->user()?->lecturer?->study_program;
 
-        return parent::getEloquentQuery()->where('study_program', $prodi);
+        return parent::getEloquentQuery()
+            ->where('study_program', $prodi)
+            ->with('sidangSubmission');
     }
 
     public static function form(Form $form): Form
@@ -290,12 +292,84 @@ class KaprodiStudentResource extends Resource
                         'access_status' => 'HasDPM',
                     ])),
 
+                // ── Schedule Sidang ──
+                // Visible when student has submitted defense docs but not yet scheduled
+                Tables\Actions\Action::make('scheduleSidang')
+                    ->label('Jadwalkan Sidang')
+                    ->icon('heroicon-o-calendar-days')
+                    ->color('info')
+                    ->visible(fn (Student $record) =>
+                        $record->access_status === 'MenungguSidang' &&
+                        $record->sidangSubmission &&
+                        $record->sidangSubmission->status === 'Pending'
+                    )
+                    ->modalHeading('Jadwalkan Sidang Magang')
+                    ->modalDescription('Tetapkan jadwal pelaksanaan sidang dan dosen penguji.')
+                    ->form([
+                        Forms\Components\DatePicker::make('scheduled_date')
+                            ->label('Tanggal Sidang')
+                            ->required()
+                            ->minDate(now()->addDay()),
+                        Forms\Components\TimePicker::make('scheduled_time')
+                            ->label('Waktu Sidang'),
+                        Forms\Components\TextInput::make('room')
+                            ->label('Ruangan / Link')
+                            ->maxLength(100),
+                        Forms\Components\Select::make('dosen_penguji_1')
+                            ->label('Dosen Penguji 1')
+                            ->required()
+                            ->options(function () {
+                                $prodi = auth()->user()?->lecturer?->study_program;
+                                return Lecturer::whereNotNull('user_id')
+                                    ->when($prodi, fn ($q) => $q->where('study_program', $prodi))
+                                    ->pluck('lecturer_name', 'lecturer_name');
+                            })
+                            ->searchable()
+                            ->preload(),
+                        Forms\Components\Select::make('dosen_penguji_2')
+                            ->label('Dosen Penguji 2')
+                            ->required()
+                            ->options(function () {
+                                $prodi = auth()->user()?->lecturer?->study_program;
+                                return Lecturer::whereNotNull('user_id')
+                                    ->when($prodi, fn ($q) => $q->where('study_program', $prodi))
+                                    ->pluck('lecturer_name', 'lecturer_name');
+                            })
+                            ->searchable()
+                            ->preload(),
+                    ])
+                    ->action(function (Student $record, array $data) {
+                        $lecturerId = auth()->user()?->lecturer?->id;
+
+                        $record->sidangSubmission->update([
+                            'status'          => 'Scheduled',
+                            'scheduled_date'  => $data['scheduled_date'],
+                            'scheduled_time'  => $data['scheduled_time'] ?? null,
+                            'room'            => $data['room'] ?? null,
+                            'dosen_penguji_1' => $data['dosen_penguji_1'],
+                            'dosen_penguji_2' => $data['dosen_penguji_2'],
+                            'scheduled_by'    => $lecturerId,
+                            'scheduled_at'    => now(),
+                        ]);
+
+                        \Filament\Notifications\Notification::make()
+                            ->title('Jadwal sidang berhasil ditetapkan')
+                            ->body("Sidang untuk {$record->name} telah dijadwalkan.")
+                            ->success()
+                            ->send();
+                    }),
+
                 // ── Complete Sidang Cycle ──
+                // Only visible after sidang has been scheduled
                 Tables\Actions\Action::make('completeCycle')
                     ->label('Selesaikan Siklus')
                     ->icon('heroicon-o-arrow-path')
                     ->color('warning')
-                    ->visible(fn (Student $record) => $record->access_status === 'MenungguSidang')
+                    ->visible(fn (Student $record) =>
+                        $record->access_status === 'MenungguSidang' &&
+                        $record->sidangSubmission &&
+                        $record->sidangSubmission->status === 'Scheduled'
+                    )
                     ->requiresConfirmation()
                     ->modalHeading('Selesaikan Siklus Magang')
                     ->modalDescription('Siklus magang akan direset. Riwayat tetap tersimpan.')

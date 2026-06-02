@@ -26,8 +26,8 @@ export default function InternshipDefensePage() {
     // Derive the current view entirely from context — no local state
     const sidangView = (() => {
         if (accessStatus === 'SiklusSelesai') return 'completed';
-        if (sidangSchedule) return 'scheduled';
-        if (sidangSubmission) return 'success';
+        if (sidangSubmission?.status === 'Scheduled') return 'scheduled';
+        if (sidangSubmission) return 'success'; // Pending — waiting for Kaprodi to schedule
         return 'form';
     })();
 

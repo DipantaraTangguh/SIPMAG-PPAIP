@@ -79,7 +79,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
         // Sidang management (schedule + cycle completion)
         Route::get('/defense', [DefenseController::class, 'indexForKaprodi']);
-        Route::post('/defense/{studentId}/schedule', [DefenseController::class, 'setSchedule']);
+        Route::post('/defense/{studentId}/schedule', [DefenseController::class, 'scheduleSidang']);
         Route::post('/defense/{studentId}/complete', [DefenseController::class, 'completeCycle']);
 
         // Students list (scoped to prodi, for Kaprodi dashboard)
