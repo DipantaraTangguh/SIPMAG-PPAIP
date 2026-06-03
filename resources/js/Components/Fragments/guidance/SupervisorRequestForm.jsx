@@ -352,12 +352,6 @@ export default function SupervisorRequestForm({ onSubmit }) {
                     <p className="mt-2 text-[13px] text-gray-600">
                         Pastikan CV dan Portofolio Anda sudah diperbarui sebelum melamar ke mitra perusahaan baru.
                     </p>
-                    <button
-                        onClick={() => console.log('Placeholder: Lihat Panduan CV')}
-                        className="mt-2 cursor-pointer text-[13px] font-bold text-primary hover:underline"
-                    >
-                        Lihat Panduan CV →
-                    </button>
                 </div>
             </div>
         </div>

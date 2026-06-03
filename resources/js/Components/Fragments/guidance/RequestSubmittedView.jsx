@@ -181,12 +181,6 @@ export default function RequestSubmittedView({ data, studentName, studentNim }) 
                     <p className="mt-2 text-[13px] text-gray-600">
                         Pastikan CV dan Portofolio Anda sudah diperbarui sebelum melamar ke mitra perusahaan baru.
                     </p>
-                    <button
-                        onClick={() => console.log('Placeholder: Lihat Panduan CV')}
-                        className="mt-2 text-[13px] font-bold text-primary hover:underline hover:cursor-pointer"
-                    >
-                        Lihat Panduan CV →
-                    </button>
                 </div>
             </div>
         </div>
