@@ -3,10 +3,13 @@
 namespace App\Filament\Resources\Ppaip;
 
 use App\Models\Student;
+use App\Services\StudentStateMachine;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+
+use Illuminate\Support\Facades\Auth;
 
 class PpaipStudentResource extends Resource
 {
@@ -19,7 +22,7 @@ class PpaipStudentResource extends Resource
 
     public static function canAccess(): bool
     {
-        return auth()->user()?->role === 'ppaip';
+        return Auth::user()?->role === 'ppaip';
     }
     public static function canCreate(): bool
     {
@@ -102,8 +105,7 @@ class PpaipStudentResource extends Resource
                             'form1_pdf_path'         => null,
                             'form1_rejection_reason' => null,
                         ]);
-                        $record->access_status = 'SiklusSelesai';
-                        $record->save();
+                        app(StudentStateMachine::class)->transition($record, 'SiklusSelesai');
 
                         \Filament\Notifications\Notification::make()
                             ->title('Siklus magang diselesaikan')

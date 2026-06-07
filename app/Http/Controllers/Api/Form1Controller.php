@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Student;
+use App\Services\StudentStateMachine;
 use App\Support\StoredFilePath;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
@@ -79,12 +80,12 @@ class Form1Controller extends Controller
         ];
 
         $student->fill([
-            'form1_data' => $form1Data,
-            'form1_pdf_path' => $transkripPath,
+            'form1_data'             => $form1Data,
+            'form1_pdf_path'         => $transkripPath,
             'form1_rejection_reason' => null,
         ]);
-        $student->access_status = 'PendingReview';
-        $student->save();
+
+        app(StudentStateMachine::class)->transition($student, 'PendingReview');
 
         return response()->json([
             'message' => 'Form 1 berhasil diajukan.',
@@ -123,13 +124,11 @@ class Form1Controller extends Controller
             ->where('access_status', 'PendingReview')
             ->firstOrFail();
 
-        $student->fill([
+        app(StudentStateMachine::class)->transition($student, 'ApprovedForm1', [
             'form1_rejection_reason' => null,
+            'form1_approved_by'      => $lecturer->id,
+            'form1_approved_at'      => now(),
         ]);
-        $student->access_status = 'ApprovedForm1';
-        $student->form1_approved_by = $lecturer->id;
-        $student->form1_approved_at = now();
-        $student->save();
 
         return response()->json([
             'message' => 'Form 1 disetujui.',
@@ -146,11 +145,9 @@ class Form1Controller extends Controller
             ->where('access_status', 'PendingReview')
             ->firstOrFail();
 
-        $student->fill([
+        app(StudentStateMachine::class)->transition($student, 'RejectedForm1', [
             'form1_rejection_reason' => $request->reason,
         ]);
-        $student->access_status = 'RejectedForm1';
-        $student->save();
 
         return response()->json([
             'message' => 'Form 1 ditolak.',

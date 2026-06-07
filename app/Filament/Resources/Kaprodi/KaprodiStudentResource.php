@@ -5,9 +5,10 @@ namespace App\Filament\Resources\Kaprodi;
 use App\Models\Lecturer;
 use App\Models\Student;
 use App\Models\User;
-use Illuminate\Support\Facades\Auth;
 use App\Services\DpmAssignmentService;
+use App\Services\StudentStateMachine;
 use App\Support\StoredFilePath;
+use Illuminate\Support\Facades\Auth;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -195,13 +196,11 @@ class KaprodiStudentResource extends Resource
                     })
                     ->action(function (Student $record) {
                         $lecturerId = static::currentUser()?->lecturer?->id;
-                        $record->fill([
+                        app(StudentStateMachine::class)->transition($record, 'ApprovedForm1', [
                             'form1_rejection_reason' => null,
+                            'form1_approved_by'      => $lecturerId,
+                            'form1_approved_at'      => now(),
                         ]);
-                        $record->access_status = 'ApprovedForm1';
-                        $record->form1_approved_by = $lecturerId;
-                        $record->form1_approved_at = now();
-                        $record->save();
                     }),
 
                 // Action reject Form 1.
@@ -214,9 +213,9 @@ class KaprodiStudentResource extends Resource
                         Forms\Components\Textarea::make('reason')->label('Alasan Penolakan')->required(),
                     ])
                     ->action(function (Student $record, array $data): void {
-                        $record->form1_rejection_reason = $data['reason'];
-                        $record->access_status = 'RejectedForm1';
-                        $record->save();
+                        app(StudentStateMachine::class)->transition($record, 'RejectedForm1', [
+                            'form1_rejection_reason' => $data['reason'],
+                        ]);
                     }),
 
                 // Action assign DPM setelah pengajuan pembimbing masuk.

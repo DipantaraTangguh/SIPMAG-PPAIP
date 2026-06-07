@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Logbook;
 use App\Models\Student;
+use App\Services\StudentStateMachine;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -26,8 +27,7 @@ class LogbookReviewService
                 ->count();
 
             if ($approvedCount >= 6 && $student->access_status === 'HasDPM') {
-                $student->access_status = 'LogbookComplete';
-                $student->save();
+                app(StudentStateMachine::class)->transition($student, 'LogbookComplete');
             }
 
             return $student->refresh()->setAttribute('approved_logbook_count', $approvedCount);

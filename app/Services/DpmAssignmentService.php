@@ -2,8 +2,10 @@
 
 namespace App\Services;
 
+use App\Exceptions\InvalidStateTransitionException;
 use App\Models\Lecturer;
 use App\Models\Student;
+use App\Services\StudentStateMachine;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -45,8 +47,7 @@ class DpmAssignmentService
             }
 
             $lockedStudent->dpm_id = $dpm->id;
-            $lockedStudent->access_status = 'HasDPM';
-            $lockedStudent->save();
+            app(StudentStateMachine::class)->transition($lockedStudent, 'HasDPM');
 
             return $lockedStudent->refresh();
         });

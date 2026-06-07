@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Application;
 use App\Models\Internship;
 use App\Models\Student;
+use App\Services\StudentStateMachine;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -89,8 +90,7 @@ class ApplicationController extends Controller
                 ]);
 
                 if ($student->access_status === 'ApprovedForm1') {
-                    $student->access_status = 'HasApplication';
-                    $student->save();
+                    app(StudentStateMachine::class)->transition($student, 'HasApplication');
                 }
 
                 return $application;

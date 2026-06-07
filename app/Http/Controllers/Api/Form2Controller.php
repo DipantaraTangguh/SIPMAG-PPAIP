@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Form2Submission;
 use App\Models\User;
+use App\Services\StudentStateMachine;
 use Illuminate\Http\Request;
 
 class Form2Controller extends Controller
@@ -74,8 +75,7 @@ class Form2Controller extends Controller
         // Form 2 sudah aman, mahasiswa boleh lanjut ke tahap DPM.
         $student = $submission->student;
         if ($student && $student->access_status === 'ApprovedForm1') {
-            $student->access_status = 'HasApplication';
-            $student->save();
+            app(StudentStateMachine::class)->transition($student, 'HasApplication');
         }
 
         return response()->json(['message' => 'Form 2 disetujui.', 'submission' => $submission]);

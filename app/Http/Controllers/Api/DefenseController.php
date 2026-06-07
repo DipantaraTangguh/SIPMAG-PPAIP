@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\DefenseSubmission;
 use App\Models\Student;
+use App\Services\StudentStateMachine;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -86,8 +87,7 @@ class DefenseController extends Controller
                     'status' => 'Pending',
                 ]);
 
-                $lockedStudent->access_status = 'MenungguSidang';
-                $lockedStudent->save();
+                app(StudentStateMachine::class)->transition($lockedStudent, 'MenungguSidang');
             });
         } catch (Throwable $exception) {
             Storage::disk('local')->delete(array_values($storedPaths));
@@ -170,14 +170,13 @@ class DefenseController extends Controller
         }
 
         $student->fill([
-            'dpm_id' => null,
-            'is_independent' => false,
-            'form1_data' => null,
-            'form1_pdf_path' => null,
+            'dpm_id'                 => null,
+            'is_independent'         => false,
+            'form1_data'             => null,
+            'form1_pdf_path'         => null,
             'form1_rejection_reason' => null,
         ]);
-        $student->access_status = 'SiklusSelesai';
-        $student->save();
+        app(StudentStateMachine::class)->transition($student, 'SiklusSelesai');
 
         return response()->json([
             'message' => 'Siklus magang berhasil diselesaikan.',
