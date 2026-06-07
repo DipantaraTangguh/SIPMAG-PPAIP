@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Models\Application;
+use App\Observers\ApplicationObserver;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -15,6 +17,8 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        Application::observe(ApplicationObserver::class);
+
         RateLimiter::for('login', function (Request $request): array {
             $identifier = Str::lower(trim((string) $request->input('login')));
             $identifierKey = hash_hmac('sha256', $identifier, (string) config('app.key'));
