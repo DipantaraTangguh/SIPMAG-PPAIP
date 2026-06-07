@@ -12,6 +12,8 @@ class DefenseSubmission extends Model
         'student_id',
         'laporan_path',
         'poster_path',
+        'foto_kegiatan_1_path',
+        'foto_kegiatan_2_path',
         'krs_path',
         'status',
         'scheduled_date',
@@ -27,9 +29,9 @@ class DefenseSubmission extends Model
     protected function casts(): array
     {
         return [
-            'submitted_at'   => 'datetime',
+            'submitted_at' => 'datetime',
             'scheduled_date' => 'date',
-            'scheduled_at'   => 'datetime',
+            'scheduled_at' => 'datetime',
         ];
     }
 
