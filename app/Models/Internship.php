@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 class Internship extends Model
@@ -28,12 +29,19 @@ class Internship extends Model
     {
         return [
             'job_description' => 'array',
-            'skills'          => 'array',
-            'requirements'    => 'array',
-            'start_date'      => 'date',
-            'deadline'        => 'date',
-            'is_active'       => 'boolean',
+            'skills' => 'array',
+            'requirements' => 'array',
+            'start_date' => 'date',
+            'deadline' => 'date',
+            'is_active' => 'boolean',
         ];
+    }
+
+    public function scopeOpenForApplications(Builder $query): Builder
+    {
+        return $query
+            ->where('is_active', true)
+            ->whereDate('deadline', '>=', today());
     }
 
     public function applications()

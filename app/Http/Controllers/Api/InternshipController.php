@@ -10,7 +10,7 @@ class InternshipController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Internship::where('is_active', true);
+        $query = Internship::query()->openForApplications();
 
         if ($search = $request->query('search')) {
             $query->where(function ($q) use ($search) {
@@ -27,9 +27,11 @@ class InternshipController extends Controller
 
         return response()->json(['internships' => $internships]);
     }
-    public function show($id)
+    public function show(int $id)
     {
-        $internship = Internship::findOrFail($id);
+        $internship = Internship::query()
+            ->openForApplications()
+            ->findOrFail($id);
 
         return response()->json(['internship' => $internship]);
     }
