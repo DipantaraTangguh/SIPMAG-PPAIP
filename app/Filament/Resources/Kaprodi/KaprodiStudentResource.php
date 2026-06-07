@@ -370,31 +370,6 @@ class KaprodiStudentResource extends Resource
                             ->send();
                     }),
 
-                // Action closing cycle magang.
-                // Baru muncul setelah jadwal sidang sudah ada.
-                Tables\Actions\Action::make('completeCycle')
-                    ->label('Selesaikan Siklus')
-                    ->icon('heroicon-o-arrow-path')
-                    ->color('warning')
-                    ->visible(fn (Student $record) =>
-                        $record->access_status === 'MenungguSidang' &&
-                        $record->sidangSubmission &&
-                        $record->sidangSubmission->status === 'Scheduled'
-                    )
-                    ->requiresConfirmation()
-                    ->modalHeading('Selesaikan Siklus Magang')
-                    ->modalDescription('Siklus magang akan direset. Riwayat tetap tersimpan.')
-                    ->action(function (Student $record): void {
-                        $record->fill([
-                        'dpm_id'                 => null,
-                        'is_independent'         => false,
-                        'form1_data'             => null,
-                        'form1_pdf_path'         => null,
-                        'form1_rejection_reason' => null,
-                        ]);
-                        $record->access_status = 'SiklusSelesai';
-                        $record->save();
-                    }),
             ])
             ->bulkActions([
                 // Bulk download transkrip buat kebutuhan review.

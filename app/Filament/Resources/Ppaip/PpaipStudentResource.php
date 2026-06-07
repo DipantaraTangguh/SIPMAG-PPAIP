@@ -29,6 +29,7 @@ class PpaipStudentResource extends Resource
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()
+            ->with('sidangSubmission')
             ->withCount(['logbooks as approved_logbook_count' => fn ($query) => $query->where('status', 'Approved')]);
     }
 
@@ -39,18 +40,18 @@ class PpaipStudentResource extends Resource
                 Tables\Columns\TextColumn::make('nim')->searchable()->sortable(),
                 Tables\Columns\TextColumn::make('name')->label('Nama')->searchable()->sortable(),
                 Tables\Columns\TextColumn::make('study_program')->label('Prodi')->sortable(),
-                Tables\Columns\BadgeColumn::make('access_status')
+                Tables\Columns\TextColumn::make('access_status')
                     ->label('Status')
-                    ->colors([
-                        'gray'    => 'Unverified',
-                        'warning' => 'PendingReview',
-                        'danger'  => 'RejectedForm1',
-                        'success' => 'ApprovedForm1',
-                        'info'    => 'HasApplication',
-                        'primary' => 'HasDPM',
-                        'success' => 'LogbookComplete',
-                        'warning' => 'MenungguSidang',
-                    ]),
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'Unverified'                       => 'gray',
+                        'PendingReview', 'MenungguSidang'  => 'warning',
+                        'RejectedForm1'                    => 'danger',
+                        'ApprovedForm1', 'LogbookComplete' => 'success',
+                        'HasApplication'                   => 'info',
+                        'HasDPM'                           => 'primary',
+                        default                            => 'gray',
+                    }),
                 Tables\Columns\TextColumn::make('dpm.lecturer_name')->label('DPM')->placeholder('—'),
                 Tables\Columns\TextColumn::make('approved_logbook_count')->label('Logbook')->sortable(),
                 Tables\Columns\IconColumn::make('is_independent')->label('Mandiri')->boolean(),
@@ -77,6 +78,39 @@ class PpaipStudentResource extends Resource
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
+
+                // ACTION: Selesaikan Siklus Magang.
+                // PRD §5.4 — hanya PPAIP yang boleh trigger cycle reset.
+                // Muncul setelah sidang sudah dijadwalkan (status Scheduled).
+                Tables\Actions\Action::make('completeCycle')
+                    ->label('Selesaikan Siklus')
+                    ->icon('heroicon-o-arrow-path')
+                    ->color('warning')
+                    ->visible(fn (Student $record) =>
+                        $record->access_status === 'MenungguSidang' &&
+                        $record->sidangSubmission &&
+                        $record->sidangSubmission->status === 'Scheduled'
+                    )
+                    ->requiresConfirmation()
+                    ->modalHeading('Selesaikan Siklus Magang')
+                    ->modalDescription('Siklus magang akan direset. Riwayat tetap tersimpan.')
+                    ->action(function (Student $record): void {
+                        $record->fill([
+                            'dpm_id'                 => null,
+                            'is_independent'         => false,
+                            'form1_data'             => null,
+                            'form1_pdf_path'         => null,
+                            'form1_rejection_reason' => null,
+                        ]);
+                        $record->access_status = 'SiklusSelesai';
+                        $record->save();
+
+                        \Filament\Notifications\Notification::make()
+                            ->title('Siklus magang diselesaikan')
+                            ->body("Siklus magang {$record->name} telah direset ke SiklusSelesai.")
+                            ->success()
+                            ->send();
+                    }),
             ])
             ->bulkActions([]);
     }
