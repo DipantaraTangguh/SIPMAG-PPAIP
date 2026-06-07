@@ -70,7 +70,7 @@ export default function useForm1() {
 
         if (!formData.rencanaSkema) e.rencanaSkema = 'Pilih skema magang terlebih dahulu';
         if (!formData.topikTempat.trim()) e.topikTempat = 'Topik/tempat magang wajib diisi';
-        // Mode simulasi nggak wajib upload transkrip beneran.
+        if (!formData.transkripFile) e.transkripFile = 'Transkrip nilai wajib diunggah';
         if (!formData.output) e.output = 'Pilih output yang ditargetkan';
         if (!formData.declarationChecked) e.declarationChecked = true;
 
@@ -81,6 +81,7 @@ export default function useForm1() {
         () =>
             formData.rencanaSkema !== '' &&
             formData.topikTempat.trim() !== '' &&
+            formData.transkripFile !== null &&
             formData.output !== '' &&
             formData.declarationChecked,
         [formData],
@@ -95,16 +96,10 @@ export default function useForm1() {
             try {
                 // Pakai FormData karena transkrip bisa ikut kebawa sebagai file.
                 const fd = new FormData();
-                fd.append('semester',     readOnlyFields.semester);
-                fd.append('jumlahSKS',    readOnlyFields.jumlahSks);
-                fd.append('ipk',          readOnlyFields.ipk);
                 fd.append('skemaMagang',  formData.rencanaSkema);
                 fd.append('topikMagang',  formData.topikTempat);
                 fd.append('outputTarget', formData.output);
-
-                if (formData.transkripFile) {
-                    fd.append('transkrip', formData.transkripFile);
-                }
+                fd.append('transkrip',     formData.transkripFile);
 
                 await submitForm1(fd);
                 navigate('/form1/status', { replace: true });
@@ -115,7 +110,7 @@ export default function useForm1() {
                 setIsSubmitting(false);
             }
         },
-        [formData, readOnlyFields, validateForm, navigate, submitForm1],
+        [formData, validateForm, navigate, submitForm1],
     );
     const handleCancel = useCallback(() => {
         navigate('/dashboard');

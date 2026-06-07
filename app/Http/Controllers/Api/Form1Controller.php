@@ -42,37 +42,45 @@ class Form1Controller extends Controller
     public function store(Request $request)
     {
         $student = $request->user()->student;
-        if (!$student) {
+        if (! $student) {
             return response()->json(['message' => 'Profil mahasiswa tidak ditemukan.'], 404);
         }
 
-        if (!in_array($student->access_status, ['Unverified', 'RejectedForm1'])) {
+        if (! in_array($student->access_status, ['Unverified', 'RejectedForm1'])) {
             return response()->json(['message' => 'Form 1 sudah diajukan atau disetujui.'], 403);
         }
 
-        $validated = $request->validate([
-            'semester'     => 'required|string',
-            'jumlahSKS'    => 'required|string',
-            'ipk'          => 'required|string',
-            'skemaMagang'  => 'required|string|in:Mitra,Mandiri,Kewirausahaan',
-            'topikMagang'  => 'nullable|string',
-            'outputTarget' => 'required|string',
-            'transkrip'    => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
-        ]);
-
-        // Simpan transkrip hanya kalau mahasiswa upload file.
-        $transkripPath = null;
-        if ($request->hasFile('transkrip')) {
-            $transkripPath = $request->file('transkrip')->store('transkrip', 'local');
+        if (! $student->semester || ! $student->jumlah_sks || ! $student->ipk) {
+            return response()->json([
+                'message' => 'Data akademik mahasiswa belum lengkap. Hubungi admin akademik sebelum mengajukan Form 1.',
+            ], 422);
         }
 
-        // File transkrip jangan ikut masuk payload JSON form.
+        $validated = $request->validate([
+            'skemaMagang' => 'required|string|in:Mitra,Mandiri,Kewirausahaan',
+            'topikMagang' => 'required|string|max:2000',
+            'outputTarget' => 'required|string|in:Produk,Prototype,Laporan',
+            'transkrip' => 'required|file|mimes:pdf,jpg,jpeg,png|max:5120',
+        ]);
+
+        $transkripPath = $request->file('transkrip')->store('transkrip', 'local');
+
         unset($validated['transkrip']);
 
+        // Academic values are authoritative server-side data, never request input.
+        $form1Data = [
+            'semester' => $student->semester,
+            'jumlahSKS' => $student->jumlah_sks,
+            'ipk' => $student->ipk,
+            'skemaMagang' => $validated['skemaMagang'],
+            'topikMagang' => $validated['topikMagang'],
+            'outputTarget' => $validated['outputTarget'],
+        ];
+
         $student->update([
-            'form1_data'             => $validated,
-            'form1_pdf_path'         => $transkripPath,
-            'access_status'          => 'PendingReview',
+            'form1_data' => $form1Data,
+            'form1_pdf_path' => $transkripPath,
+            'access_status' => 'PendingReview',
             'form1_rejection_reason' => null,
         ]);
 
@@ -97,7 +105,7 @@ class Form1Controller extends Controller
 
         return response()->json(['submissions' => $students]);
     }
-    public function approve(Request $request, $studentId)
+    public function approve(Request $request, int $studentId)
     {
         $lecturer = $request->user()->lecturer;
 
@@ -125,7 +133,7 @@ class Form1Controller extends Controller
             'access_status' => 'ApprovedForm1',
         ]);
     }
-    public function reject(Request $request, $studentId)
+    public function reject(Request $request, int $studentId)
     {
         $request->validate(['reason' => 'required|string|max:500']);
 
@@ -192,7 +200,7 @@ class Form1Controller extends Controller
 
         return $pdf->download($filename);
     }
-    public function downloadTranskrip(Request $request, $studentId)
+    public function downloadTranskrip(Request $request, int $studentId)
     {
         $lecturer = $request->user()->lecturer;
         $student = Student::where('id', $studentId)
