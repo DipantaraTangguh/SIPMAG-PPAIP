@@ -122,7 +122,7 @@ export function SimulationProvider({ children }) {
                     }
                     : null,
                 activeApplications: appsRes.status === 'fulfilled'
-                    ? (appsRes.value.applications || []).map(a => ({
+                    ? (appsRes.value.applications?.data ?? appsRes.value.applications ?? []).map(a => ({
                         id: a.id,
                         vacancyId: a.internship_id,
                         companyName: a.internship?.company_name,
@@ -132,10 +132,10 @@ export function SimulationProvider({ children }) {
                     }))
                     : [],
                 form2Submissions: form2Res.status === 'fulfilled'
-                    ? (form2Res.value.submissions || []).map(mapForm2Submission)
+                    ? (form2Res.value.submissions?.data ?? form2Res.value.submissions ?? []).map(mapForm2Submission)
                     : [],
                 logbookEntries: logbookRes.status === 'fulfilled'
-                    ? (logbookRes.value.logbooks || []).map(l => ({
+                    ? (logbookRes.value.logbooks?.data ?? logbookRes.value.logbooks ?? []).map(l => ({
                         id: l.id,
                         tanggal: l.tanggal,
                         kegiatanHarian: l.kegiatan_harian,

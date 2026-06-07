@@ -26,8 +26,8 @@ class InternshipEligibilityTest extends TestCase
 
         $response = $this->getJson('/api/internships')->assertOk();
 
-        $response->assertJsonCount(1, 'internships');
-        $response->assertJsonPath('internships.0.id', $open->id);
+        $response->assertJsonCount(1, 'internships.data');
+        $response->assertJsonPath('internships.data.0.id', $open->id);
     }
 
     public function test_inactive_or_expired_vacancy_detail_is_not_exposed(): void

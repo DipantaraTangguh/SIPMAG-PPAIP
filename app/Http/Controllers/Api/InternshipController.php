@@ -23,7 +23,7 @@ class InternshipController extends Controller
             $query->where('location', $location);
         }
 
-        $internships = $query->orderByDesc('created_at')->get();
+        $internships = $query->orderByDesc('created_at')->paginate($this->perPage($request));
 
         return response()->json(['internships' => $internships]);
     }

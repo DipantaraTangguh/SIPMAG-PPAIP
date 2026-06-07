@@ -104,7 +104,7 @@ class Form1Controller extends Controller
             ->whereNotNull('form1_data')
             ->select(['id', 'nim', 'name', 'study_program', 'access_status', 'form1_data', 'form1_pdf_path', 'form1_rejection_reason', 'updated_at'])
             ->orderByDesc('updated_at')
-            ->get();
+            ->paginate($this->perPage($request));
 
         return response()->json(['submissions' => $students]);
     }

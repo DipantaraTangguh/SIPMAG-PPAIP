@@ -18,7 +18,7 @@ class LogbookController extends Controller
 
         $logbooks = Logbook::where('student_id', $student->id)
             ->orderByDesc('tanggal')
-            ->get();
+            ->paginate($this->perPage($request));
 
         return response()->json([
             'logbooks' => $logbooks,
@@ -95,7 +95,7 @@ class LogbookController extends Controller
         })
             ->with('student:id,nim,name')
             ->orderByDesc('tanggal')
-            ->get();
+            ->paginate($this->perPage($request));
 
         return response()->json(['logbooks' => $logbooks]);
     }

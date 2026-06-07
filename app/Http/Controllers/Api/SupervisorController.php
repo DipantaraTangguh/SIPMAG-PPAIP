@@ -79,7 +79,7 @@ class SupervisorController extends Controller
         })
         ->with('student:id,nim,name,study_program,dpm_id')
         ->orderByDesc('submitted_at')
-        ->get();
+        ->paginate($this->perPage($request));
 
         return response()->json(['applications' => $applications]);
     }

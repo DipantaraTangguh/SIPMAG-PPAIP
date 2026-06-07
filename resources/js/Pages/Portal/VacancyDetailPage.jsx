@@ -88,7 +88,7 @@ export default function VacancyDetailPage() {
                 setVacancy(mapInternshipDetail(detail.internship));
                 const numericId = Number(id);
                 setSimilarVacancies(
-                    (list.internships || [])
+                    (list.internships?.data ?? list.internships ?? [])
                         .filter((i) => i.id !== numericId)
                         .slice(0, 2)
                         .map(mapSimilar),

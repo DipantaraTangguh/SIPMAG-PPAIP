@@ -82,7 +82,7 @@ export default function InternshipPortalPage() {
         api.get('/internships')
             .then((data) => {
                 if (cancelled) return;
-                setVacancies((data.internships || []).map(mapInternship));
+                setVacancies((data.internships?.data ?? data.internships ?? []).map(mapInternship));
             })
             .catch(() => { /* kalau gagal, UI cukup tampil empty state */ });
         return () => { cancelled = true; };

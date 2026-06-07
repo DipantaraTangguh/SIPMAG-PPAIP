@@ -22,7 +22,7 @@ class ApplicationController extends Controller
         $applications = Application::where('student_id', $student->id)
             ->with('internship:id,company_name,position,location,deadline')
             ->orderByDesc('created_at')
-            ->get();
+            ->paginate($this->perPage($request));
 
         return response()->json(['applications' => $applications]);
     }

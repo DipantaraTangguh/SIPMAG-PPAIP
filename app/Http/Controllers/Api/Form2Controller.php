@@ -16,7 +16,7 @@ class Form2Controller extends Controller
 
         $submissions = Form2Submission::where('student_id', $student->id)
             ->orderByDesc('submitted_at')
-            ->get();
+            ->paginate($this->perPage($request));
 
         return response()->json(['submissions' => $submissions]);
     }
@@ -52,11 +52,11 @@ class Form2Controller extends Controller
         ], 201);
     }
 
-    public function indexForPpaip()
+    public function indexForPpaip(Request $request)
     {
         $submissions = Form2Submission::with('student:id,nim,name,study_program')
             ->orderByDesc('submitted_at')
-            ->get();
+            ->paginate($this->perPage($request));
 
         return response()->json(['submissions' => $submissions]);
     }

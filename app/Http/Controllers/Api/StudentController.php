@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 
 class StudentController extends Controller
 {
-    public function indexForPpaip()
+    public function indexForPpaip(Request $request)
     {
         $students = Student::with(['dpm:id,lecturer_name'])
             ->select([
@@ -18,7 +18,7 @@ class StudentController extends Controller
             ])
             ->withCount(['logbooks as approved_logbook_count' => fn ($query) => $query->where('status', 'Approved')])
             ->orderByDesc('updated_at')
-            ->get();
+            ->paginate($this->perPage($request));
 
         return response()->json(['students' => $students]);
     }
@@ -39,7 +39,7 @@ class StudentController extends Controller
             ])
             ->withCount(['logbooks as approved_logbook_count' => fn ($query) => $query->where('status', 'Approved')])
             ->orderByDesc('updated_at')
-            ->get();
+            ->paginate($this->perPage($request));
 
         return response()->json(['students' => $students]);
     }
@@ -58,7 +58,7 @@ class StudentController extends Controller
             ])
             ->withCount(['logbooks as approved_logbook_count' => fn ($query) => $query->where('status', 'Approved')])
             ->orderByDesc('updated_at')
-            ->get();
+            ->paginate($this->perPage($request));
 
         return response()->json(['students' => $students]);
     }

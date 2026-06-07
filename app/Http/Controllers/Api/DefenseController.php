@@ -112,7 +112,7 @@ class DefenseController extends Controller
             ->where('access_status', 'MenungguSidang')
             ->with(['sidangSubmission', 'dpm:id,lecturer_name'])
             ->select(['id', 'nim', 'name', 'study_program', 'dpm_id', 'access_status'])
-            ->get();
+            ->paginate($this->perPage($request));
 
         return response()->json(['students' => $students]);
     }
