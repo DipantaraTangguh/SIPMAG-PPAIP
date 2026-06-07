@@ -21,7 +21,6 @@ class StoredFilePathSecurityTest extends TestCase
             'name' => 'Traversal Test',
             'study_program' => 'Sistem Informasi',
             'email' => 'traversal@example.test',
-            'access_status' => 'PendingReview',
             'form1_pdf_path' => '../outside-transcript.txt',
         ]);
 

@@ -84,6 +84,9 @@ class InternshipEligibilityTest extends TestCase
         $this->assertTrue(Storage::disk('local')->exists($application->cv_file_path));
     }
 
+    /**
+     * @return array{User, Student}
+     */
     private function createEligibleStudent(): array
     {
         $user = User::factory()->create(['role' => 'mahasiswa']);
@@ -93,8 +96,9 @@ class InternshipEligibilityTest extends TestCase
             'name' => 'Mahasiswa Pelamar',
             'study_program' => 'Sistem Informasi',
             'email' => fake()->unique()->safeEmail(),
-            'access_status' => 'ApprovedForm1',
         ]);
+        $student->access_status = 'ApprovedForm1';
+        $student->save();
 
         return [$user, $student];
     }

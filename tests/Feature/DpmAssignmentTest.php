@@ -64,6 +64,9 @@ class DpmAssignmentTest extends TestCase
         $this->assertNull($student->fresh()->dpm_id);
     }
 
+    /**
+     * @return array{User, Student}
+     */
     private function createAssignmentContext(): array
     {
         $kaprodiUser = User::factory()->create(['role' => 'kaprodi']);
@@ -81,8 +84,9 @@ class DpmAssignmentTest extends TestCase
             'name' => 'Mahasiswa Uji',
             'study_program' => 'Sistem Informasi',
             'email' => fake()->unique()->safeEmail(),
-            'access_status' => 'HasApplication',
         ]);
+        $student->access_status = 'HasApplication';
+        $student->save();
 
         SupervisorApplication::create([
             'student_id' => $student->id,

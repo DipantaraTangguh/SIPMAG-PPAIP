@@ -7,6 +7,7 @@ use App\Models\Logbook;
 use App\Models\Student;
 use App\Models\SupervisorApplication;
 use App\Models\User;
+use Carbon\CarbonInterface;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Schema;
 use Tests\TestCase;
@@ -126,8 +127,13 @@ class LogbookIntegrityTest extends TestCase
         $this->assertSame(2, $student->fresh()->approved_logbook_count);
     }
 
-    private function createStudentWithPeriod($startDate, $endDate): array
-    {
+    /**
+     * @return array{User, Student}
+     */
+    private function createStudentWithPeriod(
+        CarbonInterface $startDate,
+        CarbonInterface $endDate
+    ): array {
         $studentUser = User::factory()->create(['role' => 'mahasiswa']);
         $dpmUser = User::factory()->create(['role' => 'dpm']);
         $dpm = Lecturer::create([
@@ -144,8 +150,9 @@ class LogbookIntegrityTest extends TestCase
             'name' => 'Mahasiswa Logbook',
             'study_program' => 'Sistem Informasi',
             'email' => fake()->unique()->safeEmail(),
-            'access_status' => 'HasDPM',
         ]);
+        $student->access_status = 'HasDPM';
+        $student->save();
 
         SupervisorApplication::create([
             'student_id' => $student->id,

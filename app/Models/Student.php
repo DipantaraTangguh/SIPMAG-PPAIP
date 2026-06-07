@@ -17,13 +17,10 @@ class Student extends Model
         'tahun_akademik',
         'jumlah_sks',
         'ipk',
-        'access_status',
         'is_independent',
         'form1_data',
         'form1_pdf_path',
         'form1_rejection_reason',
-        'form1_approved_by',
-        'form1_approved_at',
     ];
 
     protected function casts(): array

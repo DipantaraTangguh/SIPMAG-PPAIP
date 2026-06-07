@@ -3,6 +3,8 @@
 namespace App\Filament\Resources\Ppaip;
 
 use App\Models\Form2Submission;
+use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -18,9 +20,15 @@ class PpaipForm2Resource extends Resource
     protected static ?int $navigationSort = 1;
     protected static ?string $slug = 'ppaip/form2';
 
+    /** @return User|null */
+    private static function currentUser(): ?User
+    {
+        return Auth::user();
+    }
+
     public static function canAccess(): bool
     {
-        return auth()->user()?->role === 'ppaip';
+        return static::currentUser()?->role === 'ppaip';
     }
 
     public static function canCreate(): bool
@@ -39,12 +47,15 @@ class PpaipForm2Resource extends Resource
                 Tables\Columns\TextColumn::make('lingkup_magang')->label('Lingkup')->limit(30),
                 Tables\Columns\TextColumn::make('tanggal_mulai')->label('Mulai')->date('d M Y'),
                 Tables\Columns\TextColumn::make('tanggal_selesai')->label('Selesai')->date('d M Y'),
-                Tables\Columns\BadgeColumn::make('status')
-                    ->colors([
-                        'warning' => 'PendingReview',
-                        'success' => 'ApprovedForm2',
-                        'danger'  => 'RejectedForm2',
-                    ]),
+                Tables\Columns\TextColumn::make('status')
+                    ->label('Status')
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'PendingReview'  => 'warning',
+                        'ApprovedForm2'  => 'success',
+                        'RejectedForm2'  => 'danger',
+                        default          => 'gray',
+                    }),
             ])
             ->defaultSort('submitted_at', 'desc')
             ->filters([
@@ -73,7 +84,8 @@ class PpaipForm2Resource extends Resource
                         ]);
                         $student = $record->student;
                         if ($student && $student->access_status === 'ApprovedForm1') {
-                            $student->update(['access_status' => 'HasApplication']);
+                            $student->access_status = 'HasApplication';
+                            $student->save();
                         }
                     }),
 

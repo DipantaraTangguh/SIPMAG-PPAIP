@@ -86,7 +86,8 @@ class DefenseController extends Controller
                     'status' => 'Pending',
                 ]);
 
-                $lockedStudent->update(['access_status' => 'MenungguSidang']);
+                $lockedStudent->access_status = 'MenungguSidang';
+                $lockedStudent->save();
             });
         } catch (Throwable $exception) {
             Storage::disk('local')->delete(array_values($storedPaths));
@@ -168,14 +169,15 @@ class DefenseController extends Controller
             return response()->json(['message' => 'Sidang belum dijadwalkan.'], 422);
         }
 
-        $student->update([
-            'access_status' => 'SiklusSelesai',
+        $student->fill([
             'dpm_id' => null,
             'is_independent' => false,
             'form1_data' => null,
             'form1_pdf_path' => null,
             'form1_rejection_reason' => null,
         ]);
+        $student->access_status = 'SiklusSelesai';
+        $student->save();
 
         return response()->json([
             'message' => 'Siklus magang berhasil diselesaikan.',

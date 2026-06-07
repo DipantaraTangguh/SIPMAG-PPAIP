@@ -4,6 +4,8 @@ namespace App\Filament\Resources\Kaprodi;
 
 use App\Models\Lecturer;
 use App\Models\Student;
+use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 use App\Services\DpmAssignmentService;
 use App\Support\StoredFilePath;
 use Filament\Forms;
@@ -23,13 +25,21 @@ class KaprodiStudentResource extends Resource
     protected static ?string $navigationGroup = 'Akademik';
     protected static ?int $navigationSort = 1;
     protected static ?string $slug = 'kaprodi/students';
+
+    /** @return User|null */
+    private static function currentUser(): ?User
+    {
+        return Auth::user();
+    }
+
     public static function canAccess(): bool
     {
-        return auth()->user()?->role === 'kaprodi';
+        return static::currentUser()?->role === 'kaprodi';
     }
+
     public static function getEloquentQuery(): Builder
     {
-        $prodi = auth()->user()?->lecturer?->study_program;
+        $prodi = static::currentUser()?->lecturer?->study_program;
 
         return parent::getEloquentQuery()
             ->where('study_program', $prodi)
@@ -172,7 +182,7 @@ class KaprodiStudentResource extends Resource
                     ->visible(fn (Student $record) => $record->access_status === 'PendingReview')
                     ->requiresConfirmation()
                     ->before(function (Tables\Actions\Action $action) {
-                        $lecturer = auth()->user()?->lecturer;
+                        $lecturer = static::currentUser()?->lecturer;
                         if (!$lecturer || !$lecturer->signature_path) {
                             \Filament\Notifications\Notification::make()
                                 ->title('Tanda tangan digital belum diunggah')
@@ -184,13 +194,14 @@ class KaprodiStudentResource extends Resource
                         }
                     })
                     ->action(function (Student $record) {
-                        $lecturerId = auth()->user()?->lecturer?->id;
-                        $record->update([
-                            'access_status'          => 'ApprovedForm1',
+                        $lecturerId = static::currentUser()?->lecturer?->id;
+                        $record->fill([
                             'form1_rejection_reason' => null,
-                            'form1_approved_by'      => $lecturerId,
-                            'form1_approved_at'      => now(),
                         ]);
+                        $record->access_status = 'ApprovedForm1';
+                        $record->form1_approved_by = $lecturerId;
+                        $record->form1_approved_at = now();
+                        $record->save();
                     }),
 
                 // Action reject Form 1.
@@ -202,10 +213,11 @@ class KaprodiStudentResource extends Resource
                     ->form([
                         Forms\Components\Textarea::make('reason')->label('Alasan Penolakan')->required(),
                     ])
-                    ->action(fn (Student $record, array $data) => $record->update([
-                        'access_status'          => 'RejectedForm1',
-                        'form1_rejection_reason' => $data['reason'],
-                    ])),
+                    ->action(function (Student $record, array $data): void {
+                        $record->form1_rejection_reason = $data['reason'];
+                        $record->access_status = 'RejectedForm1';
+                        $record->save();
+                    }),
 
                 // Action assign DPM setelah pengajuan pembimbing masuk.
                 // Tombol ini muncul cuma kalau mahasiswa sudah submit pengajuan.
@@ -268,7 +280,7 @@ class KaprodiStudentResource extends Resource
                                 ));
                         }
 
-                        $kaprodiProdi = auth()->user()?->lecturer?->study_program;
+                        $kaprodiProdi = static::currentUser()?->lecturer?->study_program;
 
                         $fields[] = Forms\Components\Select::make('dpm_id')
                             ->label('Pilih DPM')
@@ -318,7 +330,7 @@ class KaprodiStudentResource extends Resource
                             ->label('Dosen Penguji 1')
                             ->required()
                             ->options(function () {
-                                $prodi = auth()->user()?->lecturer?->study_program;
+                                $prodi = static::currentUser()?->lecturer?->study_program;
                                 return Lecturer::whereNotNull('user_id')
                                     ->when($prodi, fn ($q) => $q->where('study_program', $prodi))
                                     ->pluck('lecturer_name', 'lecturer_name');
@@ -329,7 +341,7 @@ class KaprodiStudentResource extends Resource
                             ->label('Dosen Penguji 2')
                             ->required()
                             ->options(function () {
-                                $prodi = auth()->user()?->lecturer?->study_program;
+                                $prodi = static::currentUser()?->lecturer?->study_program;
                                 return Lecturer::whereNotNull('user_id')
                                     ->when($prodi, fn ($q) => $q->where('study_program', $prodi))
                                     ->pluck('lecturer_name', 'lecturer_name');
@@ -338,7 +350,7 @@ class KaprodiStudentResource extends Resource
                             ->preload(),
                     ])
                     ->action(function (Student $record, array $data) {
-                        $lecturerId = auth()->user()?->lecturer?->id;
+                        $lecturerId = static::currentUser()?->lecturer?->id;
 
                         $record->sidangSubmission->update([
                             'status'          => 'Scheduled',
@@ -372,14 +384,17 @@ class KaprodiStudentResource extends Resource
                     ->requiresConfirmation()
                     ->modalHeading('Selesaikan Siklus Magang')
                     ->modalDescription('Siklus magang akan direset. Riwayat tetap tersimpan.')
-                    ->action(fn (Student $record) => $record->update([
-                        'access_status'          => 'SiklusSelesai',
+                    ->action(function (Student $record): void {
+                        $record->fill([
                         'dpm_id'                 => null,
                         'is_independent'         => false,
                         'form1_data'             => null,
                         'form1_pdf_path'         => null,
                         'form1_rejection_reason' => null,
-                    ])),
+                        ]);
+                        $record->access_status = 'SiklusSelesai';
+                        $record->save();
+                    }),
             ])
             ->bulkActions([
                 // Bulk download transkrip buat kebutuhan review.

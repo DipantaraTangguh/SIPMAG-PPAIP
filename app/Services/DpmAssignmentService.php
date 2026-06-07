@@ -44,10 +44,9 @@ class DpmAssignmentService
                 ]);
             }
 
-            $lockedStudent->update([
-                'dpm_id' => $dpm->id,
-                'access_status' => 'HasDPM',
-            ]);
+            $lockedStudent->dpm_id = $dpm->id;
+            $lockedStudent->access_status = 'HasDPM';
+            $lockedStudent->save();
 
             return $lockedStudent->refresh();
         });

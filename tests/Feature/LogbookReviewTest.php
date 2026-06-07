@@ -85,6 +85,9 @@ class LogbookReviewTest extends TestCase
         $this->assertSame(0, $student->fresh()->approved_logbook_count);
     }
 
+    /**
+     * @return array{User, Student}
+     */
     private function createReviewContext(string $studyProgram = 'Sistem Informasi'): array
     {
         $dpmUser = User::factory()->create(['role' => 'dpm']);
@@ -103,8 +106,9 @@ class LogbookReviewTest extends TestCase
             'name' => 'Mahasiswa Bimbingan',
             'study_program' => $studyProgram,
             'email' => fake()->unique()->safeEmail(),
-            'access_status' => 'HasDPM',
         ]);
+        $student->access_status = 'HasDPM';
+        $student->save();
 
         return [$dpmUser, $student];
     }

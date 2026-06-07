@@ -78,12 +78,13 @@ class Form1Controller extends Controller
             'outputTarget' => $validated['outputTarget'],
         ];
 
-        $student->update([
+        $student->fill([
             'form1_data' => $form1Data,
             'form1_pdf_path' => $transkripPath,
-            'access_status' => 'PendingReview',
             'form1_rejection_reason' => null,
         ]);
+        $student->access_status = 'PendingReview';
+        $student->save();
 
         return response()->json([
             'message' => 'Form 1 berhasil diajukan.',
@@ -122,12 +123,13 @@ class Form1Controller extends Controller
             ->where('access_status', 'PendingReview')
             ->firstOrFail();
 
-        $student->update([
-            'access_status'          => 'ApprovedForm1',
+        $student->fill([
             'form1_rejection_reason' => null,
-            'form1_approved_by'      => $lecturer->id,
-            'form1_approved_at'      => now(),
         ]);
+        $student->access_status = 'ApprovedForm1';
+        $student->form1_approved_by = $lecturer->id;
+        $student->form1_approved_at = now();
+        $student->save();
 
         return response()->json([
             'message' => 'Form 1 disetujui.',
@@ -144,10 +146,11 @@ class Form1Controller extends Controller
             ->where('access_status', 'PendingReview')
             ->firstOrFail();
 
-        $student->update([
-            'access_status'          => 'RejectedForm1',
+        $student->fill([
             'form1_rejection_reason' => $request->reason,
         ]);
+        $student->access_status = 'RejectedForm1';
+        $student->save();
 
         return response()->json([
             'message' => 'Form 1 ditolak.',

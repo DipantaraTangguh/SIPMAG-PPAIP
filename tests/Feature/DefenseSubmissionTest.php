@@ -74,6 +74,9 @@ class DefenseSubmissionTest extends TestCase
             ->assertJsonPath('submission.foto_kegiatan_2_path', $submission->foto_kegiatan_2_path);
     }
 
+    /**
+     * @return array{User, Student}
+     */
     private function createEligibleStudent(): array
     {
         $user = User::factory()->create(['role' => 'mahasiswa']);
@@ -83,8 +86,9 @@ class DefenseSubmissionTest extends TestCase
             'name' => 'Mahasiswa Sidang',
             'study_program' => 'Sistem Informasi',
             'email' => fake()->unique()->safeEmail(),
-            'access_status' => 'LogbookComplete',
         ]);
+        $student->access_status = 'LogbookComplete';
+        $student->save();
 
         return [$user, $student];
     }

@@ -89,7 +89,8 @@ class ApplicationController extends Controller
                 ]);
 
                 if ($student->access_status === 'ApprovedForm1') {
-                    $student->update(['access_status' => 'HasApplication']);
+                    $student->access_status = 'HasApplication';
+                    $student->save();
                 }
 
                 return $application;
