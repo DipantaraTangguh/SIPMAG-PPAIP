@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 class Lecturer extends Model
@@ -19,8 +20,16 @@ class Lecturer extends Model
     {
         return $this->belongsTo(User::class);
     }
+
     public function supervisedStudents()
     {
         return $this->hasMany(Student::class, 'dpm_id');
+    }
+
+    public function scopeEligibleDpmForStudyProgram(Builder $query, string $studyProgram): Builder
+    {
+        return $query
+            ->where('study_program', $studyProgram)
+            ->whereHas('user', fn (Builder $userQuery) => $userQuery->where('role', 'dpm'));
     }
 }

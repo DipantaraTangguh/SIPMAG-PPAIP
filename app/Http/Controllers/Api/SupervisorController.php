@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Student;
 use App\Models\SupervisorApplication;
+use App\Services\DpmAssignmentService;
 use Illuminate\Http\Request;
 
 class SupervisorController extends Controller
@@ -81,36 +82,23 @@ class SupervisorController extends Controller
 
         return response()->json(['applications' => $applications]);
     }
-    public function assignDpm(Request $request)
+    public function assignDpm(Request $request, DpmAssignmentService $assignmentService)
     {
-        $request->validate([
-            'student_id'  => 'required|exists:students,id',
-            'lecturer_id' => 'required|exists:lecturers,id',
+        $validated = $request->validate([
+            'student_id' => 'required|integer|exists:students,id',
+            'lecturer_id' => 'required|integer|exists:lecturers,id',
         ]);
 
-        $lecturer = $request->user()->lecturer;
-        $student = Student::where('id', $request->student_id)
-            ->where('study_program', $lecturer->study_program)
+        $kaprodi = $request->user()->lecturer;
+        if (! $kaprodi || ! $kaprodi->study_program) {
+            return response()->json(['message' => 'Profil Kaprodi tidak valid.'], 403);
+        }
+
+        $student = Student::where('id', $validated['student_id'])
+            ->where('study_program', $kaprodi->study_program)
             ->firstOrFail();
 
-        // Kaprodi baru bisa proses kalau pengajuan pembimbing sudah ada.
-        if (!$student->supervisorApplication()->exists()) {
-            return response()->json([
-                'message' => 'Mahasiswa belum mengajukan pengajuan pembimbing.',
-            ], 422);
-        }
-
-        // Jangan assign ulang kalau mahasiswa sudah punya DPM.
-        if ($student->dpm_id) {
-            return response()->json([
-                'message' => 'DPM sudah ditugaskan untuk mahasiswa ini.',
-            ], 422);
-        }
-
-        $student->update([
-            'dpm_id'        => $request->lecturer_id,
-            'access_status' => 'HasDPM',
-        ]);
+        $assignmentService->assign($student, (int) $validated['lecturer_id']);
 
         return response()->json([
             'message' => 'DPM berhasil ditugaskan.',

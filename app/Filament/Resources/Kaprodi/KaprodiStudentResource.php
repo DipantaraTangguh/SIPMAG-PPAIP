@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Kaprodi;
 
 use App\Models\Student;
 use App\Models\Lecturer;
+use App\Services\DpmAssignmentService;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -213,6 +214,7 @@ class KaprodiStudentResource extends Resource
                     ->color('primary')
                     ->visible(fn (Student $record) =>
                         !$record->dpm_id &&
+                        $record->access_status === 'HasApplication' &&
                         $record->supervisorApplication()->exists()
                     )
                     ->modalHeading('Assign Dosen Pembimbing Magang')
@@ -269,8 +271,12 @@ class KaprodiStudentResource extends Resource
                         $fields[] = Forms\Components\Select::make('dpm_id')
                             ->label('Pilih DPM')
                             ->options(
-                                Lecturer::whereNotNull('user_id')
-                                    ->when($kaprodiProdi, fn ($q) => $q->where('study_program', $kaprodiProdi))
+                                Lecturer::query()
+                                    ->when(
+                                        $kaprodiProdi,
+                                        fn ($query) => $query->eligibleDpmForStudyProgram($kaprodiProdi),
+                                        fn ($query) => $query->whereRaw('1 = 0'),
+                                    )
                                     ->pluck('lecturer_name', 'id')
                             )
                             ->searchable()
@@ -279,10 +285,9 @@ class KaprodiStudentResource extends Resource
 
                         return $fields;
                     })
-                    ->action(fn (Student $record, array $data) => $record->update([
-                        'dpm_id'        => $data['dpm_id'],
-                        'access_status' => 'HasDPM',
-                    ])),
+                    ->action(fn (Student $record, array $data) =>
+                        app(DpmAssignmentService::class)->assign($record, (int) $data['dpm_id'])
+                    ),
 
                 // Action jadwalkan sidang.
                 // Muncul kalau berkas sidang sudah masuk tapi belum dijadwalkan.
