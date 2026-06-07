@@ -28,5 +28,14 @@ return [
         ],
     ],
     'password_timeout' => env('AUTH_PASSWORD_TIMEOUT', 10800),
+    'login_security' => [
+        'lock_after_attempts' => (int) env('AUTH_LOCK_AFTER_ATTEMPTS', 5),
+        'initial_lock_seconds' => (int) env('AUTH_INITIAL_LOCK_SECONDS', 60),
+        'maximum_lock_seconds' => (int) env('AUTH_MAXIMUM_LOCK_SECONDS', 900),
+        'dummy_password_hash' => env(
+            'AUTH_DUMMY_PASSWORD_HASH',
+            '$2y$12$EmVBvzwCLgHwdc1M.TvzeeoHlA47taVBJJzx/KfiGs8nAR4GBP/Fy'
+        ),
+    ],
 
 ];

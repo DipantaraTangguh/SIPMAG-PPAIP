@@ -1,17 +1,18 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\AuthController;
-use App\Http\Controllers\Api\Form1Controller;
-use App\Http\Controllers\Api\InternshipController;
 use App\Http\Controllers\Api\ApplicationController;
-use App\Http\Controllers\Api\Form2Controller;
-use App\Http\Controllers\Api\SupervisorController;
-use App\Http\Controllers\Api\LogbookController;
+use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\DefenseController;
+use App\Http\Controllers\Api\Form1Controller;
+use App\Http\Controllers\Api\Form2Controller;
+use App\Http\Controllers\Api\InternshipController;
+use App\Http\Controllers\Api\LogbookController;
 use App\Http\Controllers\Api\StudentController;
+use App\Http\Controllers\Api\SupervisorController;
+use Illuminate\Support\Facades\Route;
+
 // Route yang boleh dihit tanpa token.
-Route::post('/login', [AuthController::class, 'login']);
+Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:login');
 
 // Area umum buat user yang sudah login.
 Route::middleware('auth:sanctum')->group(function () {
