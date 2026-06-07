@@ -11,6 +11,17 @@ class LoginSecurityTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->withSession(['_token' => 'test-csrf-token'])
+            ->withHeaders([
+                'Origin' => config('app.url'),
+                'X-CSRF-TOKEN' => 'test-csrf-token',
+            ]);
+    }
+
     public function test_account_is_locked_after_five_failed_attempts(): void
     {
         $user = User::factory()->create();
@@ -72,7 +83,10 @@ class LoginSecurityTest extends TestCase
         $this->postJson('/api/login', [
             'login' => $user->email,
             'password' => 'password',
-        ])->assertOk()->assertJsonStructure(['token', 'user']);
+        ])
+            ->assertOk()
+            ->assertJsonStructure(['user'])
+            ->assertJsonMissingPath('token');
 
         $user->refresh();
         $this->assertSame(0, $user->failed_login_attempts);

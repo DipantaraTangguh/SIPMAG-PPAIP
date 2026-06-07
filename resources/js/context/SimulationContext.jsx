@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useMemo, useCallback, useEffect } from 'react';
-import { api, getToken, clearToken } from '../lib/api';
+import { api } from '../lib/api';
 
 const SimulationContext = createContext(null);
 
@@ -22,11 +22,6 @@ export function SimulationProvider({ children }) {
     const [state, setState] = useState(EMPTY_STATE);
     useEffect(() => {
         const boot = async () => {
-            const token = getToken();
-            if (!token) {
-                setState((s) => ({ ...s, isLoading: false }));
-                return;
-            }
             try {
                 const { user } = await api.get('/me');
                 setState((s) => ({
@@ -40,7 +35,6 @@ export function SimulationProvider({ children }) {
                     fetchAllStudentData();
                 }
             } catch {
-                clearToken();
                 setState((s) => ({ ...s, isLoading: false }));
             }
         };

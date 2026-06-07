@@ -9,7 +9,6 @@ use App\Models\SupervisorApplication;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Schema;
-use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
 class LogbookIntegrityTest extends TestCase
@@ -22,7 +21,7 @@ class LogbookIntegrityTest extends TestCase
             today()->subDays(10),
             today()->addDays(10)
         );
-        Sanctum::actingAs($user);
+        $this->actingAs($user);
 
         $payload = $this->logbookPayload(today()->subDay()->toDateString());
 
@@ -41,7 +40,7 @@ class LogbookIntegrityTest extends TestCase
             today()->subDays(10),
             today()->addDays(10)
         );
-        Sanctum::actingAs($user);
+        $this->actingAs($user);
 
         foreach ([
             today()->subDays(11)->toDateString(),
@@ -61,7 +60,7 @@ class LogbookIntegrityTest extends TestCase
             today()->subDays(20),
             today()->subDays(5)
         );
-        Sanctum::actingAs($user);
+        $this->actingAs($user);
 
         $this->postJson(
             '/api/logbooks',
@@ -89,7 +88,7 @@ class LogbookIntegrityTest extends TestCase
             today()->subDay()->toDateString(),
             'Rejected'
         );
-        Sanctum::actingAs($user);
+        $this->actingAs($user);
 
         $this->putJson(
             "/api/logbooks/{$second->id}",
@@ -115,7 +114,7 @@ class LogbookIntegrityTest extends TestCase
         $this->createLogbook($student, today()->subDay()->toDateString(), 'Approved');
         $this->createLogbook($student, today()->toDateString(), 'PendingReview');
 
-        Sanctum::actingAs($user);
+        $this->actingAs($user);
 
         $this->getJson('/api/logbooks')
             ->assertOk()

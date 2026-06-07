@@ -7,7 +7,6 @@ use App\Models\Student;
 use App\Models\SupervisorApplication;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
 class DpmAssignmentTest extends TestCase
@@ -19,7 +18,7 @@ class DpmAssignmentTest extends TestCase
         [$kaprodiUser, $student] = $this->createAssignmentContext();
         $dpm = $this->createLecturer('dpm', 'Sistem Informasi', 'DPM SI');
 
-        Sanctum::actingAs($kaprodiUser);
+        $this->actingAs($kaprodiUser);
 
         $this->postJson('/api/kaprodi/assign-dpm', [
             'student_id' => $student->id,
@@ -36,7 +35,7 @@ class DpmAssignmentTest extends TestCase
         [$kaprodiUser, $student] = $this->createAssignmentContext();
         $nonDpm = $this->createLecturer('kaprodi', 'Sistem Informasi', 'Bukan DPM');
 
-        Sanctum::actingAs($kaprodiUser);
+        $this->actingAs($kaprodiUser);
 
         $this->postJson('/api/kaprodi/assign-dpm', [
             'student_id' => $student->id,
@@ -53,7 +52,7 @@ class DpmAssignmentTest extends TestCase
         [$kaprodiUser, $student] = $this->createAssignmentContext();
         $otherProgramDpm = $this->createLecturer('dpm', 'Informatika', 'DPM Informatika');
 
-        Sanctum::actingAs($kaprodiUser);
+        $this->actingAs($kaprodiUser);
 
         $this->postJson('/api/kaprodi/assign-dpm', [
             'student_id' => $student->id,

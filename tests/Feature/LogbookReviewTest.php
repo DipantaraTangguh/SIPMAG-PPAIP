@@ -7,7 +7,6 @@ use App\Models\Logbook;
 use App\Models\Student;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
 class LogbookReviewTest extends TestCase
@@ -23,7 +22,7 @@ class LogbookReviewTest extends TestCase
         }
         $pending = $this->createLogbook($student, 'PendingReview', 6);
 
-        Sanctum::actingAs($dpmUser);
+        $this->actingAs($dpmUser);
 
         $this->postJson("/api/dpm/logbooks/{$pending->id}/approve")
             ->assertOk()
@@ -39,7 +38,7 @@ class LogbookReviewTest extends TestCase
         [$dpmUser, $student] = $this->createReviewContext();
         $pending = $this->createLogbook($student);
 
-        Sanctum::actingAs($dpmUser);
+        $this->actingAs($dpmUser);
 
         $this->postJson("/api/dpm/logbooks/{$pending->id}/approve")->assertOk();
 
@@ -56,7 +55,7 @@ class LogbookReviewTest extends TestCase
         [$dpmUser, $student] = $this->createReviewContext();
         $pending = $this->createLogbook($student);
 
-        Sanctum::actingAs($dpmUser);
+        $this->actingAs($dpmUser);
 
         $this->postJson("/api/dpm/logbooks/{$pending->id}/reject", [
             'note' => 'Perlu diperbaiki.',
@@ -78,7 +77,7 @@ class LogbookReviewTest extends TestCase
         [$otherDpmUser] = $this->createReviewContext('Informatika');
         $pending = $this->createLogbook($student);
 
-        Sanctum::actingAs($otherDpmUser);
+        $this->actingAs($otherDpmUser);
 
         $this->postJson("/api/dpm/logbooks/{$pending->id}/approve")->assertNotFound();
 

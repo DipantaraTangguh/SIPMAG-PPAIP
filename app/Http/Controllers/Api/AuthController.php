@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Student;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
@@ -94,22 +95,20 @@ class AuthController extends Controller
         /** @var User $user */
         $user = $result['user'];
 
-        // Satu user satu sesi aktif biar token lama nggak gentayangan.
-        $user->tokens()->delete();
-
-        // Ability token disesuaikan role buat gate API.
-        $token = $user->createToken('auth-token', [$user->role])->plainTextToken;
+        Auth::guard('web')->login($user);
+        $request->session()->regenerate();
         $this->logLoginEvent('info', 'auth.login.succeeded', $request, $identifier, $user);
 
         return response()->json([
-            'token' => $token,
             'user' => $this->buildUserPayload($user),
         ]);
     }
 
     public function logout(Request $request)
     {
-        $request->user()->currentAccessToken()->delete();
+        Auth::guard('web')->logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
 
         return response()->json(['message' => 'Berhasil logout.']);
     }

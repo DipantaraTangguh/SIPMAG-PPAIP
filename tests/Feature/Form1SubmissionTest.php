@@ -7,7 +7,6 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
-use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
 class Form1SubmissionTest extends TestCase
@@ -32,7 +31,7 @@ class Form1SubmissionTest extends TestCase
             'access_status' => 'Unverified',
         ]);
 
-        Sanctum::actingAs($user);
+        $this->actingAs($user);
 
         $response = $this->post('/api/form1', [
             'semester' => '99',
@@ -75,7 +74,7 @@ class Form1SubmissionTest extends TestCase
             'access_status' => 'Unverified',
         ]);
 
-        Sanctum::actingAs($user);
+        $this->actingAs($user);
 
         $this->postJson('/api/form1', [
             'skemaMagang' => 'Mitra',
@@ -104,7 +103,7 @@ class Form1SubmissionTest extends TestCase
             'access_status' => 'Unverified',
         ]);
 
-        Sanctum::actingAs($user);
+        $this->actingAs($user);
 
         $this->post('/api/form1', [
             'skemaMagang' => 'Mitra',

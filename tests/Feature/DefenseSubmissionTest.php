@@ -7,7 +7,6 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
-use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
 class DefenseSubmissionTest extends TestCase
@@ -19,7 +18,7 @@ class DefenseSubmissionTest extends TestCase
         Storage::fake('local');
 
         [$user, $student] = $this->createEligibleStudent();
-        Sanctum::actingAs($user);
+        $this->actingAs($user);
 
         $this->postJson('/api/defense', [
             'laporan' => $this->pdf('laporan.pdf'),
@@ -41,7 +40,7 @@ class DefenseSubmissionTest extends TestCase
         Storage::fake('local');
 
         [$user, $student] = $this->createEligibleStudent();
-        Sanctum::actingAs($user);
+        $this->actingAs($user);
 
         $this->post('/api/defense', [
             'laporan' => $this->pdf('laporan.pdf'),

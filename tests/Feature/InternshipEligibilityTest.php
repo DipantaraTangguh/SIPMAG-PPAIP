@@ -9,7 +9,6 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
-use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
 class InternshipEligibilityTest extends TestCase
@@ -19,7 +18,7 @@ class InternshipEligibilityTest extends TestCase
     public function test_listing_returns_only_active_non_expired_vacancies(): void
     {
         $user = User::factory()->create(['role' => 'mahasiswa']);
-        Sanctum::actingAs($user);
+        $this->actingAs($user);
 
         $open = $this->createInternship(true, today()->addDay());
         $this->createInternship(false, today()->addDay());
@@ -34,7 +33,7 @@ class InternshipEligibilityTest extends TestCase
     public function test_inactive_or_expired_vacancy_detail_is_not_exposed(): void
     {
         $user = User::factory()->create(['role' => 'mahasiswa']);
-        Sanctum::actingAs($user);
+        $this->actingAs($user);
 
         $inactive = $this->createInternship(false, today()->addDay());
         $expired = $this->createInternship(true, today()->subDay());
@@ -48,7 +47,7 @@ class InternshipEligibilityTest extends TestCase
         Storage::fake('local');
 
         [$user, $student] = $this->createEligibleStudent();
-        Sanctum::actingAs($user);
+        $this->actingAs($user);
 
         foreach ([
             $this->createInternship(false, today()->addDay()),
@@ -72,7 +71,7 @@ class InternshipEligibilityTest extends TestCase
 
         [$user, $student] = $this->createEligibleStudent();
         $internship = $this->createInternship(true, today());
-        Sanctum::actingAs($user);
+        $this->actingAs($user);
 
         $this->post('/api/applications', [
             'internship_id' => $internship->id,

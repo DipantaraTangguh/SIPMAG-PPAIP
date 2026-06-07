@@ -1,21 +1,37 @@
 const API_BASE = '/api';
-const TOKEN_KEY = 'portal_magang_token';
+const UNSAFE_METHODS = new Set(['POST', 'PUT', 'PATCH', 'DELETE']);
 
-export function getToken() {
-    return localStorage.getItem(TOKEN_KEY);
+function getCookie(name) {
+    const prefix = `${encodeURIComponent(name)}=`;
+    const cookie = document.cookie
+        .split('; ')
+        .find((part) => part.startsWith(prefix));
+
+    return cookie ? decodeURIComponent(cookie.slice(prefix.length)) : null;
 }
 
-export function setToken(token) {
-    localStorage.setItem(TOKEN_KEY, token);
+async function ensureCsrfCookie() {
+    if (getCookie('XSRF-TOKEN')) return;
+
+    const response = await fetch('/sanctum/csrf-cookie', {
+        credentials: 'same-origin',
+        headers: { Accept: 'application/json' },
+    });
+
+    if (!response.ok) {
+        throw new Error('Tidak dapat menyiapkan sesi aman. Silakan muat ulang halaman.');
+    }
 }
 
-export function clearToken() {
-    localStorage.removeItem(TOKEN_KEY);
-}
 async function request(endpoint, options = {}) {
-    const token = getToken();
+    const method = (options.method || 'GET').toUpperCase();
+
+    if (UNSAFE_METHODS.has(method)) {
+        await ensureCsrfCookie();
+    }
+
     const headers = {
-        'Accept': 'application/json',
+        Accept: 'application/json',
         ...options.headers,
     };
 
@@ -24,20 +40,27 @@ async function request(endpoint, options = {}) {
         headers['Content-Type'] = 'application/json';
     }
 
-    if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
+    const csrfToken = getCookie('XSRF-TOKEN');
+    if (csrfToken && UNSAFE_METHODS.has(method)) {
+        headers['X-XSRF-TOKEN'] = csrfToken;
     }
 
     const response = await fetch(`${API_BASE}${endpoint}`, {
         ...options,
+        method,
+        credentials: 'same-origin',
         headers,
     });
 
-    // Token mati, langsung bersihin session user.
     if (response.status === 401) {
-        clearToken();
-        window.location.href = '/login';
+        if (window.location.pathname !== '/login') {
+            window.location.href = '/login';
+        }
         throw new Error('Sesi berakhir. Silakan login kembali.');
+    }
+
+    if (response.status === 419) {
+        throw new Error('Sesi keamanan berakhir. Silakan muat ulang halaman.');
     }
 
     const data = await response.json().catch(() => null);
@@ -54,21 +77,21 @@ async function request(endpoint, options = {}) {
 
     return data;
 }
+
 export const api = {
-    get:    (url)        => request(url, { method: 'GET' }),
-    post:   (url, body)  => request(url, { method: 'POST', body: JSON.stringify(body) }),
-    put:    (url, body)  => request(url, { method: 'PUT', body: JSON.stringify(body) }),
-    delete: (url)        => request(url, { method: 'DELETE' }),
+    get: (url) => request(url, { method: 'GET' }),
+    post: (url, body) => request(url, { method: 'POST', body: JSON.stringify(body) }),
+    put: (url, body) => request(url, { method: 'PUT', body: JSON.stringify(body) }),
+    delete: (url) => request(url, { method: 'DELETE' }),
     upload: (url, formData) => request(url, { method: 'POST', body: formData }),
     download: async (url, filename) => {
-        const token = getToken();
         const response = await fetch(`${API_BASE}${url}`, {
             method: 'GET',
-            headers: token ? { 'Authorization': `Bearer ${token}` } : {},
+            credentials: 'same-origin',
+            headers: { Accept: 'application/json' },
         });
 
         if (response.status === 401) {
-            clearToken();
             window.location.href = '/login';
             throw new Error('Sesi berakhir. Silakan login kembali.');
         }
@@ -87,20 +110,15 @@ export const api = {
         a.remove();
         URL.revokeObjectURL(objectUrl);
     },
-    login: async (login, password) => {
-        const data = await request('/login', {
-            method: 'POST',
-            body: JSON.stringify({ login, password }),
-        });
-        if (data.token) {
-            setToken(data.token);
-        }
-        return data;
-    },
+    login: (login, password) => request('/login', {
+        method: 'POST',
+        body: JSON.stringify({ login, password }),
+    }),
     logout: async () => {
         try {
             await request('/logout', { method: 'POST' });
-        } catch { /* aman di-skip */ }
-        clearToken();
+        } catch {
+            // Session may already be expired.
+        }
     },
 };
