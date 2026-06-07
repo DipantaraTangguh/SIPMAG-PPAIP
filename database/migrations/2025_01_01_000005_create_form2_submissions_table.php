@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('form2_submissions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('student_id')->constrained('students')->cascadeOnDelete();
+            $table->foreignId('student_id')->constrained('students')->restrictOnDelete();
             $table->string('company_name');
             $table->text('alamat_perusahaan');          // company address + postal code
             $table->text('lingkup_magang');             // scope/field of internship
@@ -24,6 +24,7 @@ return new class extends Migration
             $table->text('rejection_reason')->nullable();
             $table->string('pdf_path')->nullable();     // auto-generated after ApprovedForm2
             $table->timestamp('submitted_at')->useCurrent();
+            $table->softDeletes();
             $table->timestamps();
         });
     }

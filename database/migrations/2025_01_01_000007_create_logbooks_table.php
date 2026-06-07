@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('logbooks', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('student_id')->constrained('students')->cascadeOnDelete();
+            $table->foreignId('student_id')->constrained('students')->restrictOnDelete();
             $table->date('tanggal');                        // date of activity
             $table->text('kegiatan_harian');                // daily activities description
             $table->text('hasil');                          // outcomes / results
@@ -20,6 +20,7 @@ return new class extends Migration
                 'Rejected',
             ])->default('PendingReview');
             $table->string('dpm_note')->nullable();         // DPM rejection note
+            $table->softDeletes();
             $table->timestamps();
         });
     }

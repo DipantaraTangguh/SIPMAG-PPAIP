@@ -10,11 +10,12 @@ return new class extends Migration
     {
         Schema::create('supervisor_applications', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('student_id')->constrained('students')->cascadeOnDelete();
+            $table->foreignId('student_id')->constrained('students')->restrictOnDelete();
             $table->string('company_name');
             $table->string('company_contact');              // contact person name, phone/email
             $table->string('loa_path');                    // Letter of Acceptance PDF (required)
             $table->timestamp('submitted_at')->useCurrent();
+            $table->softDeletes();
             $table->timestamps();
         });
     }

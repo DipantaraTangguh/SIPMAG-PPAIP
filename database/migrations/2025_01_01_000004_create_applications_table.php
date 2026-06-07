@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('applications', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('student_id')->constrained('students')->cascadeOnDelete();
+            $table->foreignId('student_id')->constrained('students')->restrictOnDelete();
             $table->foreignId('internship_id')->nullable()->constrained('internships')->nullOnDelete();
             $table->string('cv_file_path')->nullable();             // uploaded CV (Portal track)
             $table->string('loa_path')->nullable();                 // LoA uploaded later (both tracks)
@@ -20,6 +20,7 @@ return new class extends Migration
                 'RejectedByCompany',
                 'Canceled',
             ])->default('Applied');
+            $table->softDeletes();
             $table->timestamps();
         });
     }

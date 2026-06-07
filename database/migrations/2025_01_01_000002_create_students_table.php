@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('students', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
+            $table->foreignId('user_id')->constrained('users')->restrictOnDelete();
             $table->foreignId('dpm_id')->nullable()->constrained('lecturers')->nullOnDelete();
             $table->string('nim')->unique();
             $table->string('name');
@@ -38,6 +38,7 @@ return new class extends Migration
             $table->foreignId('form1_approved_by')->nullable()->constrained('lecturers')->nullOnDelete();
             $table->timestamp('form1_approved_at')->nullable();
             $table->integer('approved_logbook_count')->default(0);
+            $table->softDeletes();
             $table->timestamps();
         });
     }
