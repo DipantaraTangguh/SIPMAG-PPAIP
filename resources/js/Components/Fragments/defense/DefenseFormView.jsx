@@ -142,6 +142,7 @@ export default function DefenseFormView() {
     const [fileErrors, setFileErrors] = useState({});
     const [dragOver, setDragOver] = useState(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [submitError, setSubmitError] = useState(null);
 
     const inputRefs = {
         laporanAkhir: useRef(null),
@@ -163,10 +164,12 @@ export default function DefenseFormView() {
     const handleSubmit = async () => {
         if (!isFormValid || isSubmitting) return;
         setIsSubmitting(true);
+        setSubmitError(null);
         try {
             await submitSidang(files);
         } catch (err) {
             console.error('[Sidang] Submit error:', err);
+            setSubmitError(err?.message || 'Gagal mengirim dokumen. Silakan coba lagi.');
         } finally {
             setIsSubmitting(false);
         }
@@ -309,10 +312,16 @@ export default function DefenseFormView() {
                         </div>
                     </div>
 
+                    {submitError && (
+                        <div className="mt-6 flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-3">
+                            <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-red-500" />
+                            <p className="text-[13px] font-medium text-red-600">{submitError}</p>
+                        </div>
+                    )}
                     <button
                         onClick={handleSubmit}
                         disabled={!isFormValid || isSubmitting}
-                        className={`mt-8 w-full py-4 rounded-xl font-bold text-[16px] flex items-center justify-center gap-2 transition-colors ${
+                        className={`mt-4 w-full py-4 rounded-xl font-bold text-[16px] flex items-center justify-center gap-2 transition-colors ${
                             (!isFormValid || isSubmitting)
                             ? 'bg-gray-200 text-gray-400 cursor-not-allowed border border-gray-300'
                             : 'bg-primary text-white hover:bg-primary-hover shadow-md hover:shadow-lg'

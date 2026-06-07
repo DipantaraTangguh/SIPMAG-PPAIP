@@ -41,6 +41,8 @@ export default function LogbookTabContent() {
 
     const [showAddModal, setShowAddModal] = useState(false);
     const [editEntry, setEditEntry] = useState(null);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [modalError, setModalError] = useState(null);
     const [newEntry, setNewEntry] = useState({
         tanggal: '',
         kegiatanHarian: '',
@@ -51,20 +53,36 @@ export default function LogbookTabContent() {
     const approvedCount = logbookEntries.filter((e) => e.status === 'Disetujui').length;
     const isComplete = approvedCount >= TOTAL_REQUIRED;
 
-    const handleAddEntry = () => {
+    const handleAddEntry = async () => {
         if (!newEntry.tanggal || !newEntry.kegiatanHarian.trim() || !newEntry.hasil.trim()) return;
-        addLogbookEntry(newEntry);
-        setNewEntry({ tanggal: '', kegiatanHarian: '', hasil: '' });
-        setShowAddModal(false);
+        setIsSubmitting(true);
+        setModalError(null);
+        try {
+            await addLogbookEntry(newEntry);
+            setNewEntry({ tanggal: '', kegiatanHarian: '', hasil: '' });
+            setShowAddModal(false);
+        } catch (err) {
+            setModalError(err?.message || 'Gagal menyimpan entri. Silakan coba lagi.');
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
-    const handleEditSave = () => {
+    const handleEditSave = async () => {
         if (!editEntry.kegiatanHarian.trim() || !editEntry.hasil.trim()) return;
-        updateLogbookEntry(editEntry.id, {
-            kegiatanHarian: editEntry.kegiatanHarian,
-            hasil: editEntry.hasil,
-        });
-        setEditEntry(null);
+        setIsSubmitting(true);
+        setModalError(null);
+        try {
+            await updateLogbookEntry(editEntry.id, {
+                kegiatanHarian: editEntry.kegiatanHarian,
+                hasil: editEntry.hasil,
+            });
+            setEditEntry(null);
+        } catch (err) {
+            setModalError(err?.message || 'Gagal memperbarui entri. Silakan coba lagi.');
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     // Helper kecil biar buka/tutup modal nggak nyebar ke JSX.
@@ -74,7 +92,7 @@ export default function LogbookTabContent() {
     const activeData = isEdit ? editEntry : newEntry;
     const updateActiveData = (updates) => isEdit ? setEditEntry({ ...editEntry, ...updates }) : setNewEntry({ ...newEntry, ...updates });
     const handleModalSave = isEdit ? handleEditSave : handleAddEntry;
-    const closeAllModals = () => { setShowAddModal(false); setEditEntry(null); };
+    const closeAllModals = () => { setShowAddModal(false); setEditEntry(null); setModalError(null); };
 
     return (
         <div className="mt-8 animate-in fade-in duration-500">
@@ -246,20 +264,34 @@ export default function LogbookTabContent() {
                         </div>
 
                         <div className="flex flex-col-reverse items-stretch justify-end gap-2 rounded-b-xl border-t border-gray-100 bg-white px-5 py-4 sm:flex-row sm:items-center sm:px-6">
+                            {modalError && (
+                                <p className="flex-1 text-[12px] font-medium text-red-500">
+                                    {modalError}
+                                </p>
+                            )}
                             <button
                                 type="button"
                                 onClick={closeAllModals}
-                                className="rounded-lg border border-gray-200 bg-white px-[18px] py-[9px] text-[13px] font-bold text-gray-600 transition-colors hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-200"
+                                disabled={isSubmitting}
+                                className="rounded-lg border border-gray-200 bg-white px-[18px] py-[9px] text-[13px] font-bold text-gray-600 transition-colors hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-200 disabled:opacity-50"
                             >
                                 Batal
                             </button>
                             <button
                                 type="button"
-                                disabled={!activeData.tanggal || !activeData.kegiatanHarian?.trim() || !activeData.hasil?.trim()}
+                                disabled={!activeData.tanggal || !activeData.kegiatanHarian?.trim() || !activeData.hasil?.trim() || isSubmitting}
                                 onClick={handleModalSave}
-                                className="rounded-lg bg-primary px-5 py-[9px] text-[13px] font-bold text-white transition-colors hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-primary/50 disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-400 disabled:shadow-none"
+                                className="flex items-center justify-center gap-2 rounded-lg bg-primary px-5 py-[9px] text-[13px] font-bold text-white transition-colors hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-primary/50 disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-400 disabled:shadow-none"
                             >
-                                Simpan Entri
+                                {isSubmitting ? (
+                                    <>
+                                        <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
+                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                                        </svg>
+                                        Menyimpan...
+                                    </>
+                                ) : 'Simpan Entri'}
                             </button>
                         </div>
                     </div>

@@ -40,6 +40,7 @@ export default function Form2NewPage() {
 
     const [errors, setErrors] = useState({});
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [submitError, setSubmitError] = useState(null);
 
     // Data profil dikunci, mahasiswa nggak edit di form ini.
     const studentName = 'Tangguh Dipantara';
@@ -64,7 +65,7 @@ export default function Form2NewPage() {
         }
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         const newErrors = {};
         if (!formData.namaPerusahaan.trim())
             newErrors.namaPerusahaan = 'Nama perusahaan wajib diisi';
@@ -83,12 +84,16 @@ export default function Form2NewPage() {
         }
 
         setIsSubmitting(true);
+        setSubmitError(null);
 
-        setTimeout(() => {
-            submitForm2(formData);
-            setIsSubmitting(false);
+        try {
+            await submitForm2(formData);
             navigate('/portal', { state: { activeTab: 'mandiri' } });
-        }, 1000);
+        } catch (err) {
+            setSubmitError(err?.message || 'Gagal mengirim pengajuan. Silakan coba lagi.');
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
@@ -262,29 +267,37 @@ export default function Form2NewPage() {
                             </div>
                         </div>
                     </div>
-                    <div className="mt-6 flex justify-stretch sm:justify-end">
-                        <button
-                            type="button"
-                            onClick={handleSubmit}
-                            disabled={!isFormValid || isSubmitting}
-                            className={`flex w-full items-center justify-center gap-2 rounded-xl px-8 py-3.5 text-[15px] font-bold transition-colors sm:w-auto ${
-                                isSubmitting || !isFormValid
-                                    ? 'cursor-not-allowed bg-gray-300 text-gray-400'
-                                    : 'bg-primary text-white hover:bg-primary-hover'
-                            }`}
-                        >
-                            {isSubmitting ? (
-                                <>
-                                    <Loader2 className="h-4 w-4 animate-spin" />
-                                    Mengirim...
-                                </>
-                            ) : (
-                                <>
-                                    Kirim Pengajuan
-                                    <ArrowRight className="h-4 w-4" />
-                                </>
-                            )}
-                        </button>
+                    <div className="mt-6">
+                        {submitError && (
+                            <div className="mb-4 flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-3">
+                                <Info className="mt-0.5 h-4 w-4 flex-shrink-0 text-red-500" />
+                                <p className="text-[13px] font-medium text-red-600">{submitError}</p>
+                            </div>
+                        )}
+                        <div className="flex justify-stretch sm:justify-end">
+                            <button
+                                type="button"
+                                onClick={handleSubmit}
+                                disabled={!isFormValid || isSubmitting}
+                                className={`flex w-full items-center justify-center gap-2 rounded-xl px-8 py-3.5 text-[15px] font-bold transition-colors sm:w-auto ${
+                                    isSubmitting || !isFormValid
+                                        ? 'cursor-not-allowed bg-gray-300 text-gray-400'
+                                        : 'bg-primary text-white hover:bg-primary-hover'
+                                }`}
+                            >
+                                {isSubmitting ? (
+                                    <>
+                                        <Loader2 className="h-4 w-4 animate-spin" />
+                                        Mengirim...
+                                    </>
+                                ) : (
+                                    <>
+                                        Kirim Pengajuan
+                                        <ArrowRight className="h-4 w-4" />
+                                    </>
+                                )}
+                            </button>
+                        </div>
                     </div>
                 </div>
                 <div className="self-start lg:sticky lg:top-6">
