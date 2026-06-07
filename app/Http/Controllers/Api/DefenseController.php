@@ -172,7 +172,6 @@ class DefenseController extends Controller
             'access_status' => 'SiklusSelesai',
             'dpm_id' => null,
             'is_independent' => false,
-            'approved_logbook_count' => 0,
             'form1_data' => null,
             'form1_pdf_path' => null,
             'form1_rejection_reason' => null,

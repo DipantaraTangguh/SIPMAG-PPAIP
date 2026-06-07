@@ -85,7 +85,6 @@ class DefenseSubmissionTest extends TestCase
             'study_program' => 'Sistem Informasi',
             'email' => fake()->unique()->safeEmail(),
             'access_status' => 'LogbookComplete',
-            'approved_logbook_count' => 6,
         ]);
 
         return [$user, $student];

@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Dpm\DpmLogbookResource\RelationManagers;
 
 use App\Models\Logbook;
+use App\Services\LogbookReviewService;
 use Filament\Forms;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
@@ -11,6 +12,7 @@ use Filament\Tables\Table;
 class LogbooksRelationManager extends RelationManager
 {
     protected static string $relationship = 'logbooks';
+
     protected static ?string $title = 'Daftar Logbook';
 
     public function table(Table $table): Table
@@ -33,13 +35,13 @@ class LogbooksRelationManager extends RelationManager
                     ->colors([
                         'warning' => 'PendingReview',
                         'success' => 'Approved',
-                        'danger'  => 'Rejected',
+                        'danger' => 'Rejected',
                     ])
                     ->formatStateUsing(fn (string $state) => match ($state) {
                         'PendingReview' => 'Menunggu Review',
-                        'Approved'      => 'Disetujui',
-                        'Rejected'      => 'Ditolak',
-                        default         => $state,
+                        'Approved' => 'Disetujui',
+                        'Rejected' => 'Ditolak',
+                        default => $state,
                     }),
             ])
             ->defaultSort('tanggal', 'desc')
@@ -47,8 +49,8 @@ class LogbooksRelationManager extends RelationManager
                 Tables\Filters\SelectFilter::make('status')
                     ->options([
                         'PendingReview' => 'Menunggu Review',
-                        'Approved'      => 'Disetujui',
-                        'Rejected'      => 'Ditolak',
+                        'Approved' => 'Disetujui',
+                        'Rejected' => 'Ditolak',
                     ]),
             ])
             ->actions([
@@ -59,15 +61,10 @@ class LogbooksRelationManager extends RelationManager
                     ->color('success')
                     ->visible(fn (Logbook $record) => $record->status === 'PendingReview')
                     ->requiresConfirmation()
-                    ->action(function (Logbook $record) {
-                        $record->update(['status' => 'Approved', 'dpm_note' => null]);
-                        $student = $record->student;
-                        $student->increment('approved_logbook_count');
-
-                        if ($student->approved_logbook_count >= 6 && $student->access_status === 'HasDPM') {
-                            $student->update(['access_status' => 'LogbookComplete']);
-                        }
-                    }),
+                    ->action(fn (Logbook $record) => app(LogbookReviewService::class)->approve(
+                        $record->id,
+                        auth()->user()->lecturer->id
+                    )),
 
                 // Action reject logbook DPM.
                 Tables\Actions\Action::make('reject')
@@ -78,10 +75,11 @@ class LogbooksRelationManager extends RelationManager
                     ->form([
                         Forms\Components\Textarea::make('note')->label('Catatan Penolakan'),
                     ])
-                    ->action(fn (Logbook $record, array $data) => $record->update([
-                        'status'   => 'Rejected',
-                        'dpm_note' => $data['note'] ?? null,
-                    ])),
+                    ->action(fn (Logbook $record, array $data) => app(LogbookReviewService::class)->reject(
+                        $record->id,
+                        auth()->user()->lecturer->id,
+                        $data['note'] ?? null
+                    )),
             ])
             ->bulkActions([]);
     }

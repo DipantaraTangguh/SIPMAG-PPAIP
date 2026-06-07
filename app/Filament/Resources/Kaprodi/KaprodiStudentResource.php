@@ -32,7 +32,8 @@ class KaprodiStudentResource extends Resource
 
         return parent::getEloquentQuery()
             ->where('study_program', $prodi)
-            ->with('sidangSubmission');
+            ->with('sidangSubmission')
+            ->withCount(['logbooks as approved_logbook_count' => fn ($query) => $query->where('status', 'Approved')]);
     }
 
     public static function form(Form $form): Form
@@ -374,7 +375,6 @@ class KaprodiStudentResource extends Resource
                         'access_status'          => 'SiklusSelesai',
                         'dpm_id'                 => null,
                         'is_independent'         => false,
-                        'approved_logbook_count' => 0,
                         'form1_data'             => null,
                         'form1_pdf_path'         => null,
                         'form1_rejection_reason' => null,

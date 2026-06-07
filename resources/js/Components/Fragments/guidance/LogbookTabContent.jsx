@@ -34,6 +34,7 @@ export default function LogbookTabContent() {
     const navigate = useNavigate();
     const {
         logbookEntries,
+        logbookPeriod,
         addLogbookEntry,
         updateLogbookEntry,
     } = useSimulation();
@@ -51,7 +52,7 @@ export default function LogbookTabContent() {
     const isComplete = approvedCount >= TOTAL_REQUIRED;
 
     const handleAddEntry = () => {
-        if (!newEntry.kegiatanHarian.trim() || !newEntry.hasil.trim()) return;
+        if (!newEntry.tanggal || !newEntry.kegiatanHarian.trim() || !newEntry.hasil.trim()) return;
         addLogbookEntry(newEntry);
         setNewEntry({ tanggal: '', kegiatanHarian: '', hasil: '' });
         setShowAddModal(false);
@@ -200,6 +201,8 @@ export default function LogbookTabContent() {
                                     <label className="mb-2 block text-[13px] font-bold text-[#1A1A1A]">Tanggal</label>
                                     <input
                                         type="date"
+                                        min={logbookPeriod?.start_date || undefined}
+                                        max={logbookPeriod?.maximum_date || undefined}
                                         value={activeData.tanggal ? activeData.tanggal.slice(0, 10) : ''}
                                         onChange={(e) => updateActiveData({ tanggal: e.target.value })}
                                         className="h-11 w-full rounded-lg border border-gray-200 px-3 outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-primary/10"
@@ -252,7 +255,7 @@ export default function LogbookTabContent() {
                             </button>
                             <button
                                 type="button"
-                                disabled={!activeData.kegiatanHarian?.trim() || !activeData.hasil?.trim()}
+                                disabled={!activeData.tanggal || !activeData.kegiatanHarian?.trim() || !activeData.hasil?.trim()}
                                 onClick={handleModalSave}
                                 className="rounded-lg bg-primary px-5 py-[9px] text-[13px] font-bold text-white transition-colors hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-primary/50 disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-400 disabled:shadow-none"
                             >

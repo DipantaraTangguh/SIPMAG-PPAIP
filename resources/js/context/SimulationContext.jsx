@@ -11,6 +11,7 @@ const EMPTY_STATE = {
     form2Submissions: [],
     pengajuanPembimbing: null,
     logbookEntries: [],
+    logbookPeriod: null,
     sidangSubmission: null,
     sidangSchedule: null,
     activeApplications: [],
@@ -149,6 +150,9 @@ export function SimulationProvider({ children }) {
                         dpmNote: l.dpm_note,
                     }))
                     : [],
+                logbookPeriod: logbookRes.status === 'fulfilled'
+                    ? logbookRes.value.internship_period
+                    : null,
                 sidangSubmission: sidangRes.status === 'fulfilled' && sidangRes.value.submission
                     ? {
                         id: sidangRes.value.submission.id,

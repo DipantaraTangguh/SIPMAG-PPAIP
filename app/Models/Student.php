@@ -24,17 +24,17 @@ class Student extends Model
         'form1_rejection_reason',
         'form1_approved_by',
         'form1_approved_at',
-        'approved_logbook_count',
     ];
 
     protected function casts(): array
     {
         return [
-            'form1_data'         => 'array',
-            'is_independent'     => 'boolean',
-            'form1_approved_at'  => 'datetime',
+            'form1_data' => 'array',
+            'is_independent' => 'boolean',
+            'form1_approved_at' => 'datetime',
         ];
     }
+
     public function getTahunAkademikAttribute(): string
     {
         $now = now();
@@ -42,10 +42,10 @@ class Student extends Model
         $month = $now->month;
 
         if ($month < 8) {
-            return ($year - 1) . '/' . $year;
+            return ($year - 1).'/'.$year;
         }
 
-        return $year . '/' . ($year + 1);
+        return $year.'/'.($year + 1);
     }
 
     public function user()
@@ -76,6 +76,11 @@ class Student extends Model
     public function logbooks()
     {
         return $this->hasMany(Logbook::class);
+    }
+
+    public function getApprovedLogbookCountAttribute(int|string|null $value): int
+    {
+        return (int) ($value ?? $this->logbooks()->where('status', 'Approved')->count());
     }
 
     public function sidangSubmission()

@@ -27,7 +27,8 @@ class DpmLogbookResource extends Resource
         $lecturerId = auth()->user()?->lecturer?->id;
 
         return parent::getEloquentQuery()
-            ->where('dpm_id', $lecturerId);
+            ->where('dpm_id', $lecturerId)
+            ->withCount(['logbooks as approved_logbook_count' => fn ($query) => $query->where('status', 'Approved')]);
     }
 
     public static function form(Form $form): Form

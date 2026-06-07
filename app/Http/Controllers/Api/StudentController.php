@@ -14,17 +14,19 @@ class StudentController extends Controller
             ->select([
                 'id', 'nim', 'name', 'study_program', 'email',
                 'access_status', 'is_independent', 'dpm_id',
-                'approved_logbook_count', 'updated_at',
+                'updated_at',
             ])
+            ->withCount(['logbooks as approved_logbook_count' => fn ($query) => $query->where('status', 'Approved')])
             ->orderByDesc('updated_at')
             ->get();
 
         return response()->json(['students' => $students]);
     }
+
     public function indexForKaprodi(Request $request)
     {
         $lecturer = $request->user()->lecturer;
-        if (!$lecturer || !$lecturer->study_program) {
+        if (! $lecturer || ! $lecturer->study_program) {
             return response()->json(['message' => 'Akses ditolak.'], 403);
         }
 
@@ -33,25 +35,28 @@ class StudentController extends Controller
             ->select([
                 'id', 'nim', 'name', 'study_program', 'email',
                 'access_status', 'is_independent', 'dpm_id',
-                'approved_logbook_count', 'updated_at',
+                'updated_at',
             ])
+            ->withCount(['logbooks as approved_logbook_count' => fn ($query) => $query->where('status', 'Approved')])
             ->orderByDesc('updated_at')
             ->get();
 
         return response()->json(['students' => $students]);
     }
+
     public function indexForDpm(Request $request)
     {
         $lecturer = $request->user()->lecturer;
-        if (!$lecturer) {
+        if (! $lecturer) {
             return response()->json(['message' => 'Akses ditolak.'], 403);
         }
 
         $students = Student::where('dpm_id', $lecturer->id)
             ->select([
                 'id', 'nim', 'name', 'study_program', 'email',
-                'access_status', 'approved_logbook_count', 'dpm_id', 'updated_at',
+                'access_status', 'dpm_id', 'updated_at',
             ])
+            ->withCount(['logbooks as approved_logbook_count' => fn ($query) => $query->where('status', 'Approved')])
             ->orderByDesc('updated_at')
             ->get();
 

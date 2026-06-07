@@ -30,7 +30,6 @@ class StudentSeeder extends Seeder
                 'form1_data'             => null,
                 'form1_pdf_path'         => null,
                 'form1_rejection_reason' => null,
-                'approved_logbook_count' => 0,
                 'created_at'             => now(),
                 'updated_at'             => now(),
             ],
