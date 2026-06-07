@@ -122,7 +122,7 @@ class SupervisorController extends Controller
 
         return response()->file($path);
     }
-    public function downloadLoaForKaprodi(Request $request, $studentId)
+    public function downloadLoaForKaprodi(Request $request, int $studentId)
     {
         $lecturer = $request->user()->lecturer;
         $student = Student::where('id', $studentId)

@@ -1,16 +1,17 @@
 <?php
 
 use App\Models\Student;
+use App\Models\User;
 use App\Support\StoredFilePath;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['web', 'auth'])->prefix('admin/transkrip')->group(function () {
 
     // Preview PDF langsung di iframe.
-    Route::get('/{student}/preview', function (Student $student) {
-        $user = Auth::user();
+    Route::get('/{student}/preview', function (Request $request, Student $student) {
+        /** @var User $user */
+        $user = $request->user();
         if (!in_array($user->role, ['kaprodi', 'ppaip'])) {
             abort(403);
         }
@@ -33,8 +34,9 @@ Route::middleware(['web', 'auth'])->prefix('admin/transkrip')->group(function ()
     })->name('transkrip.preview');
 
     // Download satu file tanpa render preview.
-    Route::get('/{student}/download', function (Student $student) {
-        $user = Auth::user();
+    Route::get('/{student}/download', function (Request $request, Student $student) {
+        /** @var User $user */
+        $user = $request->user();
         if (!in_array($user->role, ['kaprodi', 'ppaip'])) {
             abort(403);
         }
@@ -57,7 +59,8 @@ Route::middleware(['web', 'auth'])->prefix('admin/transkrip')->group(function ()
 
     // Paketkan semua transkrip jadi ZIP.
     Route::post('/bulk-download', function (Request $request) {
-        $user = Auth::user();
+        /** @var User $user */
+        $user = $request->user();
         if (!in_array($user->role, ['kaprodi', 'ppaip'])) {
             abort(403);
         }

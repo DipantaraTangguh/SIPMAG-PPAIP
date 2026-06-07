@@ -116,7 +116,7 @@ class DefenseController extends Controller
         return response()->json(['students' => $students]);
     }
 
-    public function scheduleSidang(Request $request, $studentId)
+    public function scheduleSidang(Request $request, int $studentId)
     {
         $lecturer = $request->user()->lecturer;
 
@@ -154,7 +154,7 @@ class DefenseController extends Controller
         ]);
     }
 
-    public function completeCycle(Request $request, $studentId)
+    public function completeCycle(Request $request, int $studentId)
     {
         $lecturer = $request->user()->lecturer;
 
