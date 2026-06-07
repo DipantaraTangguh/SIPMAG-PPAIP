@@ -29,7 +29,7 @@ class ApplicationController extends Controller
     {
         $validated = $request->validate([
             'internship_id' => 'required|integer|exists:internships,id',
-            'cv_file'       => 'required|file|mimes:pdf|max:5120',
+            'cv_file'       => 'required|file|mimes:pdf|mimetypes:application/pdf|max:5120',
         ]);
 
         $studentId = $request->user()->student?->id;

@@ -61,7 +61,7 @@ class Form1Controller extends Controller
             'skemaMagang' => 'required|string|in:Mitra,Mandiri,Kewirausahaan',
             'topikMagang' => 'required|string|max:2000',
             'outputTarget' => 'required|string|in:Produk,Prototype,Laporan',
-            'transkrip' => 'required|file|mimes:pdf,jpg,jpeg,png|max:5120',
+            'transkrip' => 'required|file|mimes:pdf,jpg,jpeg,png|mimetypes:application/pdf,image/jpeg,image/png|max:5120',
         ]);
 
         $transkripPath = $request->file('transkrip')->store('transkrip', 'local');

@@ -50,7 +50,7 @@ class SupervisorController extends Controller
             'email'            => 'required|email|max:255',
             'mulai_magang'     => 'required|date',
             'selesai_magang'   => 'required|date|after_or_equal:mulai_magang',
-            'loa_file'         => 'required|file|mimes:pdf,jpg,jpeg,png|max:5120',
+            'loa_file'         => 'required|file|mimes:pdf,jpg,jpeg,png|mimetypes:application/pdf,image/jpeg,image/png|max:5120',
         ]);
 
         $loaPath = $request->file('loa_file')->store('loa', 'local');
