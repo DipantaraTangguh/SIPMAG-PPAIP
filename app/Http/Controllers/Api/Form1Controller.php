@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Student;
+use App\Support\StoredFilePath;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -169,8 +170,8 @@ class Form1Controller extends Controller
 
         $signatureSrc = null;
         if ($kaprodi && $kaprodi->signature_path) {
-            $absPath = storage_path('app/public/' . $kaprodi->signature_path);
-            if (file_exists($absPath)) {
+            $absPath = StoredFilePath::resolve(storage_path('app/public'), $kaprodi->signature_path);
+            if ($absPath) {
                 $mime = mime_content_type($absPath) ?: 'image/png';
                 $signatureSrc = 'data:' . $mime . ';base64,' . base64_encode(file_get_contents($absPath));
             }
@@ -211,9 +212,8 @@ class Form1Controller extends Controller
             return response()->json(['message' => 'Transkrip tidak tersedia.'], 404);
         }
 
-        $path = storage_path('app/private/' . $student->form1_pdf_path);
-
-        if (!file_exists($path)) {
+        $path = StoredFilePath::resolve(storage_path('app/private'), $student->form1_pdf_path);
+        if (! $path) {
             return response()->json(['message' => 'File tidak ditemukan.'], 404);
         }
 

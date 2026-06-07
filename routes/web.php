@@ -1,9 +1,11 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
 use App\Models\Student;
+use App\Support\StoredFilePath;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
+
 Route::middleware(['web', 'auth'])->prefix('admin/transkrip')->group(function () {
 
     // Preview PDF langsung di iframe.
@@ -21,8 +23,8 @@ Route::middleware(['web', 'auth'])->prefix('admin/transkrip')->group(function ()
         if (!$student->form1_pdf_path) {
             abort(404, 'Transkrip tidak tersedia.');
         }
-        $path = storage_path('app/private/' . $student->form1_pdf_path);
-        if (!file_exists($path)) {
+        $path = StoredFilePath::resolve(storage_path('app/private'), $student->form1_pdf_path);
+        if (! $path) {
             abort(404, 'File tidak ditemukan.');
         }
         return response()->file($path, [
@@ -45,8 +47,8 @@ Route::middleware(['web', 'auth'])->prefix('admin/transkrip')->group(function ()
         if (!$student->form1_pdf_path) {
             abort(404);
         }
-        $path = storage_path('app/private/' . $student->form1_pdf_path);
-        if (!file_exists($path)) {
+        $path = StoredFilePath::resolve(storage_path('app/private'), $student->form1_pdf_path);
+        if (! $path) {
             abort(404);
         }
         $ext = pathinfo($path, PATHINFO_EXTENSION);
@@ -86,8 +88,8 @@ Route::middleware(['web', 'auth'])->prefix('admin/transkrip')->group(function ()
         $zip->open($zipPath, \ZipArchive::CREATE | \ZipArchive::OVERWRITE);
 
         foreach ($students as $student) {
-            $filePath = storage_path('app/private/' . $student->form1_pdf_path);
-            if (file_exists($filePath)) {
+            $filePath = StoredFilePath::resolve(storage_path('app/private'), $student->form1_pdf_path);
+            if ($filePath) {
                 $ext = pathinfo($filePath, PATHINFO_EXTENSION);
                 $zip->addFile($filePath, "transkrip_{$student->nim}_{$student->name}.{$ext}");
             }

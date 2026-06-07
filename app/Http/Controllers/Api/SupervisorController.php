@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Student;
 use App\Models\SupervisorApplication;
 use App\Services\DpmAssignmentService;
+use App\Support\StoredFilePath;
 use Illuminate\Http\Request;
 
 class SupervisorController extends Controller
@@ -114,9 +115,8 @@ class SupervisorController extends Controller
             return response()->json(['message' => 'LoA tidak tersedia.'], 404);
         }
 
-        $path = storage_path('app/private/' . $application->loa_path);
-
-        if (!file_exists($path)) {
+        $path = StoredFilePath::resolve(storage_path('app/private'), $application->loa_path);
+        if (! $path) {
             return response()->json(['message' => 'File tidak ditemukan.'], 404);
         }
 
@@ -135,9 +135,8 @@ class SupervisorController extends Controller
             return response()->json(['message' => 'LoA tidak tersedia.'], 404);
         }
 
-        $path = storage_path('app/private/' . $application->loa_path);
-
-        if (!file_exists($path)) {
+        $path = StoredFilePath::resolve(storage_path('app/private'), $application->loa_path);
+        if (! $path) {
             return response()->json(['message' => 'File tidak ditemukan.'], 404);
         }
 

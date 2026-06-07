@@ -2,9 +2,10 @@
 
 namespace App\Filament\Resources\Kaprodi;
 
-use App\Models\Student;
 use App\Models\Lecturer;
+use App\Models\Student;
 use App\Services\DpmAssignmentService;
+use App\Support\StoredFilePath;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -402,8 +403,8 @@ class KaprodiStudentResource extends Resource
                         // Kalau cuma satu, langsung download aja.
                         if ($students->count() === 1) {
                             $student = $students->first();
-                            $path = storage_path('app/private/' . $student->form1_pdf_path);
-                            if (file_exists($path)) {
+                            $path = StoredFilePath::resolve(storage_path('app/private'), $student->form1_pdf_path);
+                            if ($path) {
                                 $ext = pathinfo($path, PATHINFO_EXTENSION);
                                 return response()->download($path, "transkrip_{$student->nim}.{$ext}");
                             }
@@ -422,8 +423,8 @@ class KaprodiStudentResource extends Resource
                         $zip->open($zipPath, \ZipArchive::CREATE | \ZipArchive::OVERWRITE);
 
                         foreach ($students as $student) {
-                            $filePath = storage_path('app/private/' . $student->form1_pdf_path);
-                            if (file_exists($filePath)) {
+                            $filePath = StoredFilePath::resolve(storage_path('app/private'), $student->form1_pdf_path);
+                            if ($filePath) {
                                 $ext = pathinfo($filePath, PATHINFO_EXTENSION);
                                 $zip->addFile($filePath, "transkrip_{$student->nim}_{$student->name}.{$ext}");
                             }
