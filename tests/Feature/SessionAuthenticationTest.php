@@ -11,6 +11,11 @@ class SessionAuthenticationTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_sanctum_personal_access_tokens_expire_after_eight_hours(): void
+    {
+        $this->assertSame(480, config('sanctum.expiration'));
+    }
+
     public function test_login_uses_http_only_session_cookie_without_returning_a_token(): void
     {
         $user = User::factory()->create();
