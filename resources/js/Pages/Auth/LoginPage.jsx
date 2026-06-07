@@ -79,9 +79,11 @@ export default function LoginPage() {
                         <h2 className="login-form__title">Selamat Datang</h2>
                         <p className="login-form__subtitle">Masuk dengan akun BIG Anda.</p>
                     </div>
-                    <div className="mb-4 rounded-lg bg-blue-50 border border-blue-200 px-4 py-3 text-xs text-blue-700">
-                        <strong>Demo:</strong> NIM <code className="rounded bg-blue-100 px-1 font-mono">1101214230</code> · Password <code className="rounded bg-blue-100 px-1 font-mono">password</code>
-                    </div>
+                    {import.meta.env.DEV && (
+                        <div className="mb-4 rounded-lg bg-blue-50 border border-blue-200 px-4 py-3 text-xs text-blue-700">
+                            <strong>Demo:</strong> NIM <code className="rounded bg-blue-100 px-1 font-mono">1101214230</code> · Password <code className="rounded bg-blue-100 px-1 font-mono">password</code>
+                        </div>
+                    )}
                     {error && (
                         <div className="login-form__error" role="alert">
                             <XCircle className="w-4 h-4 flex-shrink-0" />
