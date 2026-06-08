@@ -84,6 +84,30 @@ class InternshipEligibilityTest extends TestCase
         $this->assertTrue(Storage::disk('local')->exists($application->cv_file_path));
     }
 
+    public function test_student_cannot_apply_to_the_same_internship_twice(): void
+    {
+        Storage::fake('local');
+
+        [$user, $student] = $this->createEligibleStudent();
+        $internship = $this->createInternship(true, today()->addDay());
+        $this->actingAs($user);
+
+        $this->post('/api/applications', [
+            'internship_id' => $internship->id,
+            'cv_file' => UploadedFile::fake()->create('cv-1.pdf', 100, 'application/pdf'),
+        ])->assertCreated();
+
+        $this->withHeader('Accept', 'application/json')->post('/api/applications', [
+            'internship_id' => $internship->id,
+            'cv_file' => UploadedFile::fake()->create('cv-2.pdf', 100, 'application/pdf'),
+        ])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors('internship_id');
+
+        $this->assertSame(1, $student->applications()->count());
+        $this->assertCount(1, Storage::disk('local')->allFiles('cv'));
+    }
+
     /**
      * @return array{User, Student}
      */

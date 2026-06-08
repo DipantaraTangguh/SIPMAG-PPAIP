@@ -9,6 +9,7 @@ use App\Models\Application;
 use App\Models\Internship;
 use App\Models\Student;
 use App\Services\StudentStateMachine;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
@@ -78,7 +79,6 @@ class ApplicationController extends Controller
 
                 $alreadyApplied = Application::where('student_id', $student->id)
                     ->where('internship_id', $internship->id)
-                    ->whereIn('status', ['Applied', 'Accepted'])
                     ->exists();
 
                 if ($alreadyApplied) {
@@ -102,6 +102,14 @@ class ApplicationController extends Controller
 
                 return $application;
             });
+        } catch (UniqueConstraintViolationException $exception) {
+            if ($cvPath) {
+                Storage::disk('local')->delete($cvPath);
+            }
+
+            throw ValidationException::withMessages([
+                'internship_id' => 'Anda sudah melamar lowongan ini.',
+            ]);
         } catch (Throwable $exception) {
             if ($cvPath) {
                 Storage::disk('local')->delete($cvPath);

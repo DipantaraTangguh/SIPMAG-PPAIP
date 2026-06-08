@@ -11,8 +11,11 @@ use App\Models\Student;
 use App\Models\SupervisorApplication;
 use App\Services\DpmAssignmentService;
 use App\Support\StoredFilePath;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
 
 class SupervisorController extends Controller
 {
@@ -58,18 +61,26 @@ class SupervisorController extends Controller
 
         $loaPath = $request->file('loa_file')->store('loa', 'local');
 
-        SupervisorApplication::create([
-            'student_id' => $student->id,
-            'company_name' => $validated['company_name'],
-            'company_contact' => $validated['company_contact'],
-            'nama_praktisi' => $validated['nama_praktisi'],
-            'jabatan_praktisi' => $validated['jabatan_praktisi'],
-            'no_telepon' => $validated['no_telepon'],
-            'email' => $validated['email'],
-            'mulai_magang' => $validated['mulai_magang'],
-            'selesai_magang' => $validated['selesai_magang'],
-            'loa_path' => $loaPath,
-        ]);
+        try {
+            SupervisorApplication::create([
+                'student_id' => $student->id,
+                'company_name' => $validated['company_name'],
+                'company_contact' => $validated['company_contact'],
+                'nama_praktisi' => $validated['nama_praktisi'],
+                'jabatan_praktisi' => $validated['jabatan_praktisi'],
+                'no_telepon' => $validated['no_telepon'],
+                'email' => $validated['email'],
+                'mulai_magang' => $validated['mulai_magang'],
+                'selesai_magang' => $validated['selesai_magang'],
+                'loa_path' => $loaPath,
+            ]);
+        } catch (UniqueConstraintViolationException) {
+            Storage::disk('local')->delete($loaPath);
+
+            throw ValidationException::withMessages([
+                'student_id' => 'Pengajuan sudah pernah diajukan.',
+            ]);
+        }
 
         return response()->json(['message' => 'Pengajuan pembimbing berhasil dikirim.'], 201);
     }
