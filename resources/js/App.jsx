@@ -16,6 +16,8 @@ import Form2NewPage from './Pages/Form2/Form2NewPage';
 import GuidancePage from './Pages/Guidance/GuidancePage';
 import InternshipDefensePage from './Pages/Defense/InternshipDefensePage';
 
+const STUDENT_ROLES = ['mahasiswa'];
+
 export default function App() {
     return (
         // Root boundary — last-resort catch for AppProvider / BrowserRouter errors.
@@ -40,7 +42,7 @@ export default function App() {
                             path="/dashboard"
                             element={
                                 <ErrorBoundary>
-                                    <ProtectedRoute><DashboardPage /></ProtectedRoute>
+                                    <ProtectedRoute allowedRoles={STUDENT_ROLES}><DashboardPage /></ProtectedRoute>
                                 </ErrorBoundary>
                             }
                         />
@@ -48,7 +50,7 @@ export default function App() {
                             path="/form1"
                             element={
                                 <ErrorBoundary>
-                                    <ProtectedRoute><Form1Page /></ProtectedRoute>
+                                    <ProtectedRoute allowedRoles={STUDENT_ROLES}><Form1Page /></ProtectedRoute>
                                 </ErrorBoundary>
                             }
                         />
@@ -56,7 +58,7 @@ export default function App() {
                             path="/form1/status"
                             element={
                                 <ErrorBoundary>
-                                    <ProtectedRoute><Form1StatusPage /></ProtectedRoute>
+                                    <ProtectedRoute allowedRoles={STUDENT_ROLES}><Form1StatusPage /></ProtectedRoute>
                                 </ErrorBoundary>
                             }
                         />
@@ -64,7 +66,7 @@ export default function App() {
                             path="/portal"
                             element={
                                 <ErrorBoundary>
-                                    <ProtectedRoute><InternshipPortalPage /></ProtectedRoute>
+                                    <ProtectedRoute allowedRoles={STUDENT_ROLES}><InternshipPortalPage /></ProtectedRoute>
                                 </ErrorBoundary>
                             }
                         />
@@ -72,7 +74,7 @@ export default function App() {
                             path="/portal/vacancy/:id"
                             element={
                                 <ErrorBoundary>
-                                    <ProtectedRoute><VacancyDetailPage /></ProtectedRoute>
+                                    <ProtectedRoute allowedRoles={STUDENT_ROLES}><VacancyDetailPage /></ProtectedRoute>
                                 </ErrorBoundary>
                             }
                         />
@@ -80,7 +82,7 @@ export default function App() {
                             path="/portal/independent/form2/new"
                             element={
                                 <ErrorBoundary>
-                                    <ProtectedRoute><Form2NewPage /></ProtectedRoute>
+                                    <ProtectedRoute allowedRoles={STUDENT_ROLES}><Form2NewPage /></ProtectedRoute>
                                 </ErrorBoundary>
                             }
                         />
@@ -88,7 +90,7 @@ export default function App() {
                             path="/guidance"
                             element={
                                 <ErrorBoundary>
-                                    <ProtectedRoute><GuidancePage /></ProtectedRoute>
+                                    <ProtectedRoute allowedRoles={STUDENT_ROLES}><GuidancePage /></ProtectedRoute>
                                 </ErrorBoundary>
                             }
                         />
@@ -96,7 +98,7 @@ export default function App() {
                             path="/defense"
                             element={
                                 <ErrorBoundary>
-                                    <ProtectedRoute><InternshipDefensePage /></ProtectedRoute>
+                                    <ProtectedRoute allowedRoles={STUDENT_ROLES}><InternshipDefensePage /></ProtectedRoute>
                                 </ErrorBoundary>
                             }
                         />
