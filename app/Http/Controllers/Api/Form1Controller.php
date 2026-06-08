@@ -42,7 +42,7 @@ class Form1Controller extends Controller
             return response()->json(['message' => 'Form 1 sudah diajukan atau disetujui.'], 403);
         }
 
-        if (! $student->semester || ! $student->jumlah_sks || ! $student->ipk) {
+        if ($student->semester === null || $student->jumlah_sks === null || $student->ipk === null) {
             return response()->json([
                 'message' => 'Data akademik mahasiswa belum lengkap. Hubungi admin akademik sebelum mengajukan Form 1.',
             ], 422);

@@ -16,10 +16,10 @@ return new class extends Migration
             $table->string('name');
             $table->string('study_program');
             $table->string('email');
-            $table->string('semester')->nullable();           // e.g. "6"
+            $table->unsignedTinyInteger('semester')->nullable(); // e.g. 6
             $table->string('tahun_akademik')->nullable();     // e.g. "2024/2025"
-            $table->string('jumlah_sks')->nullable();         // e.g. "120"
-            $table->string('ipk')->nullable();                // e.g. "3.75"
+            $table->unsignedSmallInteger('jumlah_sks')->nullable(); // e.g. 120
+            $table->decimal('ipk', 3, 2)->nullable();         // e.g. 3.75
             $table->enum('access_status', [
                 'Unverified',
                 'PendingReview',

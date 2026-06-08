@@ -24,10 +24,10 @@ class Form1SubmissionTest extends TestCase
             'name' => 'Tangguh Dipantara',
             'study_program' => 'Sistem Informasi',
             'email' => 'tangguh@student.bakrie.ac.id',
-            'semester' => '6',
+            'semester' => 6,
             'tahun_akademik' => '2025/2026',
-            'jumlah_sks' => '120',
-            'ipk' => '3.75',
+            'jumlah_sks' => 120,
+            'ipk' => 3.75,
             'access_status' => 'Unverified',
         ]);
 
@@ -51,9 +51,9 @@ class Form1SubmissionTest extends TestCase
 
         $student->refresh();
 
-        $this->assertSame('6', $student->form1_data['semester']);
-        $this->assertSame('120', $student->form1_data['jumlahSKS']);
-        $this->assertSame('3.75', $student->form1_data['ipk']);
+        $this->assertSame(6, $student->form1_data['semester']);
+        $this->assertSame(120, $student->form1_data['jumlahSKS']);
+        $this->assertSame(3.75, $student->form1_data['ipk']);
         $this->assertSame('PendingReview', $student->access_status);
         $this->assertTrue(Storage::disk('local')->exists($student->form1_pdf_path));
     }
@@ -67,10 +67,10 @@ class Form1SubmissionTest extends TestCase
             'name' => 'Mahasiswa Tanpa Transkrip',
             'study_program' => 'Sistem Informasi',
             'email' => 'student@example.test',
-            'semester' => '6',
+            'semester' => 6,
             'tahun_akademik' => '2025/2026',
-            'jumlah_sks' => '120',
-            'ipk' => '3.50',
+            'jumlah_sks' => 120,
+            'ipk' => 3.50,
             'access_status' => 'Unverified',
         ]);
 

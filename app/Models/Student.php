@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Student extends Model
 {
     use SoftDeletes;
+
     protected $fillable = [
         'user_id',
         'dpm_id',
@@ -31,6 +32,9 @@ class Student extends Model
             'form1_data' => 'array',
             'is_independent' => 'boolean',
             'form1_approved_at' => 'datetime',
+            'semester' => 'integer',
+            'jumlah_sks' => 'integer',
+            'ipk' => 'float',
         ];
     }
 
