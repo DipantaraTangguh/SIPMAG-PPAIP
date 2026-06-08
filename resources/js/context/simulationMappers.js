@@ -4,6 +4,7 @@ export function mapStudent(user) {
     const s = user.student;
 
     return {
+        id: s.id,
         name: s.name,
         nim: s.nim,
         programStudi: s.study_program,
