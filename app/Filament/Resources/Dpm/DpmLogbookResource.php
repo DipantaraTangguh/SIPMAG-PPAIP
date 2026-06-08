@@ -9,6 +9,7 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
 
 class DpmLogbookResource extends Resource
 {
@@ -20,11 +21,11 @@ class DpmLogbookResource extends Resource
     protected static ?string $slug = 'dpm/logbooks';
     public static function canAccess(): bool
     {
-        return auth()->user()?->role === 'dpm';
+        return Auth::user()?->role === 'dpm';
     }
     public static function getEloquentQuery(): Builder
     {
-        $lecturerId = auth()->user()?->lecturer?->id;
+        $lecturerId = Auth::user()?->lecturer?->id;
 
         return parent::getEloquentQuery()
             ->where('dpm_id', $lecturerId)

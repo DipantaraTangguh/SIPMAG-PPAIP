@@ -8,6 +8,7 @@ use Filament\Forms;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\Auth;
 
 class LogbooksRelationManager extends RelationManager
 {
@@ -61,10 +62,11 @@ class LogbooksRelationManager extends RelationManager
                     ->color('success')
                     ->visible(fn (Logbook $record) => $record->status === 'PendingReview')
                     ->requiresConfirmation()
-                    ->action(fn (Logbook $record) => app(LogbookReviewService::class)->approve(
-                        $record->id,
-                        auth()->user()->lecturer->id
-                    )),
+                    ->action(function (Logbook $record) {
+                        /** @var \App\Models\User $user */
+                        $user = Auth::user();
+                        app(LogbookReviewService::class)->approve($record->id, $user->lecturer->id);
+                    }),
 
                 // Action reject logbook DPM.
                 Tables\Actions\Action::make('reject')
@@ -75,11 +77,11 @@ class LogbooksRelationManager extends RelationManager
                     ->form([
                         Forms\Components\Textarea::make('note')->label('Catatan Penolakan'),
                     ])
-                    ->action(fn (Logbook $record, array $data) => app(LogbookReviewService::class)->reject(
-                        $record->id,
-                        auth()->user()->lecturer->id,
-                        $data['note'] ?? null
-                    )),
+                    ->action(function (Logbook $record, array $data) {
+                        /** @var \App\Models\User $user */
+                        $user = Auth::user();
+                        app(LogbookReviewService::class)->reject($record->id, $user->lecturer->id, $data['note'] ?? null);
+                    }),
             ])
             ->bulkActions([]);
     }

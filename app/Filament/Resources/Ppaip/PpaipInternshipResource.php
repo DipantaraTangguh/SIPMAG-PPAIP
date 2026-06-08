@@ -8,6 +8,7 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\Auth;
 
 class PpaipInternshipResource extends Resource
 {
@@ -20,7 +21,7 @@ class PpaipInternshipResource extends Resource
 
     public static function canAccess(): bool
     {
-        return auth()->user()?->role === 'ppaip';
+        return Auth::user()?->role === 'ppaip';
     }
 
     public static function form(Form $form): Form

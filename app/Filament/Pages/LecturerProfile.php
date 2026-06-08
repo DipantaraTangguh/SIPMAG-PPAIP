@@ -9,6 +9,8 @@ use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
+use Illuminate\Support\Facades\Auth;
+
 class LecturerProfile extends Page implements HasForms
 {
     use InteractsWithForms;
@@ -24,7 +26,7 @@ class LecturerProfile extends Page implements HasForms
     public ?array $data = [];
     public static function canAccess(): bool
     {
-        $role = auth()->user()?->role;
+        $role = Auth::user()?->role;
         return in_array($role, ['kaprodi', 'dpm']);
     }
     public function mount(): void
@@ -94,6 +96,8 @@ class LecturerProfile extends Page implements HasForms
     }
     private function getLecturer(): Lecturer
     {
-        return auth()->user()->lecturer;
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+        return $user->lecturer;
     }
 }
