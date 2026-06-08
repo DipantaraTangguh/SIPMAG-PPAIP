@@ -10,12 +10,14 @@ import {
     Loader2,
 } from "lucide-react";
 import DashboardLayout from "../../Components/Layouts/DashboardLayout";
-import { useSimulation } from "../../context/SimulationContext";
+import { useAuth } from "../../context/AuthContext";
+import { useForm2Workflow } from "../../context/StudentWorkflowContext";
 import { canSubmitForm2 } from "../../utils/accessUtils";
 
 export default function Form2NewPage() {
     const navigate = useNavigate();
-    const { submitForm2, student } = useSimulation();
+    const { student } = useAuth();
+    const { submitForm2 } = useForm2Workflow();
 
     // Guard keras: Form 2 jangan kebuka sebelum Form 1 approved.
     useEffect(() => {

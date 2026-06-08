@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { BookOpen, Info, Plus, GraduationCap, X } from 'lucide-react';
-import { useSimulation } from '../../../context/SimulationContext';
+import { useLogbookWorkflow } from '../../../context/StudentWorkflowContext';
 
 const formatLogbookDate = (dateStr) => {
     if (!dateStr) return '';
@@ -37,7 +37,7 @@ export default function LogbookTabContent() {
         logbookPeriod,
         addLogbookEntry,
         updateLogbookEntry,
-    } = useSimulation();
+    } = useLogbookWorkflow();
 
     const [showAddModal, setShowAddModal] = useState(false);
     const [editEntry, setEditEntry] = useState(null);

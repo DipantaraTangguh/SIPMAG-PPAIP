@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useSimulation } from "../../context/SimulationContext";
+import { useAuth } from "../../context/AuthContext";
 import { FullScreenSpinner } from "../../Components/Elements/LoadingSpinner";
 import {
     User,
@@ -12,7 +12,7 @@ import {
     XCircle,
 } from "lucide-react";
 export default function LoginPage() {
-    const { login } = useSimulation();
+    const { login } = useAuth();
     const navigate = useNavigate();
 
     const [nim, setNim] = useState("");

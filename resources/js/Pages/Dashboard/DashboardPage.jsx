@@ -1,6 +1,11 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useSimulation } from '../../context/SimulationContext';
+import { useAuth } from '../../context/AuthContext';
+import {
+    useDefenseWorkflow,
+    useLogbookWorkflow,
+    useWorkflowNotifications,
+} from '../../context/StudentWorkflowContext';
 import DashboardLayout from '../../Components/Layouts/DashboardLayout';
 
 import WelcomeBanner from '../../Components/Fragments/dashboard/WelcomeBanner';
@@ -38,7 +43,10 @@ function deriveStep(status) {
 }
 
 export default function DashboardPage() {
-    const { student, notifications, logbookEntries, sidangSchedule } = useSimulation();
+    const { student } = useAuth();
+    const { notifications } = useWorkflowNotifications();
+    const { logbookEntries } = useLogbookWorkflow();
+    const { sidangSchedule } = useDefenseWorkflow();
     const navigate = useNavigate();
 
     const name = student?.name;

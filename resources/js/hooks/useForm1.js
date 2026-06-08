@@ -1,9 +1,11 @@
 import { useState, useCallback, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useSimulation } from '../context/SimulationContext';
+import { useAuth } from '../context/AuthContext';
+import { useForm1Workflow } from '../context/StudentWorkflowContext';
 
 export default function useForm1() {
-    const { student, submitForm1 } = useSimulation();
+    const { student } = useAuth();
+    const { submitForm1 } = useForm1Workflow();
     const navigate = useNavigate();
     const location = useLocation();
     const readOnlyFields = useMemo(

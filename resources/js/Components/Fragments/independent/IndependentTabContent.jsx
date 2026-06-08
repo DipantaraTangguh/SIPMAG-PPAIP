@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useSimulation } from '../../../context/SimulationContext';
+import { useAuth } from '../../../context/AuthContext';
+import { useForm2Workflow } from '../../../context/StudentWorkflowContext';
 import { Info } from 'lucide-react';
 import IndependentInfoBanner from './IndependentInfoBanner';
 import IndependentSectionHeader from './IndependentSectionHeader';
@@ -12,7 +13,8 @@ import { canAccessPortal } from '../../../utils/accessUtils';
 export default function IndependentTabContent() {
     const navigate = useNavigate();
     const location = useLocation();
-    const { form2Submissions, student } = useSimulation();
+    const { student } = useAuth();
+    const { form2Submissions } = useForm2Workflow();
 
     const submissions = form2Submissions || [];
     const accessStatus = student?.accessStatus;

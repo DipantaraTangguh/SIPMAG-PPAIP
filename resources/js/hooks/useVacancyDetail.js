@@ -1,9 +1,11 @@
 import { useState, useCallback, useMemo } from 'react';
-import { useSimulation } from '../context/SimulationContext';
+import { useAuth } from '../context/AuthContext';
+import { useApplicationWorkflow } from '../context/StudentWorkflowContext';
 import { canAccessPortal } from '../utils/accessUtils';
 
 export default function useVacancyDetail(vacancy) {
-    const { student, activeApplications, applyToVacancy } = useSimulation();
+    const { student } = useAuth();
+    const { activeApplications, applyToVacancy } = useApplicationWorkflow();
 
     const [cvFile, setCvFile] = useState(null);
     const [cvError, setCvError] = useState(null);

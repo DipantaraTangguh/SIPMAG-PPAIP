@@ -1,12 +1,14 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
-import { useSimulation } from '../../context/SimulationContext';
+import { useAuth } from '../../context/AuthContext';
+import { useForm1Workflow } from '../../context/StudentWorkflowContext';
 import DashboardLayout from '../../Components/Layouts/DashboardLayout';
 import Form1SubmittedData from '../../Components/Fragments/form1/Form1SubmittedData';
 import Form1StatusPanel from '../../Components/Fragments/form1/Form1StatusPanel';
 
 export default function Form1StatusPage() {
-    const { form1Submission, student } = useSimulation();
+    const { student } = useAuth();
+    const { form1Submission } = useForm1Workflow();
 
     // Redirect balik hanya kalau memang belum pernah submit Form 1.
     // Pakai accessStatus karena setState bisa telat masuk setelah submit.

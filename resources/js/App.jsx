@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
-import { SimulationProvider } from './context/SimulationContext';
+import { AppProvider } from './context/AppContext';
 import ErrorBoundary from './Components/Layouts/ErrorBoundary';
 import ProtectedRoute from './Components/Layouts/ProtectedRoute';
 import GuestRoute from './Components/Layouts/GuestRoute';
@@ -18,9 +18,9 @@ import InternshipDefensePage from './Pages/Defense/InternshipDefensePage';
 
 export default function App() {
     return (
-        // Root boundary — last-resort catch for SimulationProvider / BrowserRouter errors.
+        // Root boundary — last-resort catch for AppProvider / BrowserRouter errors.
         <ErrorBoundary>
-            <SimulationProvider>
+            <AppProvider>
                 <BrowserRouter>
                     <Routes>
                         {/* Auth route — isolated so a login-page crash can't block recovery */}
@@ -104,7 +104,7 @@ export default function App() {
                         <Route path="*" element={<Navigate to="/dashboard" replace />} />
                     </Routes>
                 </BrowserRouter>
-            </SimulationProvider>
+            </AppProvider>
         </ErrorBoundary>
     );
 }

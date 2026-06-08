@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useSimulation } from '../../context/SimulationContext';
+import { useAuth } from '../../context/AuthContext';
+import { useApplicationWorkflow } from '../../context/StudentWorkflowContext';
 import { canAccessPortal } from '../../utils/accessUtils';
 import { api } from '../../lib/api';
 import { Info, FileText } from 'lucide-react';
@@ -56,7 +57,8 @@ const mockActiveApplications = [
     },
 ];
 export default function InternshipPortalPage() {
-    const { student, activeApplications } = useSimulation();
+    const { student } = useAuth();
+    const { activeApplications } = useApplicationWorkflow();
     const navigate = useNavigate();
     const location = useLocation();
     const accessStatus = student?.accessStatus;

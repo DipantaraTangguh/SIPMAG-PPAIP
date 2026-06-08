@@ -1,13 +1,13 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
-import { useSimulation } from '../../context/SimulationContext';
+import { useAuth } from '../../context/AuthContext';
 import DashboardLayout from '../../Components/Layouts/DashboardLayout';
 import Form1Card from '../../Components/Fragments/form1/Form1Card';
 import useForm1 from '../../hooks/useForm1';
 import { FullScreenSpinner } from '../../Components/Elements/LoadingSpinner';
 
 export default function Form1Page() {
-    const { student } = useSimulation();
+    const { student } = useAuth();
     const form1 = useForm1();
 
     // Form 1 cuma bisa diisi ulang kalau belum valid atau habis ditolak.

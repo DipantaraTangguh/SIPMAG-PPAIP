@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Lock, CloudUpload, ArrowRight, Info, BookOpen, FileSearch, X } from 'lucide-react';
-import { useSimulation } from '../../../context/SimulationContext';
+import { useAuth } from '../../../context/AuthContext';
 
 export default function SupervisorRequestForm({ onSubmit }) {
-    const { student } = useSimulation();
+    const { student } = useAuth();
     const navigate = useNavigate();
 
     const [formData, setFormData] = useState({

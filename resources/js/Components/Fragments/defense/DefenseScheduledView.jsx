@@ -1,9 +1,9 @@
 import React from 'react';
 import { CalendarCheck } from 'lucide-react';
-import { useSimulation } from '../../../context/SimulationContext';
+import { useDefenseWorkflow } from '../../../context/StudentWorkflowContext';
 
 export default function DefenseScheduledView() {
-    const { sidangSchedule } = useSimulation();
+    const { sidangSchedule } = useDefenseWorkflow();
 
     // Safety net kalau context kosong di luar flow normal.
     const schedule = sidangSchedule || {

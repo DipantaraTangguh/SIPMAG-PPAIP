@@ -11,7 +11,7 @@ import {
     AlertCircle,
     Loader2,
 } from 'lucide-react';
-import { useSimulation } from '../../../context/SimulationContext';
+import { useDefenseWorkflow } from '../../../context/StudentWorkflowContext';
 
 // Komponen upload kecil, sengaja lokal ke form sidang.
 function UploadField({ label, hint, icon: Icon, fieldKey, files, setFiles, fileErrors, setFileErrors, dragOver, setDragOver, inputRefs, maxSizeMB }) {
@@ -135,7 +135,7 @@ function UploadField({ label, hint, icon: Icon, fieldKey, files, setFiles, fileE
 
 // View utama buat upload berkas sidang.
 export default function DefenseFormView() {
-    const { submitSidang } = useSimulation();
+    const { submitSidang } = useDefenseWorkflow();
 
     const [files, setFiles] = useState({
         laporanAkhir: null,

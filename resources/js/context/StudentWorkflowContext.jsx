@@ -1,12 +1,18 @@
 import React, { createContext, useContext, useState, useMemo, useCallback, useEffect } from 'react';
 import { api } from '../lib/api';
+import { useAuth } from './AuthContext';
+import { mapForm2Submission } from './simulationMappers';
 
-const SimulationContext = createContext(null);
+const StudentWorkflowContext = createContext(null);
+const Form1Context = createContext(null);
+const ApplicationContext = createContext(null);
+const Form2Context = createContext(null);
+const GuidanceContext = createContext(null);
+const LogbookContext = createContext(null);
+const DefenseContext = createContext(null);
+const WorkflowNotificationsContext = createContext(null);
 
 const EMPTY_STATE = {
-    isLoggedIn: false,
-    isLoading: true,
-    student: null,
     form1Submission: null,
     form2Submissions: [],
     pengajuanPembimbing: null,
@@ -18,84 +24,15 @@ const EMPTY_STATE = {
     notifications: [],
 };
 
-export function SimulationProvider({ children }) {
+export function StudentWorkflowProvider({ children }) {
     const [state, setState] = useState(EMPTY_STATE);
-    useEffect(() => {
-        const boot = async () => {
-            try {
-                const { user } = await api.get('/me');
-                setState((s) => ({
-                    ...s,
-                    isLoggedIn: true,
-                    isLoading: false,
-                    student: mapStudent(user),
-                }));
-                // Ambil modul barengan biar dashboard nggak nunggu satu-satu.
-                if (user.role === 'mahasiswa') {
-                    fetchAllStudentData();
-                }
-            } catch {
-                setState((s) => ({ ...s, isLoading: false }));
-            }
-        };
-        boot();
-    }, []);
-    function mapStudent(user) {
-        if (!user || !user.student) return null;
-        const s = user.student;
-        return {
-            name: s.name,
-            nim: s.nim,
-            programStudi: s.study_program,
-            email: s.email,
-            semester: s.semester,
-            tahunAkademik: s.tahun_akademik,
-            jumlahSks: s.jumlah_sks,
-            ipk: s.ipk,
-            accessStatus: s.access_status,
-            approvedLogbookCount: s.approved_logbook_count,
-            dpm: s.dpm ? {
-                name: s.dpm.name,
-                nidn: s.dpm.nidn,
-                email: s.dpm.contact,
-                initials: s.dpm.name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase(),
-            } : null,
-        };
-    }
-    function mapForm2Submission(s) {
-        if (!s) return s;
-        const statusMap = {
-            PendingReview:  'Menunggu Review',
-            ApprovedForm2:  'Disetujui',
-            RejectedForm2:  'Ditolak',
-        };
-        const submittedAt = s.submitted_at
-            ? new Date(s.submitted_at).toLocaleDateString('id-ID', {
-                day: 'numeric', month: 'short', year: 'numeric',
-            })
-            : null;
-        return {
-            id: s.id,
-            companyName: s.company_name,
-            position: s.lingkup_magang,
-            alamatPerusahaan: s.alamat_perusahaan,
-            tanggalMulai: s.tanggal_mulai,
-            tanggalSelesai: s.tanggal_selesai,
-            status: statusMap[s.status] || s.status,
-            submittedAt,
-            rejectionReason: s.rejection_reason,
-            pdfPath: s.pdf_path,
-        };
-    }
-    const refreshProfile = useCallback(async () => {
-        try {
-            const { user } = await api.get('/me');
-            setState((s) => ({
-                ...s,
-                student: mapStudent(user),
-            }));
-        } catch { /* aman di-skip */ }
-    }, []);
+    const {
+        isLoggedIn,
+        userRole,
+        student,
+        refreshProfile,
+        updateStudentLocally,
+    } = useAuth();
     const fetchAllStudentData = useCallback(async () => {
         try {
             const [form1Res, appsRes, form2Res, logbookRes, sidangRes, supervisorRes] = await Promise.allSettled([
@@ -197,34 +134,23 @@ export function SimulationProvider({ children }) {
             }));
         } catch { /* biarin lanjut walau sebagian gagal */ }
     }, []);
-    const login = useCallback(async (loginId, password) => {
-        try {
-            const data = await api.login(loginId, password);
-            const student = mapStudent(data.user);
-            setState((s) => ({
-                ...s,
-                isLoggedIn: true,
-                student,
-            }));
-            // Setelah login, refresh semua state utama.
-            if (data.user.role === 'mahasiswa') {
-                setTimeout(() => fetchAllStudentData(), 100);
-            }
-            return { success: true };
-        } catch (err) {
-            return { success: false, error: err.message };
-        }
-    }, [fetchAllStudentData]);
 
-    const logout = useCallback(async () => {
-        await api.logout();
-        setState(EMPTY_STATE);
-        setState((s) => ({ ...s, isLoading: false }));
-    }, []);
+    useEffect(() => {
+        if (!isLoggedIn) {
+            setState(EMPTY_STATE);
+            return;
+        }
+
+        if (userRole === 'mahasiswa') {
+            fetchAllStudentData();
+        }
+    }, [fetchAllStudentData, isLoggedIn, userRole]);
+
     const submitForm1 = useCallback(async (formData) => {
         try {
             await api.upload('/form1', formData);
             await refreshProfile();
+            updateStudentLocally({ accessStatus: 'PendingReview' });
             const form1Res = await api.get('/form1');
             setState((s) => ({
                 ...s,
@@ -238,7 +164,6 @@ export function SimulationProvider({ children }) {
                         ? new Date(form1Res.submitted_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })
                         : null,
                 },
-                student: { ...s.student, accessStatus: 'PendingReview' },
                 notifications: [
                     { id: Date.now(), message: 'Form 1 berhasil diajukan. Menunggu persetujuan Kaprodi.', time: 'Baru saja' },
                     ...s.notifications,
@@ -247,7 +172,7 @@ export function SimulationProvider({ children }) {
         } catch (err) {
             throw err;
         }
-    }, [refreshProfile]);
+    }, [refreshProfile, updateStudentLocally]);
 
     const resetForm1 = useCallback(async () => {
         await refreshProfile();
@@ -270,9 +195,9 @@ export function SimulationProvider({ children }) {
         const data = await api.upload('/applications', formData);
         const app = data.application;
 
+        updateStudentLocally({ accessStatus: 'HasApplication' });
         setState((s) => ({
             ...s,
-            student: { ...s.student, accessStatus: 'HasApplication' },
             activeApplications: [
                 ...s.activeApplications,
                 {
@@ -286,7 +211,7 @@ export function SimulationProvider({ children }) {
             ],
         }));
         await refreshProfile();
-    }, [refreshProfile]);
+    }, [refreshProfile, updateStudentLocally]);
     const submitForm2 = useCallback(async (formData) => {
         const payload = {
             company_name:      formData.namaPerusahaan,
@@ -400,17 +325,17 @@ export function SimulationProvider({ children }) {
 
         await api.upload('/defense', fd);
         await refreshProfile();
+        updateStudentLocally({ accessStatus: 'MenungguSidang' });
 
         setState((s) => ({
             ...s,
-            student: { ...s.student, accessStatus: 'MenungguSidang' },
             sidangSubmission: { status: 'Pending', submittedAt: new Date().toISOString() },
             notifications: [
                 { id: Date.now(), message: 'Dokumen sidang berhasil dikirim.', time: 'Baru saja' },
                 ...s.notifications,
             ],
         }));
-    }, [refreshProfile]);
+    }, [refreshProfile, updateStudentLocally]);
 
     const notifications = useMemo(() => {
         const list = [];
@@ -418,20 +343,20 @@ export function SimulationProvider({ children }) {
         // Form 1 jadi sumber status akademik awal.
         if (state.form1Submission) {
             const dateStr = state.form1Submission.submittedAt ? ` pada ${state.form1Submission.submittedAt}` : '';
-            if (state.student?.accessStatus === 'PendingReview') {
+            if (student?.accessStatus === 'PendingReview') {
                 list.push({
                     message: `Form 1 Anda berhasil diajukan${dateStr}. Menunggu persetujuan Kaprodi.`,
                     time: state.form1Submission.submittedAt || 'Baru saja',
                 });
-            } else if (state.student?.accessStatus === 'RejectedForm1') {
+            } else if (student?.accessStatus === 'RejectedForm1') {
                 list.push({
                     message: `Form 1 Anda ditolak/perlu direvisi oleh Kaprodi${state.form1Submission.rejectionReason ? `: "${state.form1Submission.rejectionReason}"` : '.'}`,
                     time: 'Baru saja',
                 });
             } else if (
-                state.student?.accessStatus !== 'Unverified' &&
-                state.student?.accessStatus !== 'RejectedForm1' &&
-                state.student?.accessStatus !== 'PendingReview'
+                student?.accessStatus !== 'Unverified' &&
+                student?.accessStatus !== 'RejectedForm1' &&
+                student?.accessStatus !== 'PendingReview'
             ) {
                 list.push({
                     message: 'Form 1 Anda telah disetujui oleh Kaprodi. Surat keterangan siap diunduh.',
@@ -480,9 +405,9 @@ export function SimulationProvider({ children }) {
 
         // Bagian bimbingan mulai setelah perusahaan/praktisi valid.
         if (state.pengajuanPembimbing) {
-            if (state.student?.dpm) {
+            if (student?.dpm) {
                 list.push({
-                    message: `Dosen Pembimbing Magang (DPM) Anda telah ditetapkan: ${state.student.dpm.name}.`,
+                    message: `Dosen Pembimbing Magang (DPM) Anda telah ditetapkan: ${student.dpm.name}.`,
                     time: state.pengajuanPembimbing.submittedAt || 'Baru saja',
                 });
             } else {
@@ -527,7 +452,7 @@ export function SimulationProvider({ children }) {
             }
         }
 
-        if (state.student?.accessStatus === 'SiklusSelesai') {
+        if (student?.accessStatus === 'SiklusSelesai') {
             list.push({
                 message: 'Selamat! Siklus magang Anda telah selesai. Terima kasih atas dedikasi Anda.',
                 time: 'Baru saja',
@@ -544,13 +469,54 @@ export function SimulationProvider({ children }) {
         state.sidangSubmission,
         state.sidangSchedule,
         state.pengajuanPembimbing,
-        state.student
+        student
     ]);
+    const form1Value = useMemo(() => ({
+        form1Submission: state.form1Submission,
+        submitForm1,
+        resetForm1,
+    }), [state.form1Submission, submitForm1, resetForm1]);
+
+    const applicationValue = useMemo(() => ({
+        activeApplications: state.activeApplications,
+        applyToVacancy,
+    }), [state.activeApplications, applyToVacancy]);
+
+    const form2Value = useMemo(() => ({
+        form2Submissions: state.form2Submissions,
+        submitForm2,
+    }), [state.form2Submissions, submitForm2]);
+
+    const guidanceValue = useMemo(() => ({
+        pengajuanPembimbing: state.pengajuanPembimbing,
+        submitPengajuanPembimbing,
+    }), [state.pengajuanPembimbing, submitPengajuanPembimbing]);
+
+    const logbookValue = useMemo(() => ({
+        logbookEntries: state.logbookEntries,
+        logbookPeriod: state.logbookPeriod,
+        addLogbookEntry,
+        updateLogbookEntry,
+    }), [
+        state.logbookEntries,
+        state.logbookPeriod,
+        addLogbookEntry,
+        updateLogbookEntry,
+    ]);
+
+    const defenseValue = useMemo(() => ({
+        sidangSubmission: state.sidangSubmission,
+        sidangSchedule: state.sidangSchedule,
+        submitSidang,
+    }), [state.sidangSubmission, state.sidangSchedule, submitSidang]);
+
+    const notificationValue = useMemo(() => ({
+        notifications,
+    }), [notifications]);
+
     const value = useMemo(() => ({
         ...state,
         notifications,
-        login,
-        logout,
         submitForm1,
         resetForm1,
         applyToVacancy,
@@ -563,21 +529,67 @@ export function SimulationProvider({ children }) {
         refreshProfile,
         fetchAllStudentData,
     }), [
-        state, notifications, login, logout, submitForm1, resetForm1,
+        state, notifications, submitForm1, resetForm1,
         applyToVacancy, submitForm2, submitPengajuanPembimbing,
         addLogbookEntry, updateLogbookEntry, submitSidang,
         refreshProfile, fetchAllStudentData,
     ]);
 
     return (
-        <SimulationContext.Provider value={value}>
-            {children}
-        </SimulationContext.Provider>
+        <StudentWorkflowContext.Provider value={value}>
+            <Form1Context.Provider value={form1Value}>
+                <ApplicationContext.Provider value={applicationValue}>
+                    <Form2Context.Provider value={form2Value}>
+                        <GuidanceContext.Provider value={guidanceValue}>
+                            <LogbookContext.Provider value={logbookValue}>
+                                <DefenseContext.Provider value={defenseValue}>
+                                    <WorkflowNotificationsContext.Provider value={notificationValue}>
+                                        {children}
+                                    </WorkflowNotificationsContext.Provider>
+                                </DefenseContext.Provider>
+                            </LogbookContext.Provider>
+                        </GuidanceContext.Provider>
+                    </Form2Context.Provider>
+                </ApplicationContext.Provider>
+            </Form1Context.Provider>
+        </StudentWorkflowContext.Provider>
     );
 }
 
-export function useSimulation() {
-    const ctx = useContext(SimulationContext);
-    if (!ctx) throw new Error('useSimulation must be used within SimulationProvider');
+function useRequiredContext(context, hookName) {
+    const ctx = useContext(context);
+    if (!ctx) throw new Error(`${hookName} must be used within StudentWorkflowProvider`);
     return ctx;
+}
+
+export function useStudentWorkflow() {
+    return useRequiredContext(StudentWorkflowContext, 'useStudentWorkflow');
+}
+
+export function useForm1Workflow() {
+    return useRequiredContext(Form1Context, 'useForm1Workflow');
+}
+
+export function useApplicationWorkflow() {
+    return useRequiredContext(ApplicationContext, 'useApplicationWorkflow');
+}
+
+export function useForm2Workflow() {
+    return useRequiredContext(Form2Context, 'useForm2Workflow');
+}
+
+export function useGuidanceWorkflow() {
+    return useRequiredContext(GuidanceContext, 'useGuidanceWorkflow');
+}
+
+export function useLogbookWorkflow() {
+    return useRequiredContext(LogbookContext, 'useLogbookWorkflow');
+}
+
+export function useDefenseWorkflow() {
+    return useRequiredContext(DefenseContext, 'useDefenseWorkflow');
+}
+
+export function useWorkflowNotifications() {
+    return useRequiredContext(WorkflowNotificationsContext, 'useWorkflowNotifications');
 }

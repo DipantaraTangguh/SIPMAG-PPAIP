@@ -1,17 +1,18 @@
 import React, { useState } from 'react';
 import { Clock } from 'lucide-react';
-import { useSimulation } from '../../../context/SimulationContext';
+import { useAuth } from '../../../context/AuthContext';
+import { useGuidanceWorkflow } from '../../../context/StudentWorkflowContext';
 import SupervisorRequestForm from './SupervisorRequestForm';
 import RequestSubmittedView from './RequestSubmittedView';
 import DpmAssignedView from './DpmAssignedView';
 import LogbookTabContent from './LogbookTabContent';
 
 export default function GuidanceFullPage() {
+    const { student } = useAuth();
     const {
-        student,
         pengajuanPembimbing,
-        submitPengajuanPembimbing
-    } = useSimulation();
+        submitPengajuanPembimbing,
+    } = useGuidanceWorkflow();
 
     const [activeTab, setActiveTab] = useState('pengajuan');
 

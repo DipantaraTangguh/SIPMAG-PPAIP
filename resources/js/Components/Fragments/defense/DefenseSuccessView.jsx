@@ -1,9 +1,11 @@
 import React from 'react';
 import { Clock } from 'lucide-react';
-import { useSimulation } from '../../../context/SimulationContext';
+import { useAuth } from '../../../context/AuthContext';
+import { useApplicationWorkflow } from '../../../context/StudentWorkflowContext';
 
 export default function DefenseSuccessView() {
-    const { student, activeApplications } = useSimulation();
+    const { student } = useAuth();
+    const { activeApplications } = useApplicationWorkflow();
 
     const acceptedApp = activeApplications?.find(a => a.status === 'Diterima') || {
         company: 'Traveloka Indonesia',

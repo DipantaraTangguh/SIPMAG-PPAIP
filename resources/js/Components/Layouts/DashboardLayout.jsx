@@ -1,5 +1,5 @@
 import React from 'react';
-import { useSimulation } from '../../context/SimulationContext';
+import { useAuth } from '../../context/AuthContext';
 import Sidebar from './Sidebar';
 import PageTransition from './PageTransition';
 
@@ -8,7 +8,7 @@ export default function DashboardLayout({
     pageTitle = 'Sistem Informasi Portal Magang',
     activePath,
 }) {
-    const { student, logout } = useSimulation();
+    const { student, logout } = useAuth();
 
     const studentName = student?.name ?? '—';
     const nim = student?.nim ?? '—';

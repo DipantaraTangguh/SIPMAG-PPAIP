@@ -1,9 +1,15 @@
 import React from 'react';
 import { GraduationCap } from 'lucide-react';
-import { useSimulation } from '../../../context/SimulationContext';
+import { useAuth } from '../../../context/AuthContext';
+import {
+    useGuidanceWorkflow,
+    useLogbookWorkflow,
+} from '../../../context/StudentWorkflowContext';
 
 export default function DefenseCompletedView() {
-    const { student, pengajuanPembimbing, logbookEntries } = useSimulation();
+    const { student } = useAuth();
+    const { pengajuanPembimbing } = useGuidanceWorkflow();
+    const { logbookEntries } = useLogbookWorkflow();
 
     const perusahaan = pengajuanPembimbing?.namaPerusahaan || 'Perusahaan Magang';
     const posisi = pengajuanPembimbing?.lingkupMagang || pengajuanPembimbing?.jabatanPraktisi || 'Peserta Magang';

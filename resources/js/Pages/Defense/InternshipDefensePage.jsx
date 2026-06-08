@@ -1,6 +1,7 @@
 import React from 'react';
 import DashboardLayout from '../../Components/Layouts/DashboardLayout';
-import { useSimulation } from '../../context/SimulationContext';
+import { useAuth } from '../../context/AuthContext';
+import { useDefenseWorkflow } from '../../context/StudentWorkflowContext';
 import { canAccessSidang } from '../../utils/accessUtils';
 import DefenseLockedState from '../../Components/Fragments/defense/DefenseLockedState';
 import DefenseFormView from '../../Components/Fragments/defense/DefenseFormView';
@@ -9,7 +10,8 @@ import DefenseScheduledView from '../../Components/Fragments/defense/DefenseSche
 import DefenseCompletedView from '../../Components/Fragments/defense/DefenseCompletedView';
 
 export default function InternshipDefensePage() {
-    const { student, sidangSubmission, sidangSchedule } = useSimulation();
+    const { student } = useAuth();
+    const { sidangSubmission, sidangSchedule } = useDefenseWorkflow();
     const accessStatus = student?.accessStatus;
 
     // View sidang cukup ngikut context biar state nggak dobel.
