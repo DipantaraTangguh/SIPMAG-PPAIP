@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useMemo, useCallback, useEffect } from 'react';
+import React, { createContext, useContext, useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { api } from '../lib/api';
 import { useAuth } from './AppContext';
 import { mapForm2Submission } from './simulationMappers';
@@ -26,7 +26,9 @@ const EMPTY_STATE = {
 
 export function StudentWorkflowProvider({ children }) {
     const [state, setState] = useState(EMPTY_STATE);
+    const fetchRunRef = useRef(0);
     const {
+        isLoading,
         isLoggedIn,
         userRole,
         student,
@@ -34,6 +36,8 @@ export function StudentWorkflowProvider({ children }) {
         updateStudentLocally,
     } = useAuth();
     const fetchAllStudentData = useCallback(async () => {
+        const fetchRun = ++fetchRunRef.current;
+
         try {
             const [form1Res, appsRes, form2Res, logbookRes, sidangRes, supervisorRes] = await Promise.allSettled([
                 api.get('/form1'),
@@ -43,6 +47,10 @@ export function StudentWorkflowProvider({ children }) {
                 api.get('/defense'),
                 api.get('/supervisor-application'),
             ]);
+
+            if (fetchRun !== fetchRunRef.current) {
+                return;
+            }
 
             setState((s) => ({
                 ...s,
@@ -136,15 +144,20 @@ export function StudentWorkflowProvider({ children }) {
     }, []);
 
     useEffect(() => {
+        if (isLoading) {
+            return;
+        }
+
         if (!isLoggedIn) {
+            fetchRunRef.current += 1;
             setState(EMPTY_STATE);
             return;
         }
 
-        if (userRole === 'mahasiswa') {
+        if (userRole === 'mahasiswa' && student?.id) {
             fetchAllStudentData();
         }
-    }, [fetchAllStudentData, isLoggedIn, userRole]);
+    }, [fetchAllStudentData, isLoading, isLoggedIn, student?.id, userRole]);
 
     const submitForm1 = useCallback(async (formData) => {
         try {
