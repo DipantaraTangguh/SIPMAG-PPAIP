@@ -33,7 +33,10 @@ export default function Sidebar({ nim = '—', onLogout, activePath }) {
                 </h1>
                 <span className="text-xs text-white/60">by PPAIP</span>
             </div>
-            <nav className="flex min-w-0 flex-1 items-stretch justify-around gap-0 overflow-x-auto px-1 lg:flex-col lg:justify-start lg:gap-1 lg:px-3">
+            <nav 
+                aria-label="Navigasi Utama"
+                className="flex min-w-0 flex-1 items-stretch justify-around gap-0 overflow-x-auto px-1 lg:flex-col lg:justify-start lg:gap-1 lg:px-3"
+            >
                 {navItems.map(({ to, label, icon: Icon }) => {
                     const active = isActive(to);
 
@@ -41,6 +44,7 @@ export default function Sidebar({ nim = '—', onLogout, activePath }) {
                         <NavLink
                             key={to}
                             to={to}
+                            aria-current={active ? 'page' : undefined}
                             className={`
                                 group flex min-w-[68px] flex-1 flex-col items-center justify-center gap-1 rounded-lg px-2 py-2
                                 text-[10px] font-medium leading-tight transition-colors duration-150
@@ -65,6 +69,7 @@ export default function Sidebar({ nim = '—', onLogout, activePath }) {
                 <button
                     type="button"
                     onClick={onLogout}
+                    aria-label="Keluar dari akun"
                     className="flex items-center gap-2 text-sm text-white/60 transition-colors hover:text-white"
                 >
                     <LogOut className="h-4 w-4" />

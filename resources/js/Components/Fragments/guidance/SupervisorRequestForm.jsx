@@ -123,94 +123,108 @@ export default function SupervisorRequestForm({ onSubmit }) {
                         </div>
                         <div className="border-b border-gray-100"></div>
                         <div>
-                            <label className="mb-1.5 block text-[11px] font-medium uppercase tracking-wider text-gray-400">
+                            <label htmlFor="namaPerusahaan" className="mb-1.5 block text-[11px] font-medium uppercase tracking-wider text-gray-400">
                                 NAMA PERUSAHAAN
                             </label>
                             <input
+                                id="namaPerusahaan"
                                 type="text"
                                 name="namaPerusahaan"
                                 value={formData.namaPerusahaan}
                                 onChange={handleChange}
+                                aria-required="true"
                                 placeholder="contoh: PT Gojek Tokopedia TBK"
                                 className="h-11 w-full rounded-lg border border-gray-200 px-3 outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/10"
                             />
                         </div>
                         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                             <div>
-                                <label className="mb-1.5 block text-[11px] font-medium uppercase tracking-wider text-gray-400">
+                                <label htmlFor="namaPraktisi" className="mb-1.5 block text-[11px] font-medium uppercase tracking-wider text-gray-400">
                                     NAMA PRAKTISI PEMBIMBING MAGANG
                                 </label>
                                 <input
+                                    id="namaPraktisi"
                                     type="text"
                                     name="namaPraktisi"
                                     value={formData.namaPraktisi}
                                     placeholder="contoh: Budi Santoso"
                                     onChange={handleChange}
+                                    aria-required="true"
                                     className="h-11 w-full rounded-lg border border-gray-200 px-3 outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/10"
                                 />
                             </div>
                             <div>
-                                <label className="mb-1.5 block text-[11px] font-medium uppercase tracking-wider text-gray-400">
+                                <label htmlFor="jabatanPraktisi" className="mb-1.5 block text-[11px] font-medium uppercase tracking-wider text-gray-400">
                                     JABATAN PRAKTISI PEMBIMBING MAGANG
                                 </label>
                                 <input
+                                    id="jabatanPraktisi"
                                     type="text"
                                     name="jabatanPraktisi"
                                     value={formData.jabatanPraktisi}
                                     placeholder="contoh: Supervisor"
                                     onChange={handleChange}
+                                    aria-required="true"
                                     className="h-11 w-full rounded-lg border border-gray-200 px-3 outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/10"
                                 />
                             </div>
                         </div>
                         <div>
-                            <label className="mb-1.5 block text-[11px] font-medium uppercase tracking-wider text-gray-400">
+                            <label htmlFor="noTelepon" className="mb-1.5 block text-[11px] font-medium uppercase tracking-wider text-gray-400">
                                 NOMOR TELEPON PRAKTISI PEMBIMBING MAGANG
                             </label>
                             <input
+                                id="noTelepon"
                                 type="text"
                                 name="noTelepon"
                                 value={formData.noTelepon}
                                 placeholder="contoh: 08123456789"
                                 onChange={handleChange}
+                                aria-required="true"
                                 className="h-11 w-full rounded-lg border border-gray-200 px-3 outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/10"
                             />
                         </div>
                         <div>
-                            <label className="mb-1.5 block text-[11px] font-medium uppercase tracking-wider text-gray-400">
+                            <label htmlFor="email" className="mb-1.5 block text-[11px] font-medium uppercase tracking-wider text-gray-400">
                                 EMAIL PRAKTISI PEMBIMBING MAGANG
                             </label>
                             <input
+                                id="email"
                                 type="email"
                                 name="email"
                                 value={formData.email}
                                 onChange={handleChange}
                                 placeholder="contoh: budisantoso@gmail.com"
+                                aria-required="true"
                                 className="h-11 w-full rounded-lg border border-gray-200 px-3 outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/10"
                             />
                         </div>
                          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                             <div>
-                                <label className="mb-1.5 block text-[11px] font-medium uppercase tracking-wider text-gray-400">
+                                <label htmlFor="mulaiMagang" className="mb-1.5 block text-[11px] font-medium uppercase tracking-wider text-gray-400">
                                     MULAI MAGANG
                                 </label>
                                 <input
+                                    id="mulaiMagang"
                                     type="date"
                                     name="mulaiMagang"
                                     value={formData.mulaiMagang}
                                     onChange={handleChange}
+                                    aria-required="true"
                                     className="h-11 w-full rounded-lg border border-gray-200 px-3 outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/10"
                                 />
                             </div>
                             <div>
-                                <label className="mb-1.5 block text-[11px] font-medium uppercase tracking-wider text-gray-400">
+                                <label htmlFor="selesaiMagang" className="mb-1.5 block text-[11px] font-medium uppercase tracking-wider text-gray-400">
                                     SELESAI MAGANG
                                 </label>
                                 <input
+                                    id="selesaiMagang"
                                     type="date"
                                     name="selesaiMagang"
                                     value={formData.selesaiMagang}
                                     onChange={handleChange}
+                                    aria-required="true"
                                     className="h-11 w-full rounded-lg border border-gray-200 px-3 outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/10"
                                 />
                             </div>
@@ -225,7 +239,9 @@ export default function SupervisorRequestForm({ onSubmit }) {
                                         onDrop={handleDrop}
                                         onDragOver={handleDragOver}
                                         onDragLeave={handleDragLeave}
-                                        className={`flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed p-6 text-center transition-colors sm:p-8 ${
+                                        aria-invalid={!!fileError}
+                                        aria-describedby={fileError ? 'loaFile-error' : undefined}
+                                        className={`flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed p-6 text-center transition-colors focus-within:ring-2 focus-within:ring-primary/20 sm:p-8 ${
                                             isDragging ? 'border-primary bg-primary-pale' : 'border-gray-300 bg-white hover:border-primary hover:bg-primary-pale'
                                         }`}
                                     >
@@ -238,12 +254,12 @@ export default function SupervisorRequestForm({ onSubmit }) {
                                         </p>
                                         <input
                                             type="file"
-                                            className="hidden"
+                                            className="sr-only"
                                             accept=".pdf,.jpg,.jpeg,.png"
                                             onChange={(e) => handleFileChange(e.target.files[0])}
                                         />
                                     </label>
-                                    {fileError && <p className="mt-2 text-xs text-red-500">{fileError}</p>}
+                                    {fileError && <p id="loaFile-error" role="alert" className="mt-2 text-xs text-red-500">{fileError}</p>}
                                 </div>
                             ) : (
                                 <div className="flex items-center justify-between rounded-xl border border-primary bg-primary-pale p-4">

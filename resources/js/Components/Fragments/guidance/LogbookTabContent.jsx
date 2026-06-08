@@ -199,11 +199,14 @@ export default function LogbookTabContent() {
                     onClick={closeAllModals}
                 >
                     <div
+                        role="dialog"
+                        aria-modal="true"
+                        aria-labelledby="logbook-modal-title"
                         className="relative w-full max-w-[560px] transform rounded-xl bg-white text-left shadow-xl transition-all sm:my-8"
                         onClick={(e) => e.stopPropagation()}
                     >
                         <div className="flex items-center justify-between border-b border-gray-100 px-5 py-5 sm:px-6">
-                            <h2 className="text-[17px] font-bold text-[#1A1A1A]">{modalTitle}</h2>
+                            <h2 id="logbook-modal-title" className="text-[17px] font-bold text-[#1A1A1A]">{modalTitle}</h2>
                             <button
                                 type="button"
                                 onClick={closeAllModals}
@@ -216,27 +219,31 @@ export default function LogbookTabContent() {
                         <div className="max-h-[calc(100vh-160px)] overflow-y-auto px-5 py-5 sm:px-6">
                             <div className="flex flex-col gap-5">
                                 <div>
-                                    <label className="mb-2 block text-[13px] font-bold text-[#1A1A1A]">Tanggal</label>
+                                    <label htmlFor="logbook-tanggal" className="mb-2 block text-[13px] font-bold text-[#1A1A1A]">Tanggal</label>
                                     <input
+                                        id="logbook-tanggal"
                                         type="date"
                                         min={logbookPeriod?.start_date || undefined}
                                         max={logbookPeriod?.maximum_date || undefined}
                                         value={activeData.tanggal ? activeData.tanggal.slice(0, 10) : ''}
                                         onChange={(e) => updateActiveData({ tanggal: e.target.value })}
+                                        aria-required="true"
                                         className="h-11 w-full rounded-lg border border-gray-200 px-3 outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-primary/10"
                                     />
                                 </div>
                                 <div>
-                                    <label className="mb-2 flex justify-between text-[13px] font-bold text-[#1A1A1A]">
+                                    <label htmlFor="logbook-kegiatan" className="mb-2 flex justify-between text-[13px] font-bold text-[#1A1A1A]">
                                         <span>Kegiatan Harian <span className="text-red-500">*</span></span>
                                         <span className="font-normal text-gray-400">Maks. 500 karakter</span>
                                     </label>
                                     <textarea
+                                        id="logbook-kegiatan"
                                         rows="4"
                                         maxLength={500}
                                         value={activeData.kegiatanHarian}
                                         onChange={(e) => updateActiveData({ kegiatanHarian: e.target.value })}
                                         placeholder="Deskripsikan kegiatan yang Anda lakukan hari ini..."
+                                        aria-required="true"
                                         className="w-full resize-none rounded-lg border border-gray-200 p-3 text-[14px] leading-relaxed outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-primary/10"
                                     />
                                     <div className="mt-1 text-right text-[11px] font-medium text-gray-400">
@@ -244,16 +251,18 @@ export default function LogbookTabContent() {
                                     </div>
                                 </div>
                                 <div>
-                                    <label className="mb-2 flex justify-between text-[13px] font-bold text-[#1A1A1A]">
+                                    <label htmlFor="logbook-hasil" className="mb-2 flex justify-between text-[13px] font-bold text-[#1A1A1A]">
                                         <span>Hasil <span className="text-red-500">*</span></span>
                                         <span className="font-normal text-gray-400">Maks. 300 karakter</span>
                                     </label>
                                     <textarea
+                                        id="logbook-hasil"
                                         rows="3"
                                         maxLength={300}
                                         value={activeData.hasil}
                                         onChange={(e) => updateActiveData({ hasil: e.target.value })}
                                         placeholder="Tuliskan output atau hasil dari kegiatan Anda..."
+                                        aria-required="true"
                                         className="w-full resize-none rounded-lg border border-gray-200 p-3 text-[14px] leading-relaxed outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-primary/10"
                                     />
                                     <div className="mt-1 text-right text-[11px] font-medium text-gray-400">
@@ -265,7 +274,7 @@ export default function LogbookTabContent() {
 
                         <div className="flex flex-col-reverse items-stretch justify-end gap-2 rounded-b-xl border-t border-gray-100 bg-white px-5 py-4 sm:flex-row sm:items-center sm:px-6">
                             {modalError && (
-                                <p className="flex-1 text-[12px] font-medium text-red-500">
+                                <p className="flex-1 text-[12px] font-medium text-red-500" role="alert">
                                     {modalError}
                                 </p>
                             )}

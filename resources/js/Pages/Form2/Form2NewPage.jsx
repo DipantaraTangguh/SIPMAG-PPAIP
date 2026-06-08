@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
     ArrowLeft,
     Lock,
@@ -8,10 +8,10 @@ import {
     ArrowRight,
     Lightbulb,
     Loader2,
-} from 'lucide-react';
-import DashboardLayout from '../../Components/Layouts/DashboardLayout';
-import { useSimulation } from '../../context/SimulationContext';
-import { canSubmitForm2 } from '../../utils/accessUtils';
+} from "lucide-react";
+import DashboardLayout from "../../Components/Layouts/DashboardLayout";
+import { useSimulation } from "../../context/SimulationContext";
+import { canSubmitForm2 } from "../../utils/accessUtils";
 
 export default function Form2NewPage() {
     const navigate = useNavigate();
@@ -20,10 +20,10 @@ export default function Form2NewPage() {
     // Guard keras: Form 2 jangan kebuka sebelum Form 1 approved.
     useEffect(() => {
         if (!canSubmitForm2(student?.accessStatus)) {
-            navigate('/portal', {
+            navigate("/portal", {
                 state: {
-                    activeTab: 'mandiri',
-                    blockedReason: 'form1_required',
+                    activeTab: "mandiri",
+                    blockedReason: "form1_required",
                 },
             });
         }
@@ -31,11 +31,11 @@ export default function Form2NewPage() {
 
     // Draft form disimpan lokal sampai submit.
     const [formData, setFormData] = useState({
-        namaPerusahaan: '',
-        alamatPerusahaan: '',
-        tanggalMulai: '',
-        tanggalSelesai: '',
-        lingkupMagang: '',
+        namaPerusahaan: "",
+        alamatPerusahaan: "",
+        tanggalMulai: "",
+        tanggalSelesai: "",
+        lingkupMagang: "",
     });
 
     const [errors, setErrors] = useState({});
@@ -43,16 +43,16 @@ export default function Form2NewPage() {
     const [submitError, setSubmitError] = useState(null);
 
     // Data profil dikunci dan selalu berasal dari user yang sedang login.
-    const studentName = student?.name ?? '—';
-    const studentNim = student?.nim ?? '—';
+    const studentName = student?.name ?? "—";
+    const studentNim = student?.nim ?? "—";
 
     // Validasi ringan sebelum data dilempar ke context/API.
     const isFormValid =
-        formData.namaPerusahaan.trim() !== '' &&
-        formData.alamatPerusahaan.trim() !== '' &&
-        formData.tanggalMulai !== '' &&
-        formData.tanggalSelesai !== '' &&
-        formData.lingkupMagang.trim() !== '';
+        formData.namaPerusahaan.trim() !== "" &&
+        formData.alamatPerusahaan.trim() !== "" &&
+        formData.tanggalMulai !== "" &&
+        formData.tanggalSelesai !== "" &&
+        formData.lingkupMagang.trim() !== "";
 
     // Satu handler cukup buat semua field text/date.
     const handleChange = (e) => {
@@ -68,15 +68,15 @@ export default function Form2NewPage() {
     const handleSubmit = async () => {
         const newErrors = {};
         if (!formData.namaPerusahaan.trim())
-            newErrors.namaPerusahaan = 'Nama perusahaan wajib diisi';
+            newErrors.namaPerusahaan = "Nama perusahaan wajib diisi";
         if (!formData.alamatPerusahaan.trim())
-            newErrors.alamatPerusahaan = 'Alamat perusahaan wajib diisi';
+            newErrors.alamatPerusahaan = "Alamat perusahaan wajib diisi";
         if (!formData.tanggalMulai)
-            newErrors.tanggalMulai = 'Tanggal mulai wajib diisi';
+            newErrors.tanggalMulai = "Tanggal mulai wajib diisi";
         if (!formData.tanggalSelesai)
-            newErrors.tanggalSelesai = 'Tanggal selesai wajib diisi';
+            newErrors.tanggalSelesai = "Tanggal selesai wajib diisi";
         if (!formData.lingkupMagang.trim())
-            newErrors.lingkupMagang = 'Lingkup magang wajib diisi';
+            newErrors.lingkupMagang = "Lingkup magang wajib diisi";
 
         if (Object.keys(newErrors).length > 0) {
             setErrors(newErrors);
@@ -88,9 +88,11 @@ export default function Form2NewPage() {
 
         try {
             await submitForm2(formData);
-            navigate('/portal', { state: { activeTab: 'mandiri' } });
+            navigate("/portal", { state: { activeTab: "mandiri" } });
         } catch (err) {
-            setSubmitError(err?.message || 'Gagal mengirim pengajuan. Silakan coba lagi.');
+            setSubmitError(
+                err?.message || "Gagal mengirim pengajuan. Silakan coba lagi.",
+            );
         } finally {
             setIsSubmitting(false);
         }
@@ -101,7 +103,7 @@ export default function Form2NewPage() {
             <button
                 type="button"
                 onClick={() => navigate(-1)}
-                className="mb-6 flex items-center gap-2 rounded-lg bg-primary px-[18px] py-2 text-[13px] font-bold text-white transition-colors hover:bg-primary-hover"
+                className="mb-6 flex items-center gap-2 rounded-lg bg-primary px-4.5 py-2 text-[13px] font-bold text-white transition-colors hover:bg-primary-hover"
             >
                 <ArrowLeft className="h-4 w-4" />
                 Kembali
@@ -161,8 +163,8 @@ export default function Form2NewPage() {
                                 placeholder="Contoh: PT GoTo Gojek Tokopedia Tbk"
                                 className={`h-12 w-full rounded-lg border px-3.5 outline-none transition-all focus:ring-2 focus:ring-primary/10 ${
                                     errors.namaPerusahaan
-                                        ? 'border-red-400 focus:border-red-400'
-                                        : 'border-gray-200 focus:border-primary'
+                                        ? "border-red-400 focus:border-red-400"
+                                        : "border-gray-200 focus:border-primary"
                                 }`}
                             />
                             {errors.namaPerusahaan && (
@@ -183,8 +185,8 @@ export default function Form2NewPage() {
                                 placeholder="Contoh: PT GoTo Gojek Tokopedia Tbk, Jl. Iskandarsyah II No. 2, Kebayoran Baru, Jakarta Selatan, 12160"
                                 className={`w-full resize-none rounded-lg border p-3.5 outline-none transition-all focus:ring-2 focus:ring-primary/10 ${
                                     errors.alamatPerusahaan
-                                        ? 'border-red-400 focus:border-red-400'
-                                        : 'border-gray-200 focus:border-primary'
+                                        ? "border-red-400 focus:border-red-400"
+                                        : "border-gray-200 focus:border-primary"
                                 }`}
                             />
                             {errors.alamatPerusahaan && (
@@ -205,8 +207,8 @@ export default function Form2NewPage() {
                                     onChange={handleChange}
                                     className={`h-12 w-full rounded-lg border px-3.5 outline-none transition-colors ${
                                         errors.tanggalMulai
-                                            ? 'border-red-400 focus:border-red-400'
-                                            : 'border-gray-200 focus:border-primary'
+                                            ? "border-red-400 focus:border-red-400"
+                                            : "border-gray-200 focus:border-primary"
                                     }`}
                                 />
                                 {errors.tanggalMulai && (
@@ -226,8 +228,8 @@ export default function Form2NewPage() {
                                     onChange={handleChange}
                                     className={`h-12 w-full rounded-lg border px-3.5 outline-none transition-colors ${
                                         errors.tanggalSelesai
-                                            ? 'border-red-400 focus:border-red-400'
-                                            : 'border-gray-200 focus:border-primary'
+                                            ? "border-red-400 focus:border-red-400"
+                                            : "border-gray-200 focus:border-primary"
                                     }`}
                                 />
                                 {errors.tanggalSelesai && (
@@ -249,8 +251,8 @@ export default function Form2NewPage() {
                                 placeholder="Deskripsikan secara singkat rencana divisi dan tugas Anda..."
                                 className={`w-full resize-none rounded-lg border p-3.5 outline-none transition-all focus:ring-2 focus:ring-primary/10 ${
                                     errors.lingkupMagang
-                                        ? 'border-red-400 focus:border-red-400'
-                                        : 'border-gray-200 focus:border-primary'
+                                        ? "border-red-400 focus:border-red-400"
+                                        : "border-gray-200 focus:border-primary"
                                 }`}
                             />
                             {errors.lingkupMagang && (
@@ -259,10 +261,10 @@ export default function Form2NewPage() {
                                 </p>
                             )}
                             <div className="mt-2 flex items-center gap-1.5 text-gray-400">
-                                <Info className="h-3 w-3 flex-shrink-0" />
+                                <Info className="h-3 w-3 shrink-0" />
                                 <span className="text-[12px] italic text-gray-400">
-                                    Pastikan lingkup kerja relevan dengan program
-                                    studi Anda.
+                                    Pastikan lingkup kerja relevan dengan
+                                    program studi Anda.
                                 </span>
                             </div>
                         </div>
@@ -270,8 +272,10 @@ export default function Form2NewPage() {
                     <div className="mt-6">
                         {submitError && (
                             <div className="mb-4 flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-3">
-                                <Info className="mt-0.5 h-4 w-4 flex-shrink-0 text-red-500" />
-                                <p className="text-[13px] font-medium text-red-600">{submitError}</p>
+                                <Info className="mt-0.5 h-4 w-4 shrink-0 text-red-500" />
+                                <p className="text-[13px] font-medium text-red-600">
+                                    {submitError}
+                                </p>
                             </div>
                         )}
                         <div className="flex justify-stretch sm:justify-end">
@@ -281,8 +285,8 @@ export default function Form2NewPage() {
                                 disabled={!isFormValid || isSubmitting}
                                 className={`flex w-full items-center justify-center gap-2 rounded-xl px-8 py-3.5 text-[15px] font-bold transition-colors sm:w-auto ${
                                     isSubmitting || !isFormValid
-                                        ? 'cursor-not-allowed bg-gray-300 text-gray-400'
-                                        : 'bg-primary text-white hover:bg-primary-hover'
+                                        ? "cursor-not-allowed bg-gray-300 text-gray-400"
+                                        : "bg-primary text-white hover:bg-primary-hover"
                                 }`}
                             >
                                 {isSubmitting ? (
@@ -303,7 +307,7 @@ export default function Form2NewPage() {
                 <div className="self-start lg:sticky lg:top-6">
                     <div className="rounded-xl border border-gray-200 bg-white p-5 hover:border-primary-pale hover:shadow-sm transition-all duration-300">
                         <div className="flex items-center gap-2 border-b-2 border-primary/10 pb-4">
-                            <BookOpen className="h-[18px] w-[18px] text-primary" />
+                            <BookOpen className="h-4.5 w-4.5 text-primary" />
                             <h3 className="text-[15px] font-bold text-[#1A1A1A]">
                                 Alur Kerja Form 2
                             </h3>
@@ -312,10 +316,10 @@ export default function Form2NewPage() {
                         <div className="mt-5 flex flex-col">
                             <div className="flex">
                                 <div className="mr-3 flex flex-col items-center">
-                                    <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-primary text-xs font-bold text-white">
+                                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-bold text-white">
                                         1
                                     </div>
-                                    <div className="my-1 w-[2px] flex-1 bg-gray-200"></div>
+                                    <div className="my-1 w-0.5 flex-1 bg-gray-200"></div>
                                 </div>
                                 <div className="flex-1 pb-5">
                                     <p className="text-[14px] font-bold text-[#1A1A1A]">
@@ -329,10 +333,10 @@ export default function Form2NewPage() {
                             </div>
                             <div className="flex">
                                 <div className="mr-3 flex flex-col items-center">
-                                    <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-primary text-xs font-bold text-white">
+                                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-bold text-white">
                                         2
                                     </div>
-                                    <div className="my-1 w-[2px] flex-1 bg-gray-200"></div>
+                                    <div className="my-1 w-0.5 flex-1 bg-gray-200"></div>
                                 </div>
                                 <div className="flex-1 pb-5">
                                     <p className="text-[14px] font-bold text-[#1A1A1A]">
@@ -346,7 +350,7 @@ export default function Form2NewPage() {
                             </div>
                             <div className="flex">
                                 <div className="mr-3 flex flex-col items-center">
-                                    <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-primary text-xs font-bold text-white">
+                                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-bold text-white">
                                         3
                                     </div>
                                 </div>
@@ -372,7 +376,7 @@ export default function Form2NewPage() {
 
                         <div className="flex flex-col gap-2.5">
                             <div className="flex items-start gap-2.5">
-                                <div className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-primary text-[11px] font-bold text-white">
+                                <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary text-[11px] font-bold text-white">
                                     1
                                 </div>
                                 <p className="text-[12px] leading-relaxed text-gray-600">
@@ -381,12 +385,12 @@ export default function Form2NewPage() {
                                 </p>
                             </div>
                             <div className="flex items-start gap-2.5">
-                                <div className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-primary text-[11px] font-bold text-white">
+                                <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary text-[11px] font-bold text-white">
                                     2
                                 </div>
                                 <p className="text-[12px] leading-relaxed text-gray-600">
-                                    Proses verifikasi oleh Prodi memakan waktu 1-3
-                                    hari kerja.
+                                    Proses verifikasi oleh Prodi memakan waktu
+                                    1-3 hari kerja.
                                 </p>
                             </div>
                         </div>

@@ -134,6 +134,8 @@ export default function LoginPage() {
                                     className="login-field__input"
                                     autoComplete="username"
                                     disabled={isSubmitting}
+                                    aria-required="true"
+                                    aria-invalid={!!error}
                                 />
                             </div>
                         </div>
@@ -148,7 +150,6 @@ export default function LoginPage() {
                                 <button
                                     type="button"
                                     className="login-field__forgot"
-                                    tabIndex={-1}
                                 >
                                     Lupa Sandi?
                                 </button>
@@ -168,6 +169,8 @@ export default function LoginPage() {
                                     className="login-field__input login-field__input--password"
                                     autoComplete="current-password"
                                     disabled={isSubmitting}
+                                    aria-required="true"
+                                    aria-invalid={!!error}
                                 />
                                 <button
                                     type="button"
@@ -175,7 +178,6 @@ export default function LoginPage() {
                                     onClick={() =>
                                         setShowPassword(!showPassword)
                                     }
-                                    tabIndex={-1}
                                     aria-label={
                                         showPassword
                                             ? "Sembunyikan sandi"

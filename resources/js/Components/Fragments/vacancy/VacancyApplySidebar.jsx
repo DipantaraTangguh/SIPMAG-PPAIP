@@ -76,7 +76,10 @@ export default function VacancyApplySidebar({
                         <button
                             type="button"
                             onClick={handleDropzoneClick}
-                            className="flex w-full flex-col items-center rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 px-4 py-6 text-center transition-colors hover:border-primary/50 hover:bg-primary-pale"
+                            aria-label="Unggah CV & Portfolio. PDF, Maksimal 5MB"
+                            aria-invalid={!!cvError}
+                            aria-describedby={cvError ? "cv-error-msg" : undefined}
+                            className="flex w-full flex-col items-center rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 px-4 py-6 text-center transition-colors hover:border-primary/50 hover:bg-primary-pale focus:outline-none focus:ring-2 focus:ring-primary/20"
                         >
                             <CloudUpload className="h-8 w-8 text-gray-300" />
                             <span className="mt-2 text-[13px] text-gray-500">
@@ -115,7 +118,7 @@ export default function VacancyApplySidebar({
                     )}
 
                     {cvError && (
-                        <p className="mt-1.5 text-xs text-red-500">
+                        <p id="cv-error-msg" className="mt-1.5 text-xs text-red-500" role="alert">
                             {cvError}
                         </p>
                     )}
@@ -248,11 +251,16 @@ export default function VacancyApplySidebar({
                     className="fixed inset-0 z-[9999] flex items-center justify-center p-4"
                     style={{ backgroundColor: 'rgba(17, 24, 39, 0.5)', backdropFilter: 'blur(4px)' }}
                 >
-                    <div className="w-full max-w-[400px] rounded-2xl bg-white p-6 text-center shadow-xl">
+                    <div 
+                        role="dialog"
+                        aria-modal="true"
+                        aria-labelledby="confirm-modal-title"
+                        className="w-full max-w-[400px] rounded-2xl bg-white p-6 text-center shadow-xl"
+                    >
                         <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-primary-pale">
                             <Info className="h-7 w-7 text-primary" />
                         </div>
-                        <h3 className="mb-2 text-lg font-bold text-gray-900">
+                        <h3 id="confirm-modal-title" className="mb-2 text-lg font-bold text-gray-900">
                             Apakah Anda yakin untuk melamar pada posisi ini?
                         </h3>
                         <p className="mb-6 text-sm text-gray-500">

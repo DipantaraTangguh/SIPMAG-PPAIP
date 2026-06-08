@@ -8,9 +8,10 @@ import {
     FileText,
     Loader2,
 } from 'lucide-react';
-function FieldLabel({ children, htmlFor }) {
+function FieldLabel({ children, htmlFor, id }) {
     return (
         <label
+            id={id}
             htmlFor={htmlFor}
             className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-black"
         >
@@ -18,9 +19,9 @@ function FieldLabel({ children, htmlFor }) {
         </label>
     );
 }
-function FieldError({ message }) {
+function FieldError({ id, message }) {
     if (!message) return null;
-    return <p className="mt-1 text-xs text-red-500">{message}</p>;
+    return <p id={id} className="mt-1 text-xs text-red-500" role="alert">{message}</p>;
 }
 function ReadOnlyInput({ id, value }) {
     return (
@@ -94,7 +95,7 @@ export default function Form1Card({
                 </p>
             </div>
             {errors.submit && (
-                <div className="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
+                <div className="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600" role="alert">
                     {errors.submit}
                 </div>
             )}
@@ -141,6 +142,9 @@ export default function Form1Card({
                             id="rencanaSkema"
                             value={formData.rencanaSkema}
                             onChange={(e) => updateField('rencanaSkema', e.target.value)}
+                            aria-required="true"
+                            aria-invalid={!!errors.rencanaSkema}
+                            aria-describedby={errors.rencanaSkema ? 'rencanaSkema-error' : undefined}
                             className={`${
                                 errors.rencanaSkema ? inputError : inputNormal
                             } appearance-none pr-10 ${
@@ -155,7 +159,7 @@ export default function Form1Card({
                         </select>
                         <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
                     </div>
-                    <FieldError message={errors.rencanaSkema} />
+                    <FieldError id="rencanaSkema-error" message={errors.rencanaSkema} />
                 </div>
                 <div>
                     <FieldLabel htmlFor="topikTempat">Topik / Tempat Magang</FieldLabel>
@@ -165,6 +169,9 @@ export default function Form1Card({
                         placeholder="Tuliskan rencana tempat atau topik magang anda..."
                         value={formData.topikTempat}
                         onChange={(e) => updateField('topikTempat', e.target.value)}
+                        aria-required="true"
+                        aria-invalid={!!errors.topikTempat}
+                        aria-describedby={errors.topikTempat ? 'topikTempat-error' : undefined}
                         className={`${
                             errors.topikTempat ? inputError : inputNormal
                         } resize-none`}
@@ -177,11 +184,11 @@ export default function Form1Card({
                             lengkap.
                         </HelperText>
                     )}
-                    <FieldError message={errors.topikTempat} />
+                    <FieldError id="topikTempat-error" message={errors.topikTempat} />
                 </div>
                 <div>
-                    <FieldLabel>Upload Transkrip Nilai Terbaru</FieldLabel>
-
+                    <FieldLabel htmlFor="fileInput">Upload Transkrip Nilai Terbaru</FieldLabel>
+ 
                     {formData.transkripFile ? (
                         <div className="flex items-center gap-3 rounded-xl border border-primary bg-primary-pale px-5 py-4">
                             <FileText className="h-6 w-6 flex-shrink-0 text-primary" />
@@ -196,7 +203,7 @@ export default function Form1Card({
                             <button
                                 type="button"
                                 onClick={removeFile}
-                                className="flex h-7 w-7 items-center justify-center rounded-full text-gray-400 transition-colors hover:bg-gray-200 hover:text-gray-600"
+                                className="flex h-7 w-7 items-center justify-center rounded-full text-gray-400 transition-colors hover:bg-gray-200 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-primary/20"
                                 aria-label="Hapus file"
                             >
                                 <X className="h-4 w-4" />
@@ -208,9 +215,20 @@ export default function Form1Card({
                             onDragLeave={onDragLeave}
                             onDrop={onDrop}
                             onClick={() => fileInputRef.current?.click()}
+                            role="button"
+                            tabIndex={0}
+                            aria-label="Upload Transkrip Nilai Terbaru. PDF, JPG, atau PNG (Maks. 5MB)"
+                            aria-invalid={!!errors.transkripFile}
+                            aria-describedby={errors.transkripFile ? 'transkripFile-error' : undefined}
+                            onKeyDown={(e) => {
+                                if (e.key === ' ' || e.key === 'Enter') {
+                                    e.preventDefault();
+                                    fileInputRef.current?.click();
+                                }
+                            }}
                             className={`
                                 flex cursor-pointer flex-col items-center justify-center rounded-xl
-                                border-2 border-dashed px-6 py-10 transition-colors duration-150
+                                border-2 border-dashed px-6 py-10 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-primary/20
                                 ${isDragging
                                     ? 'border-primary bg-primary-pale'
                                     : errors.transkripFile
@@ -231,6 +249,7 @@ export default function Form1Card({
                                 PDF, JPG, atau PNG (Maks. 5MB)
                             </p>
                             <input
+                                id="fileInput"
                                 ref={fileInputRef}
                                 type="file"
                                 accept=".pdf,.jpg,.jpeg,.png"
@@ -239,22 +258,28 @@ export default function Form1Card({
                             />
                         </div>
                     )}
-
+ 
                     {fileError && (
-                        <p className="mt-1 text-xs text-red-500">{fileError}</p>
+                        <p className="mt-1 text-xs text-red-500" role="alert">{fileError}</p>
                     )}
-                    <FieldError message={errors.transkripFile} />
+                    <FieldError id="transkripFile-error" message={errors.transkripFile} />
                 </div>
                 <div>
-                    <FieldLabel>Output</FieldLabel>
-                    <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:gap-6">
+                    <FieldLabel id="output-label">Output</FieldLabel>
+                    <div 
+                        className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:gap-6"
+                        role="radiogroup"
+                        aria-labelledby="output-label"
+                        aria-invalid={!!errors.output}
+                        aria-describedby={errors.output ? 'output-error' : undefined}
+                    >
                         {['Produk', 'Prototype', 'Laporan'].map((opt) => (
                             <label
                                 key={opt}
-                                className="flex cursor-pointer items-center gap-2 text-sm text-black"
+                                className="flex cursor-pointer items-center gap-2 text-sm text-black group"
                             >
                                 <span
-                                    className={`flex h-5 w-5 items-center justify-center rounded-full border-2 transition-colors ${
+                                    className={`flex h-5 w-5 items-center justify-center rounded-full border-2 transition-colors group-focus-within:ring-2 group-focus-within:ring-primary/20 ${
                                         formData.output === opt
                                             ? 'border-primary'
                                             : errors.output
@@ -279,7 +304,7 @@ export default function Form1Card({
                             </label>
                         ))}
                     </div>
-                    <FieldError message={errors.output} />
+                    <FieldError id="output-error" message={errors.output} />
                 </div>
                 <label className="flex cursor-pointer items-start gap-3">
                     <input
@@ -288,7 +313,9 @@ export default function Form1Card({
                         onChange={(e) =>
                             updateField('declarationChecked', e.target.checked)
                         }
-                        className="mt-0.5 h-4 w-4 flex-shrink-0 cursor-pointer rounded border-gray-300 accent-primary"
+                        aria-invalid={!!errors.declarationChecked}
+                        aria-describedby={errors.declarationChecked ? 'declarationChecked-error' : undefined}
+                        className="mt-0.5 h-4 w-4 flex-shrink-0 cursor-pointer rounded border-gray-300 accent-primary focus:ring-primary/20"
                         disabled={isSubmitting}
                     />
                     <span
@@ -303,6 +330,7 @@ export default function Form1Card({
                         sesuai kurikulum Program Studi.
                     </span>
                 </label>
+                <FieldError id="declarationChecked-error" message={errors.declarationChecked} />
             </div>
             <div className="mt-8 flex flex-col-reverse items-stretch justify-end gap-3 border-t border-gray-100 pt-6 sm:flex-row sm:items-center sm:gap-4">
                 <button

@@ -55,6 +55,17 @@ function UploadField({ label, hint, icon: Icon, fieldKey, files, setFiles, fileE
                 {label}
             </label>
             <div
+                role="button"
+                tabIndex={0}
+                aria-label={`${label}. ${hint}`}
+                aria-invalid={!!fileErrors[fieldKey]}
+                aria-describedby={fileErrors[fieldKey] ? `error-${fieldKey}` : undefined}
+                onKeyDown={(e) => {
+                    if (e.key === ' ' || e.key === 'Enter') {
+                        e.preventDefault();
+                        onClick();
+                    }
+                }}
                 onDragOver={(e) => {
                     e.preventDefault();
                     setDragOver(fieldKey);
@@ -67,7 +78,7 @@ function UploadField({ label, hint, icon: Icon, fieldKey, files, setFiles, fileE
                     handleFile(droppedFile);
                 }}
                 onClick={onClick}
-                className={`border-2 rounded-xl p-5 text-center cursor-pointer transition-colors duration-200 sm:p-8 ${
+                className={`border-2 rounded-xl p-5 text-center cursor-pointer transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary/20 sm:p-8 ${
                     dragOver === fieldKey 
                     ? 'border-primary bg-primary-pale/50' 
                     : file
@@ -101,7 +112,7 @@ function UploadField({ label, hint, icon: Icon, fieldKey, files, setFiles, fileE
                 )}
             </div>
             {fileErrors[fieldKey] && (
-                <p className="text-red-500 text-[12px] mt-2 flex items-center gap-1.5 font-medium">
+                <p id={`error-${fieldKey}`} className="text-red-500 text-[12px] mt-2 flex items-center gap-1.5 font-medium" role="alert">
                     <AlertCircle size={14} />
                     {fileErrors[fieldKey]}
                 </p>
@@ -278,42 +289,50 @@ export default function DefenseFormView() {
                     </div>
 
                     <div className="mt-8 flex flex-col gap-4 border-t border-gray-100 pt-8">
-                        <div className="flex items-start gap-3">
+                        <label className="flex items-start gap-3 cursor-pointer group">
+                            <input
+                                type="checkbox"
+                                checked={checks.check1}
+                                onChange={() => toggleCheck('check1')}
+                                className="sr-only"
+                            />
                             <div
-                                onClick={() => toggleCheck('check1')}
-                                className={`w-5 h-5 rounded border-2 flex-shrink-0 mt-0.5 cursor-pointer flex items-center justify-center transition-colors ${
+                                className={`w-5 h-5 rounded border-2 flex-shrink-0 mt-0.5 flex items-center justify-center transition-colors group-focus-within:ring-2 group-focus-within:ring-primary/20 group-hover:border-primary/50 ${
                                     checks.check1 ? 'border-primary bg-primary' : 'border-gray-300 bg-white'
                                 }`}
                             >
                                 {checks.check1 && <Check size={12} className="text-white" />}
                             </div>
-                            <p 
-                                onClick={() => toggleCheck('check1')}
-                                className="text-gray-600 text-[13px] leading-relaxed cursor-pointer select-none"
+                            <span 
+                                className="text-gray-600 text-[13px] leading-relaxed select-none"
                             >
                                 Saya menyatakan bahwa seluruh dokumen yang saya unggah adalah asli dan telah melalui proses bimbingan yang sah. Ketidaksesuaian data dapat membatalkan pengajuan sidang saya.
-                            </p>
-                        </div>
-                        <div className="flex items-start gap-3">
+                            </span>
+                        </label>
+                        <label className="flex items-start gap-3 cursor-pointer group">
+                            <input
+                                type="checkbox"
+                                checked={checks.check2}
+                                onChange={() => toggleCheck('check2')}
+                                className="sr-only"
+                            />
                             <div
-                                onClick={() => toggleCheck('check2')}
-                                className={`w-5 h-5 rounded border-2 flex-shrink-0 mt-0.5 cursor-pointer flex items-center justify-center transition-colors ${
+                                className={`w-5 h-5 rounded border-2 flex-shrink-0 mt-0.5 flex items-center justify-center transition-colors group-focus-within:ring-2 group-focus-within:ring-primary/20 group-hover:border-primary/50 ${
                                     checks.check2 ? 'border-primary bg-primary' : 'border-gray-300 bg-white'
                                 }`}
                             >
                                 {checks.check2 && <Check size={12} className="text-white" />}
                             </div>
-                            <p 
-                                onClick={() => toggleCheck('check2')}
-                                className="text-gray-600 text-[13px] leading-relaxed cursor-pointer select-none"
+                            <span 
+                                className="text-gray-600 text-[13px] leading-relaxed select-none"
                             >
                                 Saya bersedia memberikan hak publikasi foto dokumentasi magang saya kepada pihak universitas untuk diunggah di Repository Magang Universitas Bakrie sebagai referensi kegiatan bagi civitas akademika dan masyarakat umum. Publikasi tersebut dipastikan tidak mengandung data teknis maupun rincian proyek yang bersifat konfidensial dari perusahaan tempat saya melaksanakan magang.
-                            </p>
-                        </div>
+                            </span>
+                        </label>
                     </div>
 
                     {submitError && (
-                        <div className="mt-6 flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-3">
+                        <div className="mt-6 flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-3" role="alert">
                             <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-red-500" />
                             <p className="text-[13px] font-medium text-red-600">{submitError}</p>
                         </div>
