@@ -42,9 +42,9 @@ export default function Form2NewPage() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitError, setSubmitError] = useState(null);
 
-    // Data profil dikunci, mahasiswa nggak edit di form ini.
-    const studentName = 'Tangguh Dipantara';
-    const studentNim = '2021031045';
+    // Data profil dikunci dan selalu berasal dari user yang sedang login.
+    const studentName = student?.name ?? '—';
+    const studentNim = student?.nim ?? '—';
 
     // Validasi ringan sebelum data dilempar ke context/API.
     const isFormValid =
