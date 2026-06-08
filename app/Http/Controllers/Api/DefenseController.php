@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Defense\ScheduleDefenseRequest;
+use App\Http\Requests\Defense\StoreDefenseSubmissionRequest;
 use App\Models\DefenseSubmission;
 use App\Models\Student;
 use App\Services\StudentStateMachine;
@@ -39,7 +41,7 @@ class DefenseController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function store(StoreDefenseSubmissionRequest $request)
     {
         $student = $request->user()->student;
 
@@ -51,13 +53,7 @@ class DefenseController extends Controller
             return response()->json(['message' => 'Sidang sudah pernah diajukan.'], 422);
         }
 
-        $validated = $request->validate([
-            'laporan'         => 'required|file|mimes:pdf|mimetypes:application/pdf|max:10240',
-            'poster'          => 'required|file|mimes:pdf|mimetypes:application/pdf|max:5120',
-            'foto_kegiatan_1' => 'required|file|mimes:jpg,jpeg,png,pdf|mimetypes:image/jpeg,image/png,application/pdf|max:5120',
-            'foto_kegiatan_2' => 'required|file|mimes:jpg,jpeg,png,pdf|mimetypes:image/jpeg,image/png,application/pdf|max:5120',
-            'krs'             => 'required|file|mimes:pdf|mimetypes:application/pdf|max:5120',
-        ]);
+        $validated = $request->validated();
 
         $storedPaths = [];
 
@@ -117,7 +113,7 @@ class DefenseController extends Controller
         return response()->json(['students' => $students]);
     }
 
-    public function scheduleSidang(Request $request, int $studentId)
+    public function scheduleSidang(ScheduleDefenseRequest $request, int $studentId)
     {
         $lecturer = $request->user()->lecturer;
 
@@ -131,21 +127,15 @@ class DefenseController extends Controller
             return response()->json(['message' => 'Submission tidak valid untuk dijadwalkan.'], 422);
         }
 
-        $request->validate([
-            'scheduled_date' => 'required|date|after:today',
-            'scheduled_time' => 'nullable|string|max:10',
-            'room' => 'nullable|string|max:100',
-            'dosen_penguji_1' => 'required|string|max:255',
-            'dosen_penguji_2' => 'required|string|max:255',
-        ]);
+        $validated = $request->validated();
 
         $submission->update([
             'status' => 'Scheduled',
-            'scheduled_date' => $request->scheduled_date,
-            'scheduled_time' => $request->scheduled_time,
-            'room' => $request->room,
-            'dosen_penguji_1' => $request->dosen_penguji_1,
-            'dosen_penguji_2' => $request->dosen_penguji_2,
+            'scheduled_date' => $validated['scheduled_date'],
+            'scheduled_time' => $validated['scheduled_time'] ?? null,
+            'room' => $validated['room'] ?? null,
+            'dosen_penguji_1' => $validated['dosen_penguji_1'],
+            'dosen_penguji_2' => $validated['dosen_penguji_2'],
             'scheduled_by' => $lecturer->id,
             'scheduled_at' => now(),
         ]);
@@ -170,10 +160,10 @@ class DefenseController extends Controller
         }
 
         $student->fill([
-            'dpm_id'                 => null,
-            'is_independent'         => false,
-            'form1_data'             => null,
-            'form1_pdf_path'         => null,
+            'dpm_id' => null,
+            'is_independent' => false,
+            'form1_data' => null,
+            'form1_pdf_path' => null,
             'form1_rejection_reason' => null,
         ]);
         app(StudentStateMachine::class)->transition($student, 'SiklusSelesai');

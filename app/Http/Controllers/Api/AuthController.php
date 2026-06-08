@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Auth\LoginRequest;
 use App\Models\Student;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -15,12 +16,9 @@ use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
-    public function login(Request $request)
+    public function login(LoginRequest $request)
     {
-        $validated = $request->validate([
-            'login' => 'required|string|max:255',  // accepts NIM or email
-            'password' => 'required|string|max:1024',
-        ]);
+        $validated = $request->validated();
 
         $identifier = trim($validated['login']);
         $user = $this->findUser($identifier);

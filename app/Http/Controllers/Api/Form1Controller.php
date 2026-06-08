@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Form1\RejectForm1Request;
+use App\Http\Requests\Form1\StoreForm1Request;
 use App\Models\Student;
 use App\Services\StudentStateMachine;
 use App\Support\StoredFilePath;
@@ -15,7 +17,7 @@ class Form1Controller extends Controller
     public function show(Request $request)
     {
         $student = $request->user()->student;
-        if (!$student) {
+        if (! $student) {
             return response()->json(['message' => 'Profil mahasiswa tidak ditemukan.'], 404);
         }
 
@@ -25,23 +27,24 @@ class Form1Controller extends Controller
         $approver = null;
         if ($student->form1Approver) {
             $approver = [
-                'name'         => $student->form1Approver->lecturer_name,
-                'nidn'         => $student->form1Approver->nidn,
-                'role'         => 'Kaprodi ' . $student->form1Approver->study_program,
+                'name' => $student->form1Approver->lecturer_name,
+                'nidn' => $student->form1Approver->nidn,
+                'role' => 'Kaprodi '.$student->form1Approver->study_program,
                 'approvalDate' => $student->form1_approved_at?->format('d/m/Y'),
             ];
         }
 
         return response()->json([
-            'form1'            => $student->form1_data,
-            'access_status'    => $student->access_status,
-            'pdf_path'         => $student->form1_pdf_path,
+            'form1' => $student->form1_data,
+            'access_status' => $student->access_status,
+            'pdf_path' => $student->form1_pdf_path,
             'rejection_reason' => $student->form1_rejection_reason,
-            'approver'         => $approver,
-            'submitted_at'     => $student->updated_at?->toIso8601String(),
+            'approver' => $approver,
+            'submitted_at' => $student->updated_at?->toIso8601String(),
         ]);
     }
-    public function store(Request $request)
+
+    public function store(StoreForm1Request $request)
     {
         $student = $request->user()->student;
         if (! $student) {
@@ -58,12 +61,7 @@ class Form1Controller extends Controller
             ], 422);
         }
 
-        $validated = $request->validate([
-            'skemaMagang' => 'required|string|in:Mitra,Mandiri,Kewirausahaan',
-            'topikMagang' => 'required|string|max:2000',
-            'outputTarget' => 'required|string|in:Produk,Prototype,Laporan',
-            'transkrip' => 'required|file|mimes:pdf,jpg,jpeg,png|mimetypes:application/pdf,image/jpeg,image/png|max:5120',
-        ]);
+        $validated = $request->validated();
 
         $transkripPath = $request->file('transkrip')->store('transkrip', 'local');
 
@@ -80,8 +78,8 @@ class Form1Controller extends Controller
         ];
 
         $student->fill([
-            'form1_data'             => $form1Data,
-            'form1_pdf_path'         => $transkripPath,
+            'form1_data' => $form1Data,
+            'form1_pdf_path' => $transkripPath,
             'form1_rejection_reason' => null,
         ]);
 
@@ -92,10 +90,11 @@ class Form1Controller extends Controller
             'access_status' => 'PendingReview',
         ], 201);
     }
+
     public function indexForKaprodi(Request $request)
     {
         $lecturer = $request->user()->lecturer;
-        if (!$lecturer || !$lecturer->study_program) {
+        if (! $lecturer || ! $lecturer->study_program) {
             return response()->json(['message' => 'Akses ditolak.'], 403);
         }
 
@@ -108,12 +107,13 @@ class Form1Controller extends Controller
 
         return response()->json(['submissions' => $students]);
     }
+
     public function approve(Request $request, int $studentId)
     {
         $lecturer = $request->user()->lecturer;
 
         // PDF butuh tanda tangan Kaprodi, jadi tahan dulu kalau belum ada.
-        if (!$lecturer->signature_path) {
+        if (! $lecturer->signature_path) {
             return response()->json([
                 'message' => 'Anda harus mengunggah tanda tangan digital terlebih dahulu melalui menu "Profil Saya" sebelum dapat menyetujui Form 1.',
             ], 422);
@@ -126,8 +126,8 @@ class Form1Controller extends Controller
 
         app(StudentStateMachine::class)->transition($student, 'ApprovedForm1', [
             'form1_rejection_reason' => null,
-            'form1_approved_by'      => $lecturer->id,
-            'form1_approved_at'      => now(),
+            'form1_approved_by' => $lecturer->id,
+            'form1_approved_at' => now(),
         ]);
 
         return response()->json([
@@ -135,9 +135,10 @@ class Form1Controller extends Controller
             'access_status' => 'ApprovedForm1',
         ]);
     }
-    public function reject(Request $request, int $studentId)
+
+    public function reject(RejectForm1Request $request, int $studentId)
     {
-        $request->validate(['reason' => 'required|string|max:500']);
+        $validated = $request->validated();
 
         $lecturer = $request->user()->lecturer;
         $student = Student::where('id', $studentId)
@@ -146,7 +147,7 @@ class Form1Controller extends Controller
             ->firstOrFail();
 
         app(StudentStateMachine::class)->transition($student, 'RejectedForm1', [
-            'form1_rejection_reason' => $request->reason,
+            'form1_rejection_reason' => $validated['reason'],
         ]);
 
         return response()->json([
@@ -154,10 +155,11 @@ class Form1Controller extends Controller
             'access_status' => 'RejectedForm1',
         ]);
     }
+
     public function downloadSuratKeterangan(Request $request)
     {
         $student = $request->user()->student;
-        if (!$student) {
+        if (! $student) {
             return response()->json(['message' => 'Profil mahasiswa tidak ditemukan.'], 404);
         }
 
@@ -173,34 +175,35 @@ class Form1Controller extends Controller
             $absPath = StoredFilePath::resolve(storage_path('app/public'), $kaprodi->signature_path);
             if ($absPath) {
                 $mime = mime_content_type($absPath) ?: 'image/png';
-                $signatureSrc = 'data:' . $mime . ';base64,' . base64_encode(file_get_contents($absPath));
+                $signatureSrc = 'data:'.$mime.';base64,'.base64_encode(file_get_contents($absPath));
             }
         }
 
         $logoPath = public_path('assets/images/logo-ubakrie.png');
         $logoSrc = file_exists($logoPath)
-            ? 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath))
+            ? 'data:image/png;base64,'.base64_encode(file_get_contents($logoPath))
             : null;
 
         Carbon::setLocale('id');
         $submittedDate = optional($student->updated_at)->translatedFormat('d F Y') ?? '—';
-        $approvalDate  = optional($student->form1_approved_at)->translatedFormat('d F Y') ?? '—';
+        $approvalDate = optional($student->form1_approved_at)->translatedFormat('d F Y') ?? '—';
 
         $pdf = Pdf::loadView('pdf.surat-keterangan', [
-            'student'       => $student,
-            'form1'         => $student->form1_data ?? [],
-            'kaprodiName'   => $kaprodi->lecturer_name ?? '—',
-            'kaprodiNidn'   => $kaprodi->nidn ?? '—',
-            'signatureSrc'  => $signatureSrc,
-            'logoSrc'       => $logoSrc,
+            'student' => $student,
+            'form1' => $student->form1_data ?? [],
+            'kaprodiName' => $kaprodi->lecturer_name ?? '—',
+            'kaprodiNidn' => $kaprodi->nidn ?? '—',
+            'signatureSrc' => $signatureSrc,
+            'logoSrc' => $logoSrc,
             'submittedDate' => $submittedDate,
-            'approvalDate'  => $approvalDate,
+            'approvalDate' => $approvalDate,
         ])->setPaper('a4');
 
-        $filename = 'Surat_Keterangan_Form1_' . $student->nim . '.pdf';
+        $filename = 'Surat_Keterangan_Form1_'.$student->nim.'.pdf';
 
         return $pdf->download($filename);
     }
+
     public function downloadTranskrip(Request $request, int $studentId)
     {
         $lecturer = $request->user()->lecturer;
@@ -208,7 +211,7 @@ class Form1Controller extends Controller
             ->where('study_program', $lecturer->study_program)
             ->firstOrFail();
 
-        if (!$student->form1_pdf_path) {
+        if (! $student->form1_pdf_path) {
             return response()->json(['message' => 'Transkrip tidak tersedia.'], 404);
         }
 

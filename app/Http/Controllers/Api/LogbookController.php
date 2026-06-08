@@ -3,6 +3,9 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Logbooks\RejectLogbookRequest;
+use App\Http\Requests\Logbooks\StoreLogbookRequest;
+use App\Http\Requests\Logbooks\UpdateLogbookRequest;
 use App\Models\Logbook;
 use App\Models\Student;
 use App\Services\LogbookReviewService;
@@ -29,7 +32,7 @@ class LogbookController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function store(StoreLogbookRequest $request)
     {
         $student = $request->user()->student;
 
@@ -37,11 +40,7 @@ class LogbookController extends Controller
             return response()->json(['message' => 'DPM harus ditugaskan terlebih dahulu.'], 403);
         }
 
-        $validated = $request->validate([
-            'tanggal' => $this->dateRules($student),
-            'kegiatan_harian' => 'required|string',
-            'hasil' => 'required|string',
-        ]);
+        $validated = $request->validated();
 
         $validated['student_id'] = $student->id;
 
@@ -56,7 +55,7 @@ class LogbookController extends Controller
         return response()->json(['message' => 'Logbook berhasil disimpan.', 'logbook' => $logbook], 201);
     }
 
-    public function update(Request $request, $id)
+    public function update(UpdateLogbookRequest $request, int $id)
     {
         $student = $request->user()->student;
 
@@ -65,11 +64,7 @@ class LogbookController extends Controller
             ->whereIn('status', ['PendingReview', 'Rejected'])
             ->firstOrFail();
 
-        $validated = $request->validate([
-            'tanggal' => $this->dateRules($student, $logbook->id, false),
-            'kegiatan_harian' => 'sometimes|string',
-            'hasil' => 'sometimes|string',
-        ]);
+        $validated = $request->validated();
 
         // Edit logbook berarti DPM perlu review ulang.
         $validated['status'] = 'PendingReview';
@@ -112,44 +107,15 @@ class LogbookController extends Controller
         ]);
     }
 
-    public function reject(Request $request, int $id, LogbookReviewService $reviewService)
+    public function reject(RejectLogbookRequest $request, int $id, LogbookReviewService $reviewService)
     {
-        $validated = $request->validate(['note' => 'nullable|string|max:500']);
+        $validated = $request->validated();
 
         $lecturer = $request->user()->lecturer;
 
         $reviewService->reject($id, $lecturer->id, $validated['note'] ?? null);
 
         return response()->json(['message' => 'Logbook ditolak.']);
-    }
-
-    private function dateRules(Student $student, ?int $ignoreId = null, bool $required = true): array
-    {
-        $period = $this->internshipPeriod($student);
-
-        if (! $period) {
-            throw ValidationException::withMessages([
-                'tanggal' => 'Periode magang belum tersedia. Lengkapi pengajuan pembimbing terlebih dahulu.',
-            ]);
-        }
-
-        return [
-            $required ? 'required' : 'sometimes',
-            'date',
-            'after_or_equal:'.$period['start_date'],
-            'before_or_equal:'.$period['maximum_date'],
-            function (string $attribute, mixed $value, \Closure $fail) use ($student, $ignoreId): void {
-                $duplicateExists = Logbook::query()
-                    ->where('student_id', $student->id)
-                    ->whereDate('tanggal', $value)
-                    ->when($ignoreId, fn ($query) => $query->whereKeyNot($ignoreId))
-                    ->exists();
-
-                if ($duplicateExists) {
-                    $fail('Logbook untuk tanggal ini sudah ada.');
-                }
-            },
-        ];
     }
 
     private function internshipPeriod(Student $student): ?array

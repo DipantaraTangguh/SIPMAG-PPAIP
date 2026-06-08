@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Applications\StoreApplicationRequest;
 use App\Models\Application;
 use App\Models\Internship;
 use App\Models\Student;
@@ -26,15 +27,13 @@ class ApplicationController extends Controller
 
         return response()->json(['applications' => $applications]);
     }
-    public function store(Request $request)
+
+    public function store(StoreApplicationRequest $request)
     {
-        $validated = $request->validate([
-            'internship_id' => 'required|integer|exists:internships,id',
-            'cv_file'       => 'required|file|mimes:pdf|mimetypes:application/pdf|max:5120',
-        ]);
+        $validated = $request->validated();
 
         $studentId = $request->user()->student?->id;
-        if (!$studentId) {
+        if (! $studentId) {
             return response()->json(['message' => 'Profil mahasiswa tidak ditemukan.'], 404);
         }
 
@@ -44,7 +43,7 @@ class ApplicationController extends Controller
             $application = DB::transaction(function () use ($request, $validated, $studentId, &$cvPath) {
                 $student = Student::query()->lockForUpdate()->findOrFail($studentId);
 
-                if (!in_array($student->access_status, ['ApprovedForm1', 'HasApplication'])) {
+                if (! in_array($student->access_status, ['ApprovedForm1', 'HasApplication'])) {
                     abort(403, 'Form 1 harus disetujui terlebih dahulu.');
                 }
 
@@ -53,7 +52,7 @@ class ApplicationController extends Controller
                     ->lockForUpdate()
                     ->find($validated['internship_id']);
 
-                if (!$internship) {
+                if (! $internship) {
                     throw ValidationException::withMessages([
                         'internship_id' => 'Lowongan tidak aktif atau batas waktu pendaftaran telah berakhir.',
                     ]);
@@ -83,10 +82,10 @@ class ApplicationController extends Controller
                 $cvPath = $request->file('cv_file')->store('cv', 'local');
 
                 $application = Application::create([
-                    'student_id'    => $student->id,
+                    'student_id' => $student->id,
                     'internship_id' => $internship->id,
-                    'cv_file_path'  => $cvPath,
-                    'status'        => 'Applied',
+                    'cv_file_path' => $cvPath,
+                    'status' => 'Applied',
                 ]);
 
                 if ($student->access_status === 'ApprovedForm1') {
@@ -104,7 +103,7 @@ class ApplicationController extends Controller
         }
 
         return response()->json([
-            'message'     => 'Lamaran berhasil dikirim.',
+            'message' => 'Lamaran berhasil dikirim.',
             'application' => $application->load('internship:id,company_name,position'),
         ], 201);
     }

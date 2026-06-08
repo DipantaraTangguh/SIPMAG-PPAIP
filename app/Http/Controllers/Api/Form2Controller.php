@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Form2\RejectForm2Request;
+use App\Http\Requests\Form2\StoreForm2Request;
 use App\Models\Form2Submission;
 use App\Models\User;
 use App\Services\StudentStateMachine;
@@ -21,7 +23,7 @@ class Form2Controller extends Controller
         return response()->json(['submissions' => $submissions]);
     }
 
-    public function store(Request $request)
+    public function store(StoreForm2Request $request)
     {
         $student = $this->authenticatedUser($request)->student;
 
@@ -29,13 +31,7 @@ class Form2Controller extends Controller
             return response()->json(['message' => 'Form 1 harus disetujui terlebih dahulu.'], 403);
         }
 
-        $validated = $request->validate([
-            'company_name' => 'required|string|max:255',
-            'alamat_perusahaan' => 'required|string',
-            'lingkup_magang' => 'required|string',
-            'tanggal_mulai' => 'required|date',
-            'tanggal_selesai' => 'required|date|after:tanggal_mulai',
-        ]);
+        $validated = $request->validated();
 
         $validated['student_id'] = $student->id;
 
@@ -81,9 +77,9 @@ class Form2Controller extends Controller
         return response()->json(['message' => 'Form 2 disetujui.', 'submission' => $submission]);
     }
 
-    public function reject(Request $request, int $id)
+    public function reject(RejectForm2Request $request, int $id)
     {
-        $request->validate(['reason' => 'required|string|max:500']);
+        $validated = $request->validated();
 
         $submission = Form2Submission::where('id', $id)
             ->where('status', 'PendingReview')
@@ -91,7 +87,7 @@ class Form2Controller extends Controller
 
         $submission->update([
             'status' => 'RejectedForm2',
-            'rejection_reason' => $request->reason,
+            'rejection_reason' => $validated['reason'],
         ]);
 
         return response()->json(['message' => 'Form 2 ditolak.', 'submission' => $submission]);
