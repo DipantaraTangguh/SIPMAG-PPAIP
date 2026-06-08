@@ -11,6 +11,7 @@ use App\Support\StoredFilePath;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Gate;
 
 class Form1Controller extends Controller
 {
@@ -20,6 +21,8 @@ class Form1Controller extends Controller
         if (! $student) {
             return response()->json(['message' => 'Profil mahasiswa tidak ditemukan.'], 404);
         }
+
+        Gate::authorize('view', $student);
 
         // Sekalian bawa data approver buat tampilan status.
         $student->load('form1Approver');
@@ -93,6 +96,8 @@ class Form1Controller extends Controller
 
     public function indexForKaprodi(Request $request)
     {
+        Gate::authorize('viewAny', Student::class);
+
         $lecturer = $request->user()->lecturer;
         if (! $lecturer || ! $lecturer->study_program) {
             return response()->json(['message' => 'Akses ditolak.'], 403);
@@ -112,17 +117,18 @@ class Form1Controller extends Controller
     {
         $lecturer = $request->user()->lecturer;
 
+        $student = Student::where('id', $studentId)
+            ->where('access_status', 'PendingReview')
+            ->firstOrFail();
+
+        Gate::authorize('reviewForm1', $student);
+
         // PDF butuh tanda tangan Kaprodi, jadi tahan dulu kalau belum ada.
         if (! $lecturer->signature_path) {
             return response()->json([
                 'message' => 'Anda harus mengunggah tanda tangan digital terlebih dahulu melalui menu "Profil Saya" sebelum dapat menyetujui Form 1.',
             ], 422);
         }
-
-        $student = Student::where('id', $studentId)
-            ->where('study_program', $lecturer->study_program)
-            ->where('access_status', 'PendingReview')
-            ->firstOrFail();
 
         app(StudentStateMachine::class)->transition($student, 'ApprovedForm1', [
             'form1_rejection_reason' => null,
@@ -142,9 +148,10 @@ class Form1Controller extends Controller
 
         $lecturer = $request->user()->lecturer;
         $student = Student::where('id', $studentId)
-            ->where('study_program', $lecturer->study_program)
             ->where('access_status', 'PendingReview')
             ->firstOrFail();
+
+        Gate::authorize('reviewForm1', $student);
 
         app(StudentStateMachine::class)->transition($student, 'RejectedForm1', [
             'form1_rejection_reason' => $validated['reason'],
@@ -162,6 +169,8 @@ class Form1Controller extends Controller
         if (! $student) {
             return response()->json(['message' => 'Profil mahasiswa tidak ditemukan.'], 404);
         }
+
+        Gate::authorize('view', $student);
 
         if ($student->access_status !== 'ApprovedForm1') {
             return response()->json(['message' => 'Form 1 belum disetujui.'], 403);
@@ -207,9 +216,9 @@ class Form1Controller extends Controller
     public function downloadTranskrip(Request $request, int $studentId)
     {
         $lecturer = $request->user()->lecturer;
-        $student = Student::where('id', $studentId)
-            ->where('study_program', $lecturer->study_program)
-            ->firstOrFail();
+        $student = Student::findOrFail($studentId);
+
+        Gate::authorize('viewTranscript', $student);
 
         if (! $student->form1_pdf_path) {
             return response()->json(['message' => 'Transkrip tidak tersedia.'], 404);

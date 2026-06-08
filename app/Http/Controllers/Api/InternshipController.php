@@ -7,11 +7,14 @@ use App\Http\Requests\Internships\StoreInternshipRequest;
 use App\Http\Requests\Internships\UpdateInternshipRequest;
 use App\Models\Internship;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class InternshipController extends Controller
 {
     public function index(Request $request)
     {
+        Gate::authorize('viewAny', Internship::class);
+
         $query = Internship::query()->openForApplications();
 
         if ($search = $request->query('search')) {
@@ -41,6 +44,8 @@ class InternshipController extends Controller
 
     public function store(StoreInternshipRequest $request)
     {
+        Gate::authorize('create', Internship::class);
+
         $validated = $request->validated();
 
         $internship = Internship::create($validated);
@@ -51,6 +56,7 @@ class InternshipController extends Controller
     public function update(UpdateInternshipRequest $request, int $id)
     {
         $internship = Internship::findOrFail($id);
+        Gate::authorize('update', $internship);
 
         $validated = $request->validated();
 
@@ -61,7 +67,10 @@ class InternshipController extends Controller
 
     public function destroy(int $id)
     {
-        Internship::findOrFail($id)->delete();
+        $internship = Internship::findOrFail($id);
+        Gate::authorize('delete', $internship);
+
+        $internship->delete();
 
         return response()->json(['message' => 'Lowongan berhasil dihapus.']);
     }

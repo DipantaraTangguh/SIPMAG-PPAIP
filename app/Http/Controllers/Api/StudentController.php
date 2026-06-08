@@ -5,11 +5,14 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Student;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class StudentController extends Controller
 {
     public function indexForPpaip(Request $request)
     {
+        Gate::authorize('viewAny', Student::class);
+
         $students = Student::with(['dpm:id,lecturer_name'])
             ->select([
                 'id', 'nim', 'name', 'study_program', 'email',
@@ -25,6 +28,8 @@ class StudentController extends Controller
 
     public function indexForKaprodi(Request $request)
     {
+        Gate::authorize('viewAny', Student::class);
+
         $lecturer = $request->user()->lecturer;
         if (! $lecturer || ! $lecturer->study_program) {
             return response()->json(['message' => 'Akses ditolak.'], 403);
@@ -46,6 +51,8 @@ class StudentController extends Controller
 
     public function indexForDpm(Request $request)
     {
+        Gate::authorize('viewAny', Student::class);
+
         $lecturer = $request->user()->lecturer;
         if (! $lecturer) {
             return response()->json(['message' => 'Akses ditolak.'], 403);

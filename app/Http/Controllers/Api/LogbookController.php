@@ -11,12 +11,15 @@ use App\Models\Student;
 use App\Services\LogbookReviewService;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\ValidationException;
 
 class LogbookController extends Controller
 {
     public function index(Request $request)
     {
+        Gate::authorize('viewAny', Logbook::class);
+
         $student = $request->user()->student;
 
         $logbooks = Logbook::where('student_id', $student->id)
@@ -34,6 +37,8 @@ class LogbookController extends Controller
 
     public function store(StoreLogbookRequest $request)
     {
+        Gate::authorize('create', Logbook::class);
+
         $student = $request->user()->student;
 
         if ($student->access_status !== 'HasDPM' && $student->access_status !== 'LogbookComplete') {
@@ -60,9 +65,10 @@ class LogbookController extends Controller
         $student = $request->user()->student;
 
         $logbook = Logbook::where('id', $id)
-            ->where('student_id', $student->id)
             ->whereIn('status', ['PendingReview', 'Rejected'])
             ->firstOrFail();
+
+        Gate::authorize('update', $logbook);
 
         $validated = $request->validated();
 
@@ -83,6 +89,8 @@ class LogbookController extends Controller
 
     public function indexForDpm(Request $request)
     {
+        Gate::authorize('viewAny', Logbook::class);
+
         $lecturer = $request->user()->lecturer;
 
         $logbooks = Logbook::whereHas('student', function ($q) use ($lecturer) {
@@ -97,6 +105,9 @@ class LogbookController extends Controller
 
     public function approve(Request $request, int $id, LogbookReviewService $reviewService)
     {
+        $logbook = Logbook::with('student')->findOrFail($id);
+        Gate::authorize('review', $logbook);
+
         $lecturer = $request->user()->lecturer;
 
         $student = $reviewService->approve($id, $lecturer->id);
@@ -110,6 +121,9 @@ class LogbookController extends Controller
     public function reject(RejectLogbookRequest $request, int $id, LogbookReviewService $reviewService)
     {
         $validated = $request->validated();
+
+        $logbook = Logbook::with('student')->findOrFail($id);
+        Gate::authorize('review', $logbook);
 
         $lecturer = $request->user()->lecturer;
 

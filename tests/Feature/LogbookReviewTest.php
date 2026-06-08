@@ -79,7 +79,7 @@ class LogbookReviewTest extends TestCase
 
         $this->actingAs($otherDpmUser);
 
-        $this->postJson("/api/dpm/logbooks/{$pending->id}/approve")->assertNotFound();
+        $this->postJson("/api/dpm/logbooks/{$pending->id}/approve")->assertForbidden();
 
         $this->assertSame('PendingReview', $pending->fresh()->status);
         $this->assertSame(0, $student->fresh()->approved_logbook_count);

@@ -10,6 +10,7 @@ use App\Models\Student;
 use App\Services\StudentStateMachine;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 use Throwable;
 
@@ -99,6 +100,8 @@ class DefenseController extends Controller
 
     public function indexForKaprodi(Request $request)
     {
+        Gate::authorize('viewAny', Student::class);
+
         $lecturer = $request->user()->lecturer;
         if (! $lecturer || ! $lecturer->study_program) {
             return response()->json(['message' => 'Akses ditolak.'], 403);
@@ -118,14 +121,17 @@ class DefenseController extends Controller
         $lecturer = $request->user()->lecturer;
 
         $student = Student::where('id', $studentId)
-            ->where('study_program', $lecturer->study_program)
             ->where('access_status', 'MenungguSidang')
             ->firstOrFail();
+
+        Gate::authorize('manageDefense', $student);
 
         $submission = $student->sidangSubmission;
         if (! $submission || $submission->status !== 'Pending') {
             return response()->json(['message' => 'Submission tidak valid untuk dijadwalkan.'], 422);
         }
+
+        Gate::authorize('schedule', $submission);
 
         $validated = $request->validated();
 
@@ -150,14 +156,17 @@ class DefenseController extends Controller
         $lecturer = $request->user()->lecturer;
 
         $student = Student::where('id', $studentId)
-            ->where('study_program', $lecturer->study_program)
             ->where('access_status', 'MenungguSidang')
             ->firstOrFail();
+
+        Gate::authorize('manageDefense', $student);
 
         $submission = $student->sidangSubmission;
         if (! $submission || $submission->status !== 'Scheduled') {
             return response()->json(['message' => 'Sidang belum dijadwalkan.'], 422);
         }
+
+        Gate::authorize('complete', $submission);
 
         $student->fill([
             'dpm_id' => null,

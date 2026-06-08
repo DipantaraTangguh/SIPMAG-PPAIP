@@ -10,14 +10,20 @@ use App\Models\SupervisorApplication;
 use App\Services\DpmAssignmentService;
 use App\Support\StoredFilePath;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class SupervisorController extends Controller
 {
     public function show(Request $request)
     {
+        Gate::authorize('viewAny', SupervisorApplication::class);
+
         $student = $request->user()->student;
 
         $application = SupervisorApplication::where('student_id', $student->id)->first();
+        if ($application) {
+            Gate::authorize('view', $application);
+        }
 
         return response()->json([
             'application' => $application,
@@ -31,6 +37,8 @@ class SupervisorController extends Controller
 
     public function store(StoreSupervisorApplicationRequest $request)
     {
+        Gate::authorize('create', SupervisorApplication::class);
+
         $student = $request->user()->student;
 
         // Request DPM baru masuk kalau tahap perusahaan sudah valid.
@@ -66,6 +74,8 @@ class SupervisorController extends Controller
 
     public function indexForKaprodi(Request $request)
     {
+        Gate::authorize('viewAny', SupervisorApplication::class);
+
         $lecturer = $request->user()->lecturer;
 
         $applications = SupervisorApplication::whereHas('student', function ($q) use ($lecturer) {
@@ -87,9 +97,9 @@ class SupervisorController extends Controller
             return response()->json(['message' => 'Profil Kaprodi tidak valid.'], 403);
         }
 
-        $student = Student::where('id', $validated['student_id'])
-            ->where('study_program', $kaprodi->study_program)
-            ->firstOrFail();
+        $student = Student::findOrFail($validated['student_id']);
+
+        Gate::authorize('assignDpm', $student);
 
         $assignmentService->assign($student, (int) $validated['lecturer_id']);
 
@@ -103,6 +113,8 @@ class SupervisorController extends Controller
     {
         $student = $request->user()->student;
         $application = SupervisorApplication::where('student_id', $student->id)->firstOrFail();
+
+        Gate::authorize('view', $application);
 
         if (! $application->loa_path) {
             return response()->json(['message' => 'LoA tidak tersedia.'], 404);
@@ -118,12 +130,11 @@ class SupervisorController extends Controller
 
     public function downloadLoaForKaprodi(Request $request, int $studentId)
     {
-        $lecturer = $request->user()->lecturer;
-        $student = Student::where('id', $studentId)
-            ->where('study_program', $lecturer->study_program)
-            ->firstOrFail();
+        $student = Student::findOrFail($studentId);
 
         $application = SupervisorApplication::where('student_id', $student->id)->firstOrFail();
+
+        Gate::authorize('view', $application);
 
         if (! $application->loa_path) {
             return response()->json(['message' => 'LoA tidak tersedia.'], 404);

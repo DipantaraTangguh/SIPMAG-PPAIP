@@ -9,11 +9,14 @@ use App\Models\Form2Submission;
 use App\Models\User;
 use App\Services\StudentStateMachine;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class Form2Controller extends Controller
 {
     public function index(Request $request)
     {
+        Gate::authorize('viewAny', Form2Submission::class);
+
         $student = $this->authenticatedUser($request)->student;
 
         $submissions = Form2Submission::where('student_id', $student->id)
@@ -25,6 +28,8 @@ class Form2Controller extends Controller
 
     public function store(StoreForm2Request $request)
     {
+        Gate::authorize('create', Form2Submission::class);
+
         $student = $this->authenticatedUser($request)->student;
 
         if (! in_array($student->access_status, ['ApprovedForm1', 'HasApplication'])) {
@@ -50,6 +55,8 @@ class Form2Controller extends Controller
 
     public function indexForPpaip(Request $request)
     {
+        Gate::authorize('viewAny', Form2Submission::class);
+
         $submissions = Form2Submission::with('student:id,nim,name,study_program')
             ->orderByDesc('submitted_at')
             ->paginate($this->perPage($request));
@@ -62,6 +69,8 @@ class Form2Controller extends Controller
         $submission = Form2Submission::where('id', $id)
             ->where('status', 'PendingReview')
             ->firstOrFail();
+
+        Gate::authorize('review', $submission);
 
         $submission->update([
             'status' => 'ApprovedForm2',
@@ -84,6 +93,8 @@ class Form2Controller extends Controller
         $submission = Form2Submission::where('id', $id)
             ->where('status', 'PendingReview')
             ->firstOrFail();
+
+        Gate::authorize('review', $submission);
 
         $submission->update([
             'status' => 'RejectedForm2',

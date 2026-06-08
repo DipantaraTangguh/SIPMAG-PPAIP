@@ -4,30 +4,22 @@ use App\Models\Student;
 use App\Models\User;
 use App\Support\StoredFilePath;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['web', 'auth'])->prefix('admin/transkrip')->group(function () {
 
     // Preview PDF langsung di iframe.
     Route::get('/{student}/preview', function (Request $request, Student $student) {
-        /** @var User $user */
-        $user = $request->user();
-        if (!in_array($user->role, ['kaprodi', 'ppaip'])) {
-            abort(403);
-        }
-        if ($user->role === 'kaprodi') {
-            $prodi = $user->lecturer?->study_program;
-            if ($student->study_program !== $prodi) {
-                abort(403);
-            }
-        }
-        if (!$student->form1_pdf_path) {
+        Gate::authorize('viewTranscript', $student);
+        if (! $student->form1_pdf_path) {
             abort(404, 'Transkrip tidak tersedia.');
         }
         $path = StoredFilePath::resolve(storage_path('app/private'), $student->form1_pdf_path);
         if (! $path) {
             abort(404, 'File tidak ditemukan.');
         }
+
         return response()->file($path, [
             'Content-Type' => mime_content_type($path),
         ]);
@@ -35,18 +27,8 @@ Route::middleware(['web', 'auth'])->prefix('admin/transkrip')->group(function ()
 
     // Download satu file tanpa render preview.
     Route::get('/{student}/download', function (Request $request, Student $student) {
-        /** @var User $user */
-        $user = $request->user();
-        if (!in_array($user->role, ['kaprodi', 'ppaip'])) {
-            abort(403);
-        }
-        if ($user->role === 'kaprodi') {
-            $prodi = $user->lecturer?->study_program;
-            if ($student->study_program !== $prodi) {
-                abort(403);
-            }
-        }
-        if (!$student->form1_pdf_path) {
+        Gate::authorize('viewTranscript', $student);
+        if (! $student->form1_pdf_path) {
             abort(404);
         }
         $path = StoredFilePath::resolve(storage_path('app/private'), $student->form1_pdf_path);
@@ -54,6 +36,7 @@ Route::middleware(['web', 'auth'])->prefix('admin/transkrip')->group(function ()
             abort(404);
         }
         $ext = pathinfo($path, PATHINFO_EXTENSION);
+
         return response()->download($path, "transkrip_{$student->nim}.{$ext}");
     })->name('transkrip.download');
 
@@ -61,9 +44,7 @@ Route::middleware(['web', 'auth'])->prefix('admin/transkrip')->group(function ()
     Route::post('/bulk-download', function (Request $request) {
         /** @var User $user */
         $user = $request->user();
-        if (!in_array($user->role, ['kaprodi', 'ppaip'])) {
-            abort(403);
-        }
+        Gate::authorize('viewTranscripts', Student::class);
 
         $ids = $request->input('ids', []);
         $query = Student::whereIn('id', $ids)->whereNotNull('form1_pdf_path');
@@ -79,16 +60,16 @@ Route::middleware(['web', 'auth'])->prefix('admin/transkrip')->group(function ()
             abort(404, 'Tidak ada transkrip untuk diunduh.');
         }
 
-        $zipName = 'transkrip_' . now()->format('Ymd_His') . '.zip';
-        $zipPath = storage_path('app/private/temp/' . $zipName);
+        $zipName = 'transkrip_'.now()->format('Ymd_His').'.zip';
+        $zipPath = storage_path('app/private/temp/'.$zipName);
 
         // Folder temp kadang belum ada di fresh install.
-        if (!is_dir(dirname($zipPath))) {
+        if (! is_dir(dirname($zipPath))) {
             mkdir(dirname($zipPath), 0755, true);
         }
 
-        $zip = new \ZipArchive();
-        $zip->open($zipPath, \ZipArchive::CREATE | \ZipArchive::OVERWRITE);
+        $zip = new ZipArchive;
+        $zip->open($zipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE);
 
         foreach ($students as $student) {
             $filePath = StoredFilePath::resolve(storage_path('app/private'), $student->form1_pdf_path);

@@ -10,6 +10,7 @@ use App\Models\Student;
 use App\Services\StudentStateMachine;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 use Throwable;
@@ -18,6 +19,8 @@ class ApplicationController extends Controller
 {
     public function index(Request $request)
     {
+        Gate::authorize('viewAny', Application::class);
+
         $student = $request->user()->student;
 
         $applications = Application::where('student_id', $student->id)
@@ -30,6 +33,8 @@ class ApplicationController extends Controller
 
     public function store(StoreApplicationRequest $request)
     {
+        Gate::authorize('create', Application::class);
+
         $validated = $request->validated();
 
         $studentId = $request->user()->student?->id;
