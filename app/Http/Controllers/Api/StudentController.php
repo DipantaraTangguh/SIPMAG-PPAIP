@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\StudentResource;
 use App\Models\Student;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -23,7 +24,9 @@ class StudentController extends Controller
             ->orderByDesc('updated_at')
             ->paginate($this->perPage($request));
 
-        return response()->json(['students' => $students]);
+        return response()->json([
+            'students' => $this->resourceCollection($request, StudentResource::class, $students),
+        ]);
     }
 
     public function indexForKaprodi(Request $request)
@@ -46,7 +49,9 @@ class StudentController extends Controller
             ->orderByDesc('updated_at')
             ->paginate($this->perPage($request));
 
-        return response()->json(['students' => $students]);
+        return response()->json([
+            'students' => $this->resourceCollection($request, StudentResource::class, $students),
+        ]);
     }
 
     public function indexForDpm(Request $request)
@@ -67,6 +72,8 @@ class StudentController extends Controller
             ->orderByDesc('updated_at')
             ->paginate($this->perPage($request));
 
-        return response()->json(['students' => $students]);
+        return response()->json([
+            'students' => $this->resourceCollection($request, StudentResource::class, $students),
+        ]);
     }
 }

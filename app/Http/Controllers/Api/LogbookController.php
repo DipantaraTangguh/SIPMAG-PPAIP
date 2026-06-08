@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Logbooks\RejectLogbookRequest;
 use App\Http\Requests\Logbooks\StoreLogbookRequest;
 use App\Http\Requests\Logbooks\UpdateLogbookRequest;
+use App\Http\Resources\LogbookResource;
 use App\Models\Logbook;
 use App\Models\Student;
 use App\Services\LogbookReviewService;
@@ -27,7 +28,7 @@ class LogbookController extends Controller
             ->paginate($this->perPage($request));
 
         return response()->json([
-            'logbooks' => $logbooks,
+            'logbooks' => $this->resourceCollection($request, LogbookResource::class, $logbooks),
             'approved_logbook_count' => $student->logbooks()
                 ->where('status', 'Approved')
                 ->count(),
@@ -57,7 +58,10 @@ class LogbookController extends Controller
             ]);
         }
 
-        return response()->json(['message' => 'Logbook berhasil disimpan.', 'logbook' => $logbook], 201);
+        return response()->json([
+            'message' => 'Logbook berhasil disimpan.',
+            'logbook' => LogbookResource::make($logbook)->resolve($request),
+        ], 201);
     }
 
     public function update(UpdateLogbookRequest $request, int $id)
@@ -84,7 +88,10 @@ class LogbookController extends Controller
             ]);
         }
 
-        return response()->json(['message' => 'Logbook berhasil diperbarui.', 'logbook' => $logbook]);
+        return response()->json([
+            'message' => 'Logbook berhasil diperbarui.',
+            'logbook' => LogbookResource::make($logbook)->resolve($request),
+        ]);
     }
 
     public function indexForDpm(Request $request)
@@ -100,7 +107,9 @@ class LogbookController extends Controller
             ->orderByDesc('tanggal')
             ->paginate($this->perPage($request));
 
-        return response()->json(['logbooks' => $logbooks]);
+        return response()->json([
+            'logbooks' => $this->resourceCollection($request, LogbookResource::class, $logbooks),
+        ]);
     }
 
     public function approve(Request $request, int $id, LogbookReviewService $reviewService)

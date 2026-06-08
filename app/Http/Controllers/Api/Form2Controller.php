@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Form2\RejectForm2Request;
 use App\Http\Requests\Form2\StoreForm2Request;
+use App\Http\Resources\Form2SubmissionResource;
 use App\Models\Form2Submission;
 use App\Models\User;
 use App\Services\StudentStateMachine;
@@ -23,7 +24,9 @@ class Form2Controller extends Controller
             ->orderByDesc('submitted_at')
             ->paginate($this->perPage($request));
 
-        return response()->json(['submissions' => $submissions]);
+        return response()->json([
+            'submissions' => $this->resourceCollection($request, Form2SubmissionResource::class, $submissions),
+        ]);
     }
 
     public function store(StoreForm2Request $request)
@@ -49,7 +52,7 @@ class Form2Controller extends Controller
 
         return response()->json([
             'message' => 'Form 2 berhasil diajukan.',
-            'submission' => $submission,
+            'submission' => Form2SubmissionResource::make($submission)->resolve($request),
         ], 201);
     }
 
@@ -61,10 +64,12 @@ class Form2Controller extends Controller
             ->orderByDesc('submitted_at')
             ->paginate($this->perPage($request));
 
-        return response()->json(['submissions' => $submissions]);
+        return response()->json([
+            'submissions' => $this->resourceCollection($request, Form2SubmissionResource::class, $submissions),
+        ]);
     }
 
-    public function approve(int $id)
+    public function approve(Request $request, int $id)
     {
         $submission = Form2Submission::where('id', $id)
             ->where('status', 'PendingReview')
@@ -83,7 +88,10 @@ class Form2Controller extends Controller
             app(StudentStateMachine::class)->transition($student, 'HasApplication');
         }
 
-        return response()->json(['message' => 'Form 2 disetujui.', 'submission' => $submission]);
+        return response()->json([
+            'message' => 'Form 2 disetujui.',
+            'submission' => Form2SubmissionResource::make($submission)->resolve($request),
+        ]);
     }
 
     public function reject(RejectForm2Request $request, int $id)
@@ -101,7 +109,10 @@ class Form2Controller extends Controller
             'rejection_reason' => $validated['reason'],
         ]);
 
-        return response()->json(['message' => 'Form 2 ditolak.', 'submission' => $submission]);
+        return response()->json([
+            'message' => 'Form 2 ditolak.',
+            'submission' => Form2SubmissionResource::make($submission)->resolve($request),
+        ]);
     }
 
     private function authenticatedUser(Request $request): User

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Internships\StoreInternshipRequest;
 use App\Http\Requests\Internships\UpdateInternshipRequest;
+use App\Http\Resources\InternshipResource;
 use App\Models\Internship;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -30,16 +31,20 @@ class InternshipController extends Controller
 
         $internships = $query->orderByDesc('created_at')->paginate($this->perPage($request));
 
-        return response()->json(['internships' => $internships]);
+        return response()->json([
+            'internships' => $this->resourceCollection($request, InternshipResource::class, $internships),
+        ]);
     }
 
-    public function show(int $id)
+    public function show(Request $request, int $id)
     {
         $internship = Internship::query()
             ->openForApplications()
             ->findOrFail($id);
 
-        return response()->json(['internship' => $internship]);
+        return response()->json([
+            'internship' => InternshipResource::make($internship)->resolve($request),
+        ]);
     }
 
     public function store(StoreInternshipRequest $request)
@@ -50,7 +55,9 @@ class InternshipController extends Controller
 
         $internship = Internship::create($validated);
 
-        return response()->json(['internship' => $internship], 201);
+        return response()->json([
+            'internship' => InternshipResource::make($internship)->resolve($request),
+        ], 201);
     }
 
     public function update(UpdateInternshipRequest $request, int $id)
@@ -62,7 +69,9 @@ class InternshipController extends Controller
 
         $internship->update($validated);
 
-        return response()->json(['internship' => $internship]);
+        return response()->json([
+            'internship' => InternshipResource::make($internship)->resolve($request),
+        ]);
     }
 
     public function destroy(int $id)

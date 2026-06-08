@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Supervisors\AssignDpmRequest;
 use App\Http\Requests\Supervisors\StoreSupervisorApplicationRequest;
+use App\Http\Resources\LecturerResource;
+use App\Http\Resources\SupervisorApplicationResource;
 use App\Models\Student;
 use App\Models\SupervisorApplication;
 use App\Services\DpmAssignmentService;
@@ -26,12 +28,12 @@ class SupervisorController extends Controller
         }
 
         return response()->json([
-            'application' => $application,
-            'dpm' => $student->dpm ? [
-                'name' => $student->dpm->lecturer_name,
-                'nidn' => $student->dpm->nidn,
-                'contact' => $student->dpm->contact,
-            ] : null,
+            'application' => $application
+                ? SupervisorApplicationResource::make($application)->resolve($request)
+                : null,
+            'dpm' => $student->dpm
+                ? LecturerResource::make($student->dpm)->resolve($request)
+                : null,
         ]);
     }
 
@@ -85,7 +87,9 @@ class SupervisorController extends Controller
             ->orderByDesc('submitted_at')
             ->paginate($this->perPage($request));
 
-        return response()->json(['applications' => $applications]);
+        return response()->json([
+            'applications' => $this->resourceCollection($request, SupervisorApplicationResource::class, $applications),
+        ]);
     }
 
     public function assignDpm(AssignDpmRequest $request, DpmAssignmentService $assignmentService)

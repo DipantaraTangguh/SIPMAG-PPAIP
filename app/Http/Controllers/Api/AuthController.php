@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Http\Resources\UserResource;
 use App\Models\Student;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -98,7 +99,7 @@ class AuthController extends Controller
         $this->logLoginEvent('info', 'auth.login.succeeded', $request, $identifier, $user);
 
         return response()->json([
-            'user' => $this->buildUserPayload($user),
+            'user' => UserResource::make($user->loadMissing(['student.dpm', 'lecturer']))->resolve($request),
         ]);
     }
 
@@ -114,7 +115,7 @@ class AuthController extends Controller
     public function me(Request $request)
     {
         return response()->json([
-            'user' => $this->buildUserPayload($request->user()),
+            'user' => UserResource::make($request->user()->loadMissing(['student.dpm', 'lecturer']))->resolve($request),
         ]);
     }
 
@@ -187,54 +188,5 @@ class AuthController extends Controller
             'user_agent' => Str::limit((string) $request->userAgent(), 500, ''),
             ...$context,
         ]);
-    }
-
-    private function buildUserPayload(User $user): array
-    {
-        $payload = [
-            'id' => $user->id,
-            'name' => $user->name,
-            'email' => $user->email,
-            'role' => $user->role,
-        ];
-
-        if ($user->isMahasiswa()) {
-            $student = $user->student;
-            if ($student) {
-                $payload['student'] = [
-                    'id' => $student->id,
-                    'nim' => $student->nim,
-                    'name' => $student->name,
-                    'study_program' => $student->study_program,
-                    'email' => $student->email,
-                    'semester' => $student->semester,
-                    'tahun_akademik' => $student->tahun_akademik,
-                    'jumlah_sks' => $student->jumlah_sks,
-                    'ipk' => $student->ipk,
-                    'access_status' => $student->access_status,
-                    'is_independent' => $student->is_independent,
-                    'approved_logbook_count' => $student->approved_logbook_count,
-                    'dpm' => $student->dpm ? [
-                        'name' => $student->dpm->lecturer_name,
-                        'nidn' => $student->dpm->nidn,
-                        'contact' => $student->dpm->contact,
-                    ] : null,
-                ];
-            }
-        }
-
-        if ($user->isKaprodi() || $user->isDpm()) {
-            $lecturer = $user->lecturer;
-            if ($lecturer) {
-                $payload['lecturer'] = [
-                    'id' => $lecturer->id,
-                    'nidn' => $lecturer->nidn,
-                    'lecturer_name' => $lecturer->lecturer_name,
-                    'study_program' => $lecturer->study_program,
-                ];
-            }
-        }
-
-        return $payload;
     }
 }

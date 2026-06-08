@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Form1\RejectForm1Request;
 use App\Http\Requests\Form1\StoreForm1Request;
+use App\Http\Resources\Form1Resource;
+use App\Http\Resources\StudentResource;
 use App\Models\Student;
 use App\Services\StudentStateMachine;
 use App\Support\StoredFilePath;
@@ -27,24 +29,7 @@ class Form1Controller extends Controller
         // Sekalian bawa data approver buat tampilan status.
         $student->load('form1Approver');
 
-        $approver = null;
-        if ($student->form1Approver) {
-            $approver = [
-                'name' => $student->form1Approver->lecturer_name,
-                'nidn' => $student->form1Approver->nidn,
-                'role' => 'Kaprodi '.$student->form1Approver->study_program,
-                'approvalDate' => $student->form1_approved_at?->format('d/m/Y'),
-            ];
-        }
-
-        return response()->json([
-            'form1' => $student->form1_data,
-            'access_status' => $student->access_status,
-            'pdf_path' => $student->form1_pdf_path,
-            'rejection_reason' => $student->form1_rejection_reason,
-            'approver' => $approver,
-            'submitted_at' => $student->updated_at?->toIso8601String(),
-        ]);
+        return response()->json(Form1Resource::make($student)->resolve($request));
     }
 
     public function store(StoreForm1Request $request)
@@ -110,7 +95,9 @@ class Form1Controller extends Controller
             ->orderByDesc('updated_at')
             ->paginate($this->perPage($request));
 
-        return response()->json(['submissions' => $students]);
+        return response()->json([
+            'submissions' => $this->resourceCollection($request, StudentResource::class, $students),
+        ]);
     }
 
     public function approve(Request $request, int $studentId)

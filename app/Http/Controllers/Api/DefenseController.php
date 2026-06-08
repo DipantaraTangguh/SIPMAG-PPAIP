@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Defense\ScheduleDefenseRequest;
 use App\Http\Requests\Defense\StoreDefenseSubmissionRequest;
+use App\Http\Resources\DefenseSubmissionResource;
+use App\Http\Resources\StudentResource;
 use App\Models\DefenseSubmission;
 use App\Models\Student;
 use App\Services\StudentStateMachine;
@@ -23,21 +25,9 @@ class DefenseController extends Controller
         $submission = $student->sidangSubmission()->first();
 
         return response()->json([
-            'submission' => $submission ? [
-                'id' => $submission->id,
-                'laporan_path' => $submission->laporan_path,
-                'poster_path' => $submission->poster_path,
-                'foto_kegiatan_1_path' => $submission->foto_kegiatan_1_path,
-                'foto_kegiatan_2_path' => $submission->foto_kegiatan_2_path,
-                'krs_path' => $submission->krs_path,
-                'status' => $submission->status,
-                'scheduled_date' => $submission->scheduled_date?->format('Y-m-d'),
-                'scheduled_time' => $submission->scheduled_time,
-                'room' => $submission->room,
-                'dosen_penguji_1' => $submission->dosen_penguji_1,
-                'dosen_penguji_2' => $submission->dosen_penguji_2,
-                'submitted_at' => $submission->submitted_at,
-            ] : null,
+            'submission' => $submission
+                ? DefenseSubmissionResource::make($submission)->resolve($request)
+                : null,
             'access_status' => $student->access_status,
         ]);
     }
@@ -113,7 +103,9 @@ class DefenseController extends Controller
             ->select(['id', 'nim', 'name', 'study_program', 'dpm_id', 'access_status'])
             ->paginate($this->perPage($request));
 
-        return response()->json(['students' => $students]);
+        return response()->json([
+            'students' => $this->resourceCollection($request, StudentResource::class, $students),
+        ]);
     }
 
     public function scheduleSidang(ScheduleDefenseRequest $request, int $studentId)

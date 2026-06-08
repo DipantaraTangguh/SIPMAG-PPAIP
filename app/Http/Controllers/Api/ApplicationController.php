@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Applications\StoreApplicationRequest;
+use App\Http\Resources\ApplicationResource;
 use App\Models\Application;
 use App\Models\Internship;
 use App\Models\Student;
@@ -28,7 +29,9 @@ class ApplicationController extends Controller
             ->orderByDesc('created_at')
             ->paginate($this->perPage($request));
 
-        return response()->json(['applications' => $applications]);
+        return response()->json([
+            'applications' => $this->resourceCollection($request, ApplicationResource::class, $applications),
+        ]);
     }
 
     public function store(StoreApplicationRequest $request)
@@ -109,7 +112,7 @@ class ApplicationController extends Controller
 
         return response()->json([
             'message' => 'Lamaran berhasil dikirim.',
-            'application' => $application->load('internship:id,company_name,position'),
+            'application' => ApplicationResource::make($application->load('internship:id,company_name,position'))->resolve($request),
         ], 201);
     }
 }
