@@ -15,8 +15,8 @@ class StoreForm2Request extends FormRequest
     {
         return [
             'company_name' => 'required|string|max:255',
-            'alamat_perusahaan' => 'required|string',
-            'lingkup_magang' => 'required|string',
+            'alamat_perusahaan' => 'required|string|max:2000',
+            'lingkup_magang' => 'required|string|max:2000',
             'tanggal_mulai' => 'required|date',
             'tanggal_selesai' => 'required|date|after:tanggal_mulai',
         ];
