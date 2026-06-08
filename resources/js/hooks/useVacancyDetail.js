@@ -1,5 +1,5 @@
 import { useState, useCallback, useMemo } from 'react';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context/AppContext';
 import { useApplicationWorkflow } from '../context/StudentWorkflowContext';
 import { canAccessPortal } from '../utils/accessUtils';
 

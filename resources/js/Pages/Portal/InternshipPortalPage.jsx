@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '../../context/AppContext';
 import { useApplicationWorkflow } from '../../context/StudentWorkflowContext';
 import { canAccessPortal } from '../../utils/accessUtils';
 import { api } from '../../lib/api';

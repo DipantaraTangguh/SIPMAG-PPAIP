@@ -1,6 +1,6 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '../../context/AppContext';
 import DashboardLayout from '../../Components/Layouts/DashboardLayout';
 import Form1Card from '../../Components/Fragments/form1/Form1Card';
 import useForm1 from '../../hooks/useForm1';

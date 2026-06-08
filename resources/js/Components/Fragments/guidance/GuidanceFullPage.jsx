@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Clock } from 'lucide-react';
-import { useAuth } from '../../../context/AuthContext';
+import { useAuth } from '../../../context/AppContext';
 import { useGuidanceWorkflow } from '../../../context/StudentWorkflowContext';
 import SupervisorRequestForm from './SupervisorRequestForm';
 import RequestSubmittedView from './RequestSubmittedView';

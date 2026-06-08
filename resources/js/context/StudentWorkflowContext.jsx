@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useMemo, useCallback, useEffect } from 'react';
 import { api } from '../lib/api';
-import { useAuth } from './AuthContext';
+import { useAuth } from './AppContext';
 import { mapForm2Submission } from './simulationMappers';
 
 const StudentWorkflowContext = createContext(null);

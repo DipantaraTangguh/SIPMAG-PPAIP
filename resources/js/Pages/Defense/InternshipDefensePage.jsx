@@ -1,6 +1,6 @@
 import React from 'react';
 import DashboardLayout from '../../Components/Layouts/DashboardLayout';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '../../context/AppContext';
 import { useDefenseWorkflow } from '../../context/StudentWorkflowContext';
 import { canAccessSidang } from '../../utils/accessUtils';
 import DefenseLockedState from '../../Components/Fragments/defense/DefenseLockedState';

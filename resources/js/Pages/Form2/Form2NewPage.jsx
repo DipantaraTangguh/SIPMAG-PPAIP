@@ -10,7 +10,7 @@ import {
     Loader2,
 } from "lucide-react";
 import DashboardLayout from "../../Components/Layouts/DashboardLayout";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../context/AppContext";
 import { useForm2Workflow } from "../../context/StudentWorkflowContext";
 import { canSubmitForm2 } from "../../utils/accessUtils";
 
