@@ -2,32 +2,39 @@
 
 namespace App\Filament\Resources\Kaprodi;
 
+use App\Filament\Resources\Kaprodi\KaprodiStudentResource\Pages\ListStudents;
 use App\Models\Lecturer;
 use App\Models\Student;
 use App\Models\User;
 use App\Services\DpmAssignmentService;
 use App\Services\StudentStateMachine;
 use App\Support\StoredFilePath;
-use Illuminate\Support\Facades\Auth;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\HtmlString;
 
 class KaprodiStudentResource extends Resource
 {
     protected static ?string $model = Student::class;
+
     protected static ?string $navigationIcon = 'heroicon-o-academic-cap';
+
     protected static ?string $navigationLabel = 'Mahasiswa';
+
     protected static ?string $navigationGroup = 'Akademik';
+
     protected static ?int $navigationSort = 1;
+
     protected static ?string $slug = 'kaprodi/students';
 
-    /** @return User|null */
     private static function currentUser(): ?User
     {
         return Auth::user();
@@ -44,7 +51,7 @@ class KaprodiStudentResource extends Resource
 
         return parent::getEloquentQuery()
             ->where('study_program', $prodi)
-            ->with('sidangSubmission')
+            ->with(['dpm', 'sidangSubmission'])
             ->withCount(['logbooks as approved_logbook_count' => fn ($query) => $query->where('status', 'Approved')]);
     }
 
@@ -59,15 +66,15 @@ class KaprodiStudentResource extends Resource
                 Forms\Components\Select::make('access_status')
                     ->label('Status Akses')
                     ->options([
-                        'Unverified'      => 'Unverified',
-                        'PendingReview'   => 'PendingReview',
-                        'RejectedForm1'   => 'RejectedForm1',
-                        'ApprovedForm1'   => 'ApprovedForm1',
-                        'HasApplication'  => 'HasApplication',
-                        'HasDPM'          => 'HasDPM',
+                        'Unverified' => 'Unverified',
+                        'PendingReview' => 'PendingReview',
+                        'RejectedForm1' => 'RejectedForm1',
+                        'ApprovedForm1' => 'ApprovedForm1',
+                        'HasApplication' => 'HasApplication',
+                        'HasDPM' => 'HasDPM',
                         'LogbookComplete' => 'LogbookComplete',
-                        'MenungguSidang'  => 'MenungguSidang',
-                        'SiklusSelesai'   => 'SiklusSelesai',
+                        'MenungguSidang' => 'MenungguSidang',
+                        'SiklusSelesai' => 'SiklusSelesai',
                     ])
                     ->disabled(),
             ])->columns(2),
@@ -80,16 +87,17 @@ class KaprodiStudentResource extends Resource
                 Forms\Components\Placeholder::make('transkrip_status')
                     ->label('Transkrip Nilai')
                     ->content(function (?Student $record): HtmlString {
-                        if (!$record || !$record->form1_pdf_path) {
+                        if (! $record || ! $record->form1_pdf_path) {
                             return new HtmlString('<span class="text-gray-400">Belum diunggah</span>');
                         }
                         $previewUrl = route('transkrip.preview', $record->id);
                         $downloadUrl = route('transkrip.download', $record->id);
+
                         return new HtmlString(
-                            '<div class="flex items-center gap-3">' .
-                            '<span class="text-green-600 font-medium">✅ ' . basename($record->form1_pdf_path) . '</span>' .
-                            '<a href="' . $previewUrl . '" target="_blank" class="text-sm text-blue-600 hover:underline">Lihat</a>' .
-                            '<a href="' . $downloadUrl . '" class="text-sm text-blue-600 hover:underline">Download</a>' .
+                            '<div class="flex items-center gap-3">'.
+                            '<span class="text-green-600 font-medium">✅ '.basename($record->form1_pdf_path).'</span>'.
+                            '<a href="'.$previewUrl.'" target="_blank" class="text-sm text-blue-600 hover:underline">Lihat</a>'.
+                            '<a href="'.$downloadUrl.'" class="text-sm text-blue-600 hover:underline">Download</a>'.
                             '</div>'
                         );
                     }),
@@ -127,13 +135,13 @@ class KaprodiStudentResource extends Resource
                 Tables\Filters\SelectFilter::make('access_status')
                     ->label('Status')
                     ->options([
-                        'Unverified'      => 'Unverified',
-                        'PendingReview'   => 'PendingReview',
-                        'ApprovedForm1'   => 'ApprovedForm1',
-                        'HasApplication'  => 'HasApplication',
-                        'HasDPM'          => 'HasDPM',
+                        'Unverified' => 'Unverified',
+                        'PendingReview' => 'PendingReview',
+                        'ApprovedForm1' => 'ApprovedForm1',
+                        'HasApplication' => 'HasApplication',
+                        'HasDPM' => 'HasDPM',
                         'LogbookComplete' => 'LogbookComplete',
-                        'MenungguSidang'  => 'MenungguSidang',
+                        'MenungguSidang' => 'MenungguSidang',
                     ]),
             ])
             ->actions([
@@ -144,8 +152,8 @@ class KaprodiStudentResource extends Resource
                     ->label('Lihat Transkrip')
                     ->icon('heroicon-o-eye')
                     ->color('info')
-                    ->visible(fn (Student $record) => !empty($record->form1_pdf_path))
-                    ->modalHeading(fn (Student $record) => 'Transkrip — ' . $record->name . ' (' . $record->nim . ')')
+                    ->visible(fn (Student $record) => ! empty($record->form1_pdf_path))
+                    ->modalHeading(fn (Student $record) => 'Transkrip — '.$record->name.' ('.$record->nim.')')
                     ->modalContent(function (Student $record): HtmlString {
                         $previewUrl = route('transkrip.preview', $record->id);
                         $downloadUrl = route('transkrip.download', $record->id);
@@ -153,21 +161,21 @@ class KaprodiStudentResource extends Resource
                         $isPdf = strtolower($ext) === 'pdf';
 
                         if ($isPdf) {
-                            $preview = '<iframe src="' . $previewUrl . '" class="w-full rounded-lg border" style="height:70vh;"></iframe>';
+                            $preview = '<iframe src="'.$previewUrl.'" class="w-full rounded-lg border" style="height:70vh;"></iframe>';
                         } else {
-                            $preview = '<img src="' . $previewUrl . '" alt="Transkrip" class="max-w-full max-h-[70vh] mx-auto rounded-lg shadow" />';
+                            $preview = '<img src="'.$previewUrl.'" alt="Transkrip" class="max-w-full max-h-[70vh] mx-auto rounded-lg shadow" />';
                         }
 
                         return new HtmlString(
-                            '<div class="space-y-4">' .
-                                $preview .
-                                '<div class="flex justify-end">' .
-                                    '<a href="' . $downloadUrl . '" ' .
-                                       'class="inline-flex items-center gap-2 rounded-lg bg-primary-600 px-4 py-2 text-sm font-medium text-white shadow hover:bg-primary-700 transition">' .
-                                        '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>' .
-                                        'Download Transkrip' .
-                                    '</a>' .
-                                '</div>' .
+                            '<div class="space-y-4">'.
+                                $preview.
+                                '<div class="flex justify-end">'.
+                                    '<a href="'.$downloadUrl.'" '.
+                                       'class="inline-flex items-center gap-2 rounded-lg bg-primary-600 px-4 py-2 text-sm font-medium text-white shadow hover:bg-primary-700 transition">'.
+                                        '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>'.
+                                        'Download Transkrip'.
+                                    '</a>'.
+                                '</div>'.
                             '</div>'
                         );
                     })
@@ -184,8 +192,8 @@ class KaprodiStudentResource extends Resource
                     ->requiresConfirmation()
                     ->before(function (Tables\Actions\Action $action) {
                         $lecturer = static::currentUser()?->lecturer;
-                        if (!$lecturer || !$lecturer->signature_path) {
-                            \Filament\Notifications\Notification::make()
+                        if (! $lecturer || ! $lecturer->signature_path) {
+                            Notification::make()
                                 ->title('Tanda tangan digital belum diunggah')
                                 ->body('Anda harus mengunggah tanda tangan digital terlebih dahulu melalui menu "Profil Saya" sebelum dapat menyetujui Form 1.')
                                 ->danger()
@@ -198,8 +206,8 @@ class KaprodiStudentResource extends Resource
                         $lecturerId = static::currentUser()?->lecturer?->id;
                         app(StudentStateMachine::class)->transition($record, 'ApprovedForm1', [
                             'form1_rejection_reason' => null,
-                            'form1_approved_by'      => $lecturerId,
-                            'form1_approved_at'      => now(),
+                            'form1_approved_by' => $lecturerId,
+                            'form1_approved_at' => now(),
                         ]);
                     }),
 
@@ -225,8 +233,7 @@ class KaprodiStudentResource extends Resource
                     ->label('Assign DPM')
                     ->icon('heroicon-o-user-plus')
                     ->color('primary')
-                    ->visible(fn (Student $record) =>
-                        !$record->dpm_id &&
+                    ->visible(fn (Student $record) => ! $record->dpm_id &&
                         $record->access_status === 'HasApplication' &&
                         $record->supervisorApplication()->exists()
                     )
@@ -240,7 +247,7 @@ class KaprodiStudentResource extends Resource
                             $mulai = '-';
                             if ($supApp->mulai_magang) {
                                 try {
-                                    $mulai = \Illuminate\Support\Carbon::parse($supApp->mulai_magang)->format('d/m/Y');
+                                    $mulai = Carbon::parse($supApp->mulai_magang)->format('d/m/Y');
                                 } catch (\Throwable $e) {
                                     $mulai = (string) $supApp->mulai_magang;
                                 }
@@ -249,7 +256,7 @@ class KaprodiStudentResource extends Resource
                             $selesai = '-';
                             if ($supApp->selesai_magang) {
                                 try {
-                                    $selesai = \Illuminate\Support\Carbon::parse($supApp->selesai_magang)->format('d/m/Y');
+                                    $selesai = Carbon::parse($supApp->selesai_magang)->format('d/m/Y');
                                 } catch (\Throwable $e) {
                                     $selesai = (string) $supApp->selesai_magang;
                                 }
@@ -258,7 +265,7 @@ class KaprodiStudentResource extends Resource
                             $diajukan = '-';
                             if ($supApp->submitted_at) {
                                 try {
-                                    $diajukan = \Illuminate\Support\Carbon::parse($supApp->submitted_at)->format('d/m/Y H:i');
+                                    $diajukan = Carbon::parse($supApp->submitted_at)->format('d/m/Y H:i');
                                 } catch (\Throwable $e) {
                                     $diajukan = (string) $supApp->submitted_at;
                                 }
@@ -269,12 +276,12 @@ class KaprodiStudentResource extends Resource
                             $fields[] = Forms\Components\Placeholder::make('nomination_info')
                                 ->label(new HtmlString('<strong>Pengajuan Pembimbing</strong>'))
                                 ->content(new HtmlString(
-                                    "<strong>Perusahaan:</strong> {$supApp->company_name}<br />" .
-                                    "<strong>Nama Praktisi:</strong> " . ($supApp->nama_praktisi ?? $supApp->company_contact) . "<br />" .
-                                    "<strong>Jabatan:</strong> " . ($supApp->jabatan_praktisi ?? '-') . "<br />" .
-                                    "<strong>No. Telepon:</strong> " . ($supApp->no_telepon ?? '-') . "<br />" .
-                                    "<strong>Email:</strong> " . ($supApp->email ?? '-') . "<br />" .
-                                    "<strong>Periode:</strong> {$periode}<br />" .
+                                    "<strong>Perusahaan:</strong> {$supApp->company_name}<br />".
+                                    '<strong>Nama Praktisi:</strong> '.($supApp->nama_praktisi ?? $supApp->company_contact).'<br />'.
+                                    '<strong>Jabatan:</strong> '.($supApp->jabatan_praktisi ?? '-').'<br />'.
+                                    '<strong>No. Telepon:</strong> '.($supApp->no_telepon ?? '-').'<br />'.
+                                    '<strong>Email:</strong> '.($supApp->email ?? '-').'<br />'.
+                                    "<strong>Periode:</strong> {$periode}<br />".
                                     "<strong>Diajukan:</strong> {$diajukan}"
                                 ));
                         }
@@ -298,8 +305,7 @@ class KaprodiStudentResource extends Resource
 
                         return $fields;
                     })
-                    ->action(fn (Student $record, array $data) =>
-                        app(DpmAssignmentService::class)->assign($record, (int) $data['dpm_id'])
+                    ->action(fn (Student $record, array $data) => app(DpmAssignmentService::class)->assign($record, (int) $data['dpm_id'])
                     ),
 
                 // Action jadwalkan sidang.
@@ -308,8 +314,7 @@ class KaprodiStudentResource extends Resource
                     ->label('Jadwalkan Sidang')
                     ->icon('heroicon-o-calendar-days')
                     ->color('info')
-                    ->visible(fn (Student $record) =>
-                        $record->access_status === 'MenungguSidang' &&
+                    ->visible(fn (Student $record) => $record->access_status === 'MenungguSidang' &&
                         $record->sidangSubmission &&
                         $record->sidangSubmission->status === 'Pending'
                     )
@@ -330,6 +335,7 @@ class KaprodiStudentResource extends Resource
                             ->required()
                             ->options(function () {
                                 $prodi = static::currentUser()?->lecturer?->study_program;
+
                                 return Lecturer::whereNotNull('user_id')
                                     ->when($prodi, fn ($q) => $q->where('study_program', $prodi))
                                     ->pluck('lecturer_name', 'lecturer_name');
@@ -341,6 +347,7 @@ class KaprodiStudentResource extends Resource
                             ->required()
                             ->options(function () {
                                 $prodi = static::currentUser()?->lecturer?->study_program;
+
                                 return Lecturer::whereNotNull('user_id')
                                     ->when($prodi, fn ($q) => $q->where('study_program', $prodi))
                                     ->pluck('lecturer_name', 'lecturer_name');
@@ -352,17 +359,17 @@ class KaprodiStudentResource extends Resource
                         $lecturerId = static::currentUser()?->lecturer?->id;
 
                         $record->sidangSubmission->update([
-                            'status'          => 'Scheduled',
-                            'scheduled_date'  => $data['scheduled_date'],
-                            'scheduled_time'  => $data['scheduled_time'] ?? null,
-                            'room'            => $data['room'] ?? null,
+                            'status' => 'Scheduled',
+                            'scheduled_date' => $data['scheduled_date'],
+                            'scheduled_time' => $data['scheduled_time'] ?? null,
+                            'room' => $data['room'] ?? null,
                             'dosen_penguji_1' => $data['dosen_penguji_1'],
                             'dosen_penguji_2' => $data['dosen_penguji_2'],
-                            'scheduled_by'    => $lecturerId,
-                            'scheduled_at'    => now(),
+                            'scheduled_by' => $lecturerId,
+                            'scheduled_at' => now(),
                         ]);
 
-                        \Filament\Notifications\Notification::make()
+                        Notification::make()
                             ->title('Jadwal sidang berhasil ditetapkan')
                             ->body("Sidang untuk {$record->name} telah dijadwalkan.")
                             ->success()
@@ -378,14 +385,15 @@ class KaprodiStudentResource extends Resource
                     ->color('info')
                     ->deselectRecordsAfterCompletion()
                     ->action(function (Collection $records) {
-                        $students = $records->filter(fn (Student $s) => !empty($s->form1_pdf_path));
+                        $students = $records->filter(fn (Student $s) => ! empty($s->form1_pdf_path));
 
                         if ($students->isEmpty()) {
-                            \Filament\Notifications\Notification::make()
+                            Notification::make()
                                 ->title('Tidak ada transkrip')
                                 ->body('Mahasiswa yang dipilih belum mengunggah transkrip.')
                                 ->warning()
                                 ->send();
+
                             return;
                         }
 
@@ -395,20 +403,22 @@ class KaprodiStudentResource extends Resource
                             $path = StoredFilePath::resolve(storage_path('app/private'), $student->form1_pdf_path);
                             if ($path) {
                                 $ext = pathinfo($path, PATHINFO_EXTENSION);
+
                                 return response()->download($path, "transkrip_{$student->nim}.{$ext}");
                             }
+
                             return;
                         }
 
                         // Kalau banyak, zip dulu biar rapi.
-                        $zipName = 'transkrip_' . now()->format('Ymd_His') . '.zip';
-                        $zipPath = storage_path('app/private/temp/' . $zipName);
+                        $zipName = 'transkrip_'.now()->format('Ymd_His').'.zip';
+                        $zipPath = storage_path('app/private/temp/'.$zipName);
 
-                        if (!is_dir(dirname($zipPath))) {
+                        if (! is_dir(dirname($zipPath))) {
                             mkdir(dirname($zipPath), 0755, true);
                         }
 
-                        $zip = new \ZipArchive();
+                        $zip = new \ZipArchive;
                         $zip->open($zipPath, \ZipArchive::CREATE | \ZipArchive::OVERWRITE);
 
                         foreach ($students as $student) {
@@ -429,7 +439,7 @@ class KaprodiStudentResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => \App\Filament\Resources\Kaprodi\KaprodiStudentResource\Pages\ListStudents::route('/'),
+            'index' => ListStudents::route('/'),
         ];
     }
 }

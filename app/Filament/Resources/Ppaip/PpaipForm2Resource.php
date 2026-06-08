@@ -2,25 +2,30 @@
 
 namespace App\Filament\Resources\Ppaip;
 
+use App\Filament\Resources\Ppaip\PpaipForm2Resource\Pages\ListForm2;
 use App\Models\Form2Submission;
 use App\Models\User;
-use Illuminate\Support\Facades\Auth;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
 
 class PpaipForm2Resource extends Resource
 {
     protected static ?string $model = Form2Submission::class;
+
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
+
     protected static ?string $navigationLabel = 'Form 2 (Mandiri)';
+
     protected static ?string $navigationGroup = 'Review';
+
     protected static ?int $navigationSort = 1;
+
     protected static ?string $slug = 'ppaip/form2';
 
-    /** @return User|null */
     private static function currentUser(): ?User
     {
         return Auth::user();
@@ -34,6 +39,12 @@ class PpaipForm2Resource extends Resource
     public static function canCreate(): bool
     {
         return false;
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->with('student.dpm');
     }
 
     public static function table(Table $table): Table
@@ -51,19 +62,19 @@ class PpaipForm2Resource extends Resource
                     ->label('Status')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'PendingReview'  => 'warning',
-                        'ApprovedForm2'  => 'success',
-                        'RejectedForm2'  => 'danger',
-                        default          => 'gray',
+                        'PendingReview' => 'warning',
+                        'ApprovedForm2' => 'success',
+                        'RejectedForm2' => 'danger',
+                        default => 'gray',
                     }),
             ])
             ->defaultSort('submitted_at', 'desc')
             ->filters([
                 Tables\Filters\SelectFilter::make('status')
                     ->options([
-                        'PendingReview'  => 'Menunggu Review',
-                        'ApprovedForm2'  => 'Disetujui',
-                        'RejectedForm2'  => 'Ditolak',
+                        'PendingReview' => 'Menunggu Review',
+                        'ApprovedForm2' => 'Disetujui',
+                        'RejectedForm2' => 'Ditolak',
                     ]),
             ])
             ->actions([
@@ -79,7 +90,7 @@ class PpaipForm2Resource extends Resource
                     ->modalDescription('Menyetujui Form 2 akan mengubah status mahasiswa menjadi HasApplication.')
                     ->action(function (Form2Submission $record) {
                         $record->update([
-                            'status'           => 'ApprovedForm2',
+                            'status' => 'ApprovedForm2',
                             'rejection_reason' => null,
                         ]);
                         $student = $record->student;
@@ -98,7 +109,7 @@ class PpaipForm2Resource extends Resource
                         Forms\Components\Textarea::make('reason')->label('Alasan Penolakan')->required(),
                     ])
                     ->action(fn (Form2Submission $record, array $data) => $record->update([
-                        'status'           => 'RejectedForm2',
+                        'status' => 'RejectedForm2',
                         'rejection_reason' => $data['reason'],
                     ])),
             ])
@@ -108,7 +119,7 @@ class PpaipForm2Resource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => \App\Filament\Resources\Ppaip\PpaipForm2Resource\Pages\ListForm2::route('/'),
+            'index' => ListForm2::route('/'),
         ];
     }
 }
