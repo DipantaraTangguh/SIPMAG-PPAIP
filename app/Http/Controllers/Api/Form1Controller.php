@@ -8,11 +8,10 @@ use App\Http\Requests\Form1\StoreForm1Request;
 use App\Http\Resources\Form1Resource;
 use App\Http\Resources\StudentResource;
 use App\Models\Student;
+use App\Services\PdfService;
 use App\Services\StudentStateMachine;
 use App\Support\StoredFilePath;
-use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Gate;
 
 class Form1Controller extends Controller
@@ -150,7 +149,7 @@ class Form1Controller extends Controller
         ]);
     }
 
-    public function downloadSuratKeterangan(Request $request)
+    public function downloadSuratKeterangan(Request $request, PdfService $pdfService)
     {
         $student = $request->user()->student;
         if (! $student) {
@@ -163,41 +162,7 @@ class Form1Controller extends Controller
             return response()->json(['message' => 'Form 1 belum disetujui.'], 403);
         }
 
-        $student->load('form1Approver');
-        $kaprodi = $student->form1Approver;
-
-        $signatureSrc = null;
-        if ($kaprodi && $kaprodi->signature_path) {
-            $absPath = StoredFilePath::resolve(storage_path('app/public'), $kaprodi->signature_path);
-            if ($absPath) {
-                $mime = mime_content_type($absPath) ?: 'image/png';
-                $signatureSrc = 'data:'.$mime.';base64,'.base64_encode(file_get_contents($absPath));
-            }
-        }
-
-        $logoPath = public_path('assets/images/logo-ubakrie.png');
-        $logoSrc = file_exists($logoPath)
-            ? 'data:image/png;base64,'.base64_encode(file_get_contents($logoPath))
-            : null;
-
-        Carbon::setLocale('id');
-        $submittedDate = optional($student->updated_at)->translatedFormat('d F Y') ?? '—';
-        $approvalDate = optional($student->form1_approved_at)->translatedFormat('d F Y') ?? '—';
-
-        $pdf = Pdf::loadView('pdf.surat-keterangan', [
-            'student' => $student,
-            'form1' => $student->form1_data ?? [],
-            'kaprodiName' => $kaprodi->lecturer_name ?? '—',
-            'kaprodiNidn' => $kaprodi->nidn ?? '—',
-            'signatureSrc' => $signatureSrc,
-            'logoSrc' => $logoSrc,
-            'submittedDate' => $submittedDate,
-            'approvalDate' => $approvalDate,
-        ])->setPaper('a4');
-
-        $filename = 'Surat_Keterangan_Form1_'.$student->nim.'.pdf';
-
-        return $pdf->download($filename);
+        return $pdfService->downloadForm1ApprovalLetter($student);
     }
 
     public function downloadTranskrip(Request $request, int $studentId)
