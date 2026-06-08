@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class DefenseSubmission extends Model
 {
     use SoftDeletes;
+
     protected $table = 'sidang_submissions';
 
     protected $fillable = [
@@ -21,8 +22,8 @@ class DefenseSubmission extends Model
         'scheduled_date',
         'scheduled_time',
         'room',
-        'dosen_penguji_1',
-        'dosen_penguji_2',
+        'dosen_penguji_1_id',
+        'dosen_penguji_2_id',
         'scheduled_by',
         'scheduled_at',
         'submitted_at',
@@ -45,5 +46,15 @@ class DefenseSubmission extends Model
     public function scheduler()
     {
         return $this->belongsTo(Lecturer::class, 'scheduled_by');
+    }
+
+    public function examinerOne()
+    {
+        return $this->belongsTo(Lecturer::class, 'dosen_penguji_1_id');
+    }
+
+    public function examinerTwo()
+    {
+        return $this->belongsTo(Lecturer::class, 'dosen_penguji_2_id');
     }
 }

@@ -2,6 +2,8 @@
 
 namespace Tests\Feature;
 
+use App\Models\DefenseSubmission;
+use App\Models\Lecturer;
 use App\Models\Student;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -72,6 +74,67 @@ class DefenseSubmissionTest extends TestCase
             ->assertOk()
             ->assertJsonPath('submission.foto_kegiatan_1_path', $submission->foto_kegiatan_1_path)
             ->assertJsonPath('submission.foto_kegiatan_2_path', $submission->foto_kegiatan_2_path);
+    }
+
+    public function test_kaprodi_schedules_defense_with_lecturer_examiner_references(): void
+    {
+        [$studentUser, $student] = $this->createEligibleStudent();
+        $student->forceFill(['access_status' => 'MenungguSidang'])->save();
+
+        $submission = DefenseSubmission::create([
+            'student_id' => $student->id,
+            'laporan_path' => 'sidang/laporan.pdf',
+            'poster_path' => 'sidang/poster.pdf',
+            'foto_kegiatan_1_path' => 'sidang/foto-1.pdf',
+            'foto_kegiatan_2_path' => 'sidang/foto-2.pdf',
+            'krs_path' => 'sidang/krs.pdf',
+            'status' => 'Pending',
+        ]);
+
+        $kaprodiUser = User::factory()->create(['role' => 'kaprodi']);
+        $kaprodi = Lecturer::create([
+            'user_id' => $kaprodiUser->id,
+            'nidn' => fake()->unique()->numerify('##########'),
+            'lecturer_name' => 'Kaprodi Sistem Informasi',
+            'study_program' => $student->study_program,
+        ]);
+        $examinerOne = Lecturer::create([
+            'user_id' => User::factory()->create(['role' => 'dpm'])->id,
+            'nidn' => fake()->unique()->numerify('##########'),
+            'lecturer_name' => 'Dosen Penguji Satu',
+            'study_program' => $student->study_program,
+        ]);
+        $examinerTwo = Lecturer::create([
+            'user_id' => User::factory()->create(['role' => 'dpm'])->id,
+            'nidn' => fake()->unique()->numerify('##########'),
+            'lecturer_name' => 'Dosen Penguji Dua',
+            'study_program' => $student->study_program,
+        ]);
+
+        $this->actingAs($kaprodiUser)
+            ->postJson("/api/kaprodi/defense/{$student->id}/schedule", [
+                'scheduled_date' => today()->addWeek()->toDateString(),
+                'scheduled_time' => '09:00',
+                'room' => 'Ruang 301',
+                'dosen_penguji_1_id' => $examinerOne->id,
+                'dosen_penguji_2_id' => $examinerTwo->id,
+            ])
+            ->assertOk();
+
+        $submission->refresh();
+
+        $this->assertSame('Scheduled', $submission->status);
+        $this->assertSame($examinerOne->id, $submission->dosen_penguji_1_id);
+        $this->assertSame($examinerTwo->id, $submission->dosen_penguji_2_id);
+        $this->assertSame($kaprodi->id, $submission->scheduled_by);
+
+        $this->actingAs($studentUser)
+            ->getJson('/api/defense')
+            ->assertOk()
+            ->assertJsonPath('submission.dosen_penguji_1_id', $examinerOne->id)
+            ->assertJsonPath('submission.dosen_penguji_2_id', $examinerTwo->id)
+            ->assertJsonPath('submission.dosen_penguji_1', 'Dosen Penguji Satu')
+            ->assertJsonPath('submission.dosen_penguji_2', 'Dosen Penguji Dua');
     }
 
     /**

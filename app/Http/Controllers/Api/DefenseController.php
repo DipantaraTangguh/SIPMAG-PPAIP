@@ -22,7 +22,9 @@ class DefenseController extends Controller
     {
         $student = $request->user()->student;
 
-        $submission = $student->sidangSubmission()->first();
+        $submission = $student->sidangSubmission()
+            ->with(['examinerOne', 'examinerTwo'])
+            ->first();
 
         return response()->json([
             'submission' => $submission
@@ -99,7 +101,7 @@ class DefenseController extends Controller
 
         $students = Student::where('study_program', $lecturer->study_program)
             ->where('access_status', 'MenungguSidang')
-            ->with(['sidangSubmission', 'dpm:id,lecturer_name'])
+            ->with(['sidangSubmission.examinerOne', 'sidangSubmission.examinerTwo', 'dpm:id,lecturer_name'])
             ->select(['id', 'nim', 'name', 'study_program', 'dpm_id', 'access_status'])
             ->paginate($this->perPage($request));
 
@@ -132,8 +134,8 @@ class DefenseController extends Controller
             'scheduled_date' => $validated['scheduled_date'],
             'scheduled_time' => $validated['scheduled_time'] ?? null,
             'room' => $validated['room'] ?? null,
-            'dosen_penguji_1' => $validated['dosen_penguji_1'],
-            'dosen_penguji_2' => $validated['dosen_penguji_2'],
+            'dosen_penguji_1_id' => $validated['dosen_penguji_1_id'],
+            'dosen_penguji_2_id' => $validated['dosen_penguji_2_id'],
             'scheduled_by' => $lecturer->id,
             'scheduled_at' => now(),
         ]);

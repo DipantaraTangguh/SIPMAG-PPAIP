@@ -21,12 +21,16 @@ class DefenseSubmissionResource extends JsonResource
             'scheduled_date' => $this->scheduled_date?->toDateString(),
             'scheduled_time' => $this->scheduled_time,
             'room' => $this->room,
-            'dosen_penguji_1' => $this->dosen_penguji_1,
-            'dosen_penguji_2' => $this->dosen_penguji_2,
+            'dosen_penguji_1_id' => $this->dosen_penguji_1_id,
+            'dosen_penguji_2_id' => $this->dosen_penguji_2_id,
+            'dosen_penguji_1' => $this->examinerOne?->lecturer_name,
+            'dosen_penguji_2' => $this->examinerTwo?->lecturer_name,
             'submitted_at' => $this->submitted_at?->toJSON(),
             'scheduled_at' => $this->scheduled_at?->toJSON(),
             'student' => StudentResource::make($this->whenLoaded('student')),
             'scheduler' => LecturerResource::make($this->whenLoaded('scheduler')),
+            'examiner_one' => LecturerResource::make($this->whenLoaded('examinerOne')),
+            'examiner_two' => LecturerResource::make($this->whenLoaded('examinerTwo')),
         ];
     }
 }

@@ -330,7 +330,7 @@ class KaprodiStudentResource extends Resource
                         Forms\Components\TextInput::make('room')
                             ->label('Ruangan / Link')
                             ->maxLength(100),
-                        Forms\Components\Select::make('dosen_penguji_1')
+                        Forms\Components\Select::make('dosen_penguji_1_id')
                             ->label('Dosen Penguji 1')
                             ->required()
                             ->options(function () {
@@ -338,19 +338,20 @@ class KaprodiStudentResource extends Resource
 
                                 return Lecturer::whereNotNull('user_id')
                                     ->when($prodi, fn ($q) => $q->where('study_program', $prodi))
-                                    ->pluck('lecturer_name', 'lecturer_name');
+                                    ->pluck('lecturer_name', 'id');
                             })
                             ->searchable()
                             ->preload(),
-                        Forms\Components\Select::make('dosen_penguji_2')
+                        Forms\Components\Select::make('dosen_penguji_2_id')
                             ->label('Dosen Penguji 2')
                             ->required()
+                            ->different('dosen_penguji_1_id')
                             ->options(function () {
                                 $prodi = static::currentUser()?->lecturer?->study_program;
 
                                 return Lecturer::whereNotNull('user_id')
                                     ->when($prodi, fn ($q) => $q->where('study_program', $prodi))
-                                    ->pluck('lecturer_name', 'lecturer_name');
+                                    ->pluck('lecturer_name', 'id');
                             })
                             ->searchable()
                             ->preload(),
@@ -363,8 +364,8 @@ class KaprodiStudentResource extends Resource
                             'scheduled_date' => $data['scheduled_date'],
                             'scheduled_time' => $data['scheduled_time'] ?? null,
                             'room' => $data['room'] ?? null,
-                            'dosen_penguji_1' => $data['dosen_penguji_1'],
-                            'dosen_penguji_2' => $data['dosen_penguji_2'],
+                            'dosen_penguji_1_id' => $data['dosen_penguji_1_id'],
+                            'dosen_penguji_2_id' => $data['dosen_penguji_2_id'],
                             'scheduled_by' => $lecturerId,
                             'scheduled_at' => now(),
                         ]);
