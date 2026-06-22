@@ -1,7 +1,9 @@
 <?php
 
+use App\Models\DefenseSubmission;
 use App\Models\Student;
 use App\Models\User;
+use App\Support\DefenseDocument;
 use App\Support\StoredFilePath;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -83,6 +85,36 @@ Route::middleware(['web', 'auth'])->prefix('admin/transkrip')->group(function ()
 
         return response()->download($zipPath, $zipName)->deleteFileAfterSend(true);
     })->name('transkrip.bulk-download');
+});
+
+Route::middleware(['web', 'auth'])->prefix('admin/defense-documents')->group(function () {
+    Route::get('/{submission}/{document}/preview', function (DefenseSubmission $submission, string $document) {
+        Gate::authorize('view', $submission);
+
+        $path = DefenseDocument::resolvedPath($submission, $document);
+        if (! $path) {
+            abort(404, 'Dokumen sidang tidak ditemukan.');
+        }
+
+        return response()->file($path, [
+            'Content-Type' => mime_content_type($path),
+        ]);
+    })->whereIn('document', DefenseDocument::keys())->name('defense-documents.preview');
+
+    Route::get('/{submission}/{document}/download', function (DefenseSubmission $submission, string $document) {
+        Gate::authorize('view', $submission);
+
+        $path = DefenseDocument::resolvedPath($submission, $document);
+        if (! $path) {
+            abort(404, 'Dokumen sidang tidak ditemukan.');
+        }
+
+        $ext = pathinfo($path, PATHINFO_EXTENSION);
+        $student = $submission->student;
+        $label = str($document)->replace('_', '-');
+
+        return response()->download($path, "sidang_{$student?->nim}_{$label}.{$ext}");
+    })->whereIn('document', DefenseDocument::keys())->name('defense-documents.download');
 });
 
 // Sisanya lempar ke React router.
