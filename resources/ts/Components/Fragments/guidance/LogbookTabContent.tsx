@@ -1,7 +1,13 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
-import { BookOpen, Info, Plus, GraduationCap, X } from "lucide-react";
+import {
+    BookOpen,
+    CalendarDays,
+    GraduationCap,
+    Info,
+    X,
+} from "lucide-react";
 import { useLogbookWorkflow } from "../../../context/StudentWorkflowContext";
 
 const formatLogbookDate = (dateStr) => {
@@ -30,6 +36,9 @@ const getLogbookDayName = (dateStr) => {
     }
 };
 
+const toDateInputValue = (dateStr) =>
+    dateStr ? String(dateStr).slice(0, 10) : "";
+
 export default function LogbookTabContent() {
     const navigate = useNavigate();
     const {
@@ -48,12 +57,22 @@ export default function LogbookTabContent() {
         kegiatanHarian: "",
         hasil: "",
     });
+    const dateInputRef = useRef<HTMLInputElement | null>(null);
 
     const TOTAL_REQUIRED = 6;
     const approvedCount = logbookEntries.filter(
         (e) => e.status === "Disetujui",
     ).length;
     const isComplete = approvedCount >= TOTAL_REQUIRED;
+    const logbookStartDate = toDateInputValue(logbookPeriod?.start_date);
+    const logbookMaxDate = toDateInputValue(logbookPeriod?.maximum_date);
+    const hasSelectableLogbookDate =
+        !logbookStartDate ||
+        !logbookMaxDate ||
+        logbookStartDate <= logbookMaxDate;
+    const unavailableDateMessage = hasSelectableLogbookDate
+        ? null
+        : `Logbook baru dapat diisi mulai ${formatLogbookDate(logbookStartDate)}.`;
 
     const handleAddEntry = async () => {
         if (
@@ -113,6 +132,21 @@ export default function LogbookTabContent() {
         setEditEntry(null);
         setModalError(null);
     };
+    const openDatePicker = () => {
+        const input = dateInputRef.current;
+
+        if (!input) return;
+
+        input.focus();
+
+        if (typeof input.showPicker === "function") {
+            try {
+                input.showPicker();
+            } catch {
+                // Some browsers only allow showPicker directly from trusted clicks.
+            }
+        }
+    };
 
     return (
         <div className="mt-8 animate-in fade-in duration-500">
@@ -152,6 +186,10 @@ export default function LogbookTabContent() {
                             <GraduationCap className="h-4.5 w-4.5" />
                             <span>Daftar Sidang →</span>
                         </button>
+                    ) : unavailableDateMessage ? (
+                        <div className="w-full rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-[13px] font-semibold text-amber-700 sm:ml-4 sm:w-auto">
+                            {unavailableDateMessage}
+                        </div>
                     ) : (
                         <button
                             onClick={() => setShowAddModal(true)}
@@ -179,8 +217,8 @@ export default function LogbookTabContent() {
                         Belum Ada Entri Logbook
                     </h3>
                     <p className="mt-1.5 text-[13px] text-gray-400">
-                        Klik '+ Tambah Entri' untuk mulai mencatat kegiatan
-                        magang harian Anda.
+                        {unavailableDateMessage ||
+                            "Klik '+ Tambah Entri' untuk mulai mencatat kegiatan magang harian Anda."}
                     </p>
                 </div>
             ) : (
@@ -290,33 +328,60 @@ export default function LogbookTabContent() {
                                         >
                                             Tanggal
                                         </label>
-                                        <input
-                                            id="logbook-tanggal"
-                                            type="date"
-                                            min={
-                                                logbookPeriod?.start_date ||
-                                                undefined
-                                            }
-                                            max={
-                                                logbookPeriod?.maximum_date ||
-                                                undefined
-                                            }
-                                            value={
-                                                activeData.tanggal
-                                                    ? activeData.tanggal.slice(
-                                                          0,
-                                                          10,
-                                                      )
-                                                    : ""
-                                            }
-                                            onChange={(e) =>
-                                                updateActiveData({
-                                                    tanggal: e.target.value,
-                                                })
-                                            }
-                                            aria-required="true"
-                                            className="h-11 w-full rounded-lg border border-gray-200 px-3 outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-primary/10"
-                                        />
+                                        <div className="relative">
+                                            <input
+                                                ref={dateInputRef}
+                                                id="logbook-tanggal"
+                                                type="date"
+                                                min={
+                                                    hasSelectableLogbookDate &&
+                                                    logbookStartDate
+                                                        ? logbookStartDate
+                                                        : undefined
+                                                }
+                                                max={
+                                                    hasSelectableLogbookDate &&
+                                                    logbookMaxDate
+                                                        ? logbookMaxDate
+                                                        : undefined
+                                                }
+                                                value={
+                                                    activeData.tanggal
+                                                        ? activeData.tanggal.slice(
+                                                              0,
+                                                              10,
+                                                          )
+                                                        : ""
+                                                }
+                                                onClick={openDatePicker}
+                                                disabled={
+                                                    !hasSelectableLogbookDate
+                                                }
+                                                onChange={(e) =>
+                                                    updateActiveData({
+                                                        tanggal: e.target.value,
+                                                    })
+                                                }
+                                                aria-required="true"
+                                                className="h-11 w-full cursor-pointer rounded-lg border border-gray-200 px-3 pr-11 outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-primary/10 disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-400"
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={openDatePicker}
+                                                disabled={
+                                                    !hasSelectableLogbookDate
+                                                }
+                                                aria-label="Buka kalender logbook"
+                                                className="absolute right-2 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-md text-gray-400 transition-colors hover:bg-gray-100 hover:text-primary focus:outline-none focus:ring-2 focus:ring-primary/20 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-gray-400"
+                                            >
+                                                <CalendarDays className="h-4.5 w-4.5" />
+                                            </button>
+                                        </div>
+                                        {unavailableDateMessage && (
+                                            <p className="mt-2 text-[12px] font-medium text-amber-600">
+                                                {unavailableDateMessage}
+                                            </p>
+                                        )}
                                     </div>
                                     <div>
                                         <label

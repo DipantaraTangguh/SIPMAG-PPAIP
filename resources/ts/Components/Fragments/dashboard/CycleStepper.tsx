@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
     ClipboardCheck,
     FileText,
@@ -6,14 +6,18 @@ import {
     BookOpen,
     Award,
     Check,
-} from 'lucide-react';
+} from "lucide-react";
 
 const steps = [
-    { key: 'syarat_akademik', label: 'Syarat Akademik', icon: ClipboardCheck },
-    { key: 'lamaran', label: 'Lamaran', icon: FileText },
-    { key: 'pengajuan_pembimbing', label: 'Pengajuan Pembimbing', icon: UserCheck },
-    { key: 'logbook', label: 'Logbook', icon: BookOpen },
-    { key: 'sidang', label: 'Sidang', icon: Award },
+    { key: "syarat_akademik", label: "Syarat Akademik", icon: ClipboardCheck },
+    { key: "lamaran", label: "Lamaran", icon: FileText },
+    {
+        key: "pengajuan_pembimbing",
+        label: "Pengajuan Pembimbing",
+        icon: UserCheck,
+    },
+    { key: "logbook", label: "Logbook", icon: BookOpen },
+    { key: "sidang", label: "Sidang", icon: Award },
 ];
 
 export default function CycleStepper({ currentStep = 1 }) {
@@ -29,16 +33,17 @@ export default function CycleStepper({ currentStep = 1 }) {
 
                     return (
                         <React.Fragment key={step.key}>
-                            <div className="flex min-w-[72px] flex-col items-center gap-2 sm:min-w-0">
+                            <div className="flex min-w-18 flex-col items-center gap-2 sm:min-w-0">
                                 <div
                                     className={`
                                         flex h-10 w-10 items-center justify-center rounded-full sm:h-11 sm:w-11
                                         transition-colors duration-200
-                                        ${isCompleted
-                                            ? 'bg-primary text-white'
-                                            : isActive
-                                                ? 'bg-primary text-white'
-                                                : 'border-2 border-gray-300 bg-white text-gray-400'
+                                        ${
+                                            isCompleted
+                                                ? "bg-primary text-white"
+                                                : isActive
+                                                  ? "bg-primary text-white"
+                                                  : "border-2 border-gray-300 bg-white text-gray-400"
                                         }
                                     `}
                                 >
@@ -50,12 +55,13 @@ export default function CycleStepper({ currentStep = 1 }) {
                                 </div>
                                 <span
                                     className={`
-                                        max-w-[110px] text-center text-xs
-                                        ${isActive
-                                            ? 'font-semibold text-primary'
-                                            : isCompleted
-                                                ? 'font-medium text-primary'
-                                                : 'font-normal text-gray-400'
+                                        max-w-27.5 text-center text-xs
+                                        ${
+                                            isActive
+                                                ? "font-semibold text-primary"
+                                                : isCompleted
+                                                  ? "font-medium text-primary"
+                                                  : "font-normal text-gray-400"
                                         }
                                     `}
                                 >
@@ -65,10 +71,11 @@ export default function CycleStepper({ currentStep = 1 }) {
                             {idx < steps.length - 1 && (
                                 <div
                                     className={`
-                                        mx-1 mt-5 h-[2px] min-w-6 flex-1 sm:mx-2 sm:mb-6 sm:mt-0
-                                        ${stepNum < currentStep
-                                            ? 'bg-primary'
-                                            : 'bg-gray-200'
+                                        mx-1 mt-5 h-0.5 min-w-6 flex-1 sm:mx-2 sm:mb-6 sm:mt-0
+                                        ${
+                                            stepNum < currentStep
+                                                ? "bg-primary"
+                                                : "bg-gray-200"
                                         }
                                     `}
                                 />

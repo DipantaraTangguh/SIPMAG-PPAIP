@@ -63,7 +63,7 @@ class LecturerSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
-                'user_id' => 8,
+                'user_id' => 9,
                 'nidn' => '0316048703',
                 'lecturer_name' => 'Dr. Maya Puspita, M.Kom.',
                 'contact' => 'maya.puspita@bakrie.ac.id',
