@@ -64,10 +64,6 @@
         table.fields td.value { width: 57%; }
         table.fields td.value::before { content: ":  "; }
 
-        .verif-subtitle {
-            font-weight: bold;
-            margin: 0 0 4pt 0;
-        }
         .sig-student {
             margin-top: 8pt;
         }
@@ -170,9 +166,7 @@
         <p>NIM {{ $student->nim }}</p>
     </div>
 
-    <h2 class="section-title">VERIFIKASI DAN PERSETUJUAN</h2>
-
-    <p class="verif-subtitle">Verifikasi Akademik oleh Ketua Program Studi dan Dosen Pembimbing yang Ditunjuk</p>
+    <h2 class="section-title">Verifikasi dan Persetujuan Oleh Ketua Program Studi</h2>
 
     <p>Saya yang bertandatangan di bawah ini menyatakan bahwa mahasiswa tersebut di atas memenuhi syarat
     akademik untuk mengikuti kegiatan Magang.</p>
