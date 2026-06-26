@@ -85,7 +85,11 @@ function RejectedCard({ data }) {
         </div>
     );
 }
-export default function IndependentFilledState({ submissions = [], onCreateNew }) {
+export default function IndependentFilledState({
+    submissions = [],
+    onCreateNew,
+    isLocked = false,
+}) {
     return (
         <div className="flex flex-col">
             <div className="mb-4 mt-8 flex items-center justify-between">
@@ -99,8 +103,13 @@ export default function IndependentFilledState({ submissions = [], onCreateNew }
                 </div>
                 <button
                     type="button"
-                    onClick={onCreateNew}
-                    className="flex items-center gap-2 rounded-lg bg-primary px-[18px] py-2.5 text-[13px] font-bold text-white transition-colors hover:bg-primary-hover"
+                    onClick={isLocked ? undefined : onCreateNew}
+                    disabled={isLocked}
+                    className={`flex items-center gap-2 rounded-lg px-[18px] py-2.5 text-[13px] font-bold transition-colors ${
+                        isLocked
+                            ? 'cursor-not-allowed bg-gray-200 text-gray-400'
+                            : 'bg-primary text-white hover:bg-primary-hover'
+                    }`}
                 >
                     <FileEdit className="h-4 w-4" />
                     Ajukan Baru

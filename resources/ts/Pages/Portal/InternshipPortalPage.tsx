@@ -1,8 +1,15 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AppContext';
-import { useApplicationWorkflow } from '../../context/StudentWorkflowContext';
-import { canAccessPortal } from '../../utils/accessUtils';
+import {
+    useApplicationWorkflow,
+    useForm2Workflow,
+} from '../../context/StudentWorkflowContext';
+import {
+    canAccessPortal,
+    hasSecuredInternship,
+    SECURED_INTERNSHIP_MESSAGE,
+} from '../../utils/accessUtils';
 import { api } from '../../lib/api';
 import { Info, FileText } from 'lucide-react';
 import DashboardLayout from '../../Components/Layouts/DashboardLayout';
@@ -59,6 +66,7 @@ const mockActiveApplications = [
 export default function InternshipPortalPage() {
     const { student } = useAuth();
     const { activeApplications } = useApplicationWorkflow();
+    const { form2Submissions } = useForm2Workflow();
     const navigate = useNavigate();
     const location = useLocation();
     const accessStatus = student?.accessStatus;
@@ -118,6 +126,11 @@ export default function InternshipPortalPage() {
     };
 
     const showAccessBanner = !canAccessPortal(accessStatus); // Status ini sudah ikut helper akses terbaru.
+    const internshipSecured = hasSecuredInternship(
+        accessStatus,
+        activeApplications,
+        form2Submissions,
+    );
 
     return (
         <DashboardLayout pageTitle="Portal Magang">
@@ -141,6 +154,21 @@ export default function InternshipPortalPage() {
                                     className="w-full flex-shrink-0 rounded-lg bg-primary px-3.5 py-2 text-xs font-bold text-white hover:bg-primary-hover sm:w-auto sm:py-1.5"
                                 >
                                     Isi Form 1 →
+                                </button>
+                            </div>
+                        )}
+                        {internshipSecured && (
+                            <div className="flex flex-col gap-3 rounded-xl border border-green-200 bg-green-50 px-4 py-3 sm:flex-row sm:items-center">
+                                <Info className="h-[18px] w-[18px] flex-shrink-0 text-green-600" />
+                                <p className="flex-1 text-[13px] leading-relaxed text-green-700">
+                                    {SECURED_INTERNSHIP_MESSAGE}
+                                </p>
+                                <button
+                                    type="button"
+                                    onClick={() => navigate('/guidance')}
+                                    className="w-full flex-shrink-0 rounded-lg bg-primary px-3.5 py-2 text-xs font-bold text-white hover:bg-primary-hover sm:w-auto sm:py-1.5"
+                                >
+                                    Buka Bimbingan &amp; Logbook
                                 </button>
                             </div>
                         )}

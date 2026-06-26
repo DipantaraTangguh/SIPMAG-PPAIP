@@ -1,11 +1,19 @@
 import { useState, useCallback, useMemo } from 'react';
 import { useAuth } from '../context/AppContext';
-import { useApplicationWorkflow } from '../context/StudentWorkflowContext';
-import { canAccessPortal } from '../utils/accessUtils';
+import {
+    useApplicationWorkflow,
+    useForm2Workflow,
+} from '../context/StudentWorkflowContext';
+import {
+    canAccessPortal,
+    hasSecuredInternship,
+    SECURED_INTERNSHIP_MESSAGE,
+} from '../utils/accessUtils';
 
 export default function useVacancyDetail(vacancy) {
     const { student } = useAuth();
     const { activeApplications, applyToVacancy } = useApplicationWorkflow();
+    const { form2Submissions } = useForm2Workflow();
 
     const [cvFile, setCvFile] = useState(null);
     const [cvError, setCvError] = useState(null);
@@ -13,7 +21,12 @@ export default function useVacancyDetail(vacancy) {
     const [justApplied, setJustApplied] = useState(false);
 
     const accessStatus = student?.accessStatus;
-    const canApply = canAccessPortal(accessStatus);
+    const internshipSecured = hasSecuredInternship(
+        accessStatus,
+        activeApplications,
+        form2Submissions,
+    );
+    const canApply = canAccessPortal(accessStatus) && !internshipSecured;
 
     // Cek lowongan ini dulu, biar tombol nggak bisa apply dobel.
     const alreadyApplied = useMemo(() => {
@@ -53,7 +66,7 @@ export default function useVacancyDetail(vacancy) {
     }, []);
 
     const handleApply = useCallback(async () => {
-        if (!vacancy || !cvFile) return;
+        if (!vacancy || !cvFile || internshipSecured) return;
 
         setIsApplying(true);
         try {
@@ -65,7 +78,7 @@ export default function useVacancyDetail(vacancy) {
         } finally {
             setIsApplying(false);
         }
-    }, [vacancy, cvFile, applyToVacancy]);
+    }, [vacancy, cvFile, internshipSecured, applyToVacancy]);
 
     return {
         cvFile,
@@ -75,6 +88,8 @@ export default function useVacancyDetail(vacancy) {
         canApply,
         accessStatus,
         hasAnyApplication,
+        internshipSecured,
+        securedInternshipMessage: SECURED_INTERNSHIP_MESSAGE,
         handleFileChange,
         handleRemoveFile,
         handleApply,

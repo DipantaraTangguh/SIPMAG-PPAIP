@@ -23,6 +23,8 @@ export default function VacancyApplySidebar({
     isApplying,
     isApplied,
     canApply,
+    internshipSecured = false,
+    securedInternshipMessage,
     onFileChange,
     onRemoveFile,
     onApply,
@@ -58,7 +60,29 @@ export default function VacancyApplySidebar({
                         </p>
                     </div>
                 </div>
-                {!isApplied && (
+                {internshipSecured && (
+                    <div className="mt-4 rounded-xl border border-green-200 bg-green-50 p-4">
+                        <div className="flex items-start gap-3">
+                            <CheckCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-green-600" />
+                            <div>
+                                <p className="text-[13px] font-bold text-green-800">
+                                    Magang Sudah Disetujui
+                                </p>
+                                <p className="mt-1 text-[12px] leading-relaxed text-green-700">
+                                    {securedInternshipMessage}
+                                </p>
+                            </div>
+                        </div>
+                        <button
+                            type="button"
+                            onClick={() => navigate('/guidance')}
+                            className="mt-4 w-full rounded-xl bg-primary py-3 text-[13px] font-bold text-white transition-colors hover:bg-primary-hover"
+                        >
+                            Buka Bimbingan &amp; Logbook
+                        </button>
+                    </div>
+                )}
+                {!isApplied && !internshipSecured && (
                 <div className="mt-4">
                     <p className="mb-2 text-[13px] font-bold text-gray-900">
                         Unggah CV &amp; Portfolio
@@ -125,7 +149,23 @@ export default function VacancyApplySidebar({
                 </div>
                 )}
                 <div className="mt-4">
-                    {isApplied ? (
+                    {internshipSecured ? (
+                        <>
+                            <button
+                                type="button"
+                                disabled
+                                className="w-full cursor-not-allowed rounded-xl bg-gray-200 py-3.5 text-[15px] font-bold text-gray-400"
+                            >
+                                Lamar Sekarang ▶
+                            </button>
+                            <div className="mt-2 flex items-start gap-1.5">
+                                <Info className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-green-600" />
+                                <p className="text-xs text-green-700">
+                                    Anda sudah memiliki pengajuan magang yang disetujui.
+                                </p>
+                            </div>
+                        </>
+                    ) : isApplied ? (
                         <>
                             <div className="rounded-xl border border-green-200 bg-green-50 p-5 shadow-sm text-center">
                                 <div className="mx-auto flex h-[48px] w-[48px] items-center justify-center rounded-full bg-green-100 mb-3 shadow-sm">

@@ -6,14 +6,26 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Form2\RejectForm2Request;
 use App\Http\Requests\Form2\StoreForm2Request;
 use App\Http\Resources\Form2SubmissionResource;
+use App\Models\Application;
 use App\Models\Form2Submission;
+use App\Models\Student;
 use App\Models\User;
 use App\Services\StudentStateMachine;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Validation\ValidationException;
 
 class Form2Controller extends Controller
 {
+    private const SECURED_INTERNSHIP_STATUSES = [
+        'HasDPM',
+        'LogbookComplete',
+        'MenungguSidang',
+        'SiklusSelesai',
+    ];
+
+    private const SECURED_INTERNSHIP_MESSAGE = 'Pengajuan magang Anda sudah disetujui. Anda sudah dapat menjalani magang sehingga tidak dapat melamar lowongan mitra atau mengajukan Form 2 lain.';
+
     public function index(Request $request)
     {
         Gate::authorize('viewAny', Form2Submission::class);
@@ -34,6 +46,12 @@ class Form2Controller extends Controller
         Gate::authorize('create', Form2Submission::class);
 
         $student = $this->authenticatedUser($request)->student;
+
+        if ($this->studentHasSecuredInternship($student)) {
+            throw ValidationException::withMessages([
+                'company_name' => self::SECURED_INTERNSHIP_MESSAGE,
+            ]);
+        }
 
         if (! in_array($student->access_status, ['ApprovedForm1', 'HasApplication'])) {
             return response()->json(['message' => 'Form 1 harus disetujui terlebih dahulu.'], 403);
@@ -122,5 +140,28 @@ class Form2Controller extends Controller
         abort_unless($user instanceof User, 401);
 
         return $user;
+    }
+
+    private function studentHasSecuredInternship(?Student $student): bool
+    {
+        if (! $student) {
+            return false;
+        }
+
+        if (in_array($student->access_status, self::SECURED_INTERNSHIP_STATUSES, true)) {
+            return true;
+        }
+
+        $hasAcceptedPartnerApplication = Application::where('student_id', $student->id)
+            ->where('status', 'Accepted')
+            ->exists();
+
+        if ($hasAcceptedPartnerApplication) {
+            return true;
+        }
+
+        return Form2Submission::where('student_id', $student->id)
+            ->where('status', 'ApprovedForm2')
+            ->exists();
     }
 }

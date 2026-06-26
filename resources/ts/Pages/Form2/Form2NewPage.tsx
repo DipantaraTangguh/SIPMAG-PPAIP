@@ -4,6 +4,7 @@ import {
     ArrowLeft,
     Lock,
     Info,
+    CheckCircle,
     BookOpen,
     ArrowRight,
     Lightbulb,
@@ -11,13 +12,27 @@ import {
 } from "lucide-react";
 import DashboardLayout from "../../Components/Layouts/DashboardLayout";
 import { useAuth } from "../../context/AppContext";
-import { useForm2Workflow } from "../../context/StudentWorkflowContext";
-import { canSubmitForm2 } from "../../utils/accessUtils";
+import {
+    useApplicationWorkflow,
+    useForm2Workflow,
+} from "../../context/StudentWorkflowContext";
+import {
+    canSubmitForm2,
+    hasSecuredInternship,
+    SECURED_INTERNSHIP_MESSAGE,
+} from "../../utils/accessUtils";
 
 export default function Form2NewPage() {
     const navigate = useNavigate();
     const { student } = useAuth();
-    const { submitForm2 } = useForm2Workflow();
+    const { activeApplications } = useApplicationWorkflow();
+    const { submitForm2, form2Submissions } = useForm2Workflow();
+
+    const internshipSecured = hasSecuredInternship(
+        student?.accessStatus,
+        activeApplications,
+        form2Submissions,
+    );
 
     // Guard keras: Form 2 jangan kebuka sebelum Form 1 approved.
     useEffect(() => {
@@ -71,6 +86,11 @@ export default function Form2NewPage() {
     };
 
     const handleSubmit = async () => {
+        if (internshipSecured) {
+            setSubmitError(SECURED_INTERNSHIP_MESSAGE);
+            return;
+        }
+
         const newErrors: Partial<Record<keyof typeof formData, string>> = {};
         if (!formData.namaPerusahaan.trim())
             newErrors.namaPerusahaan = "Nama perusahaan wajib diisi";
@@ -104,6 +124,43 @@ export default function Form2NewPage() {
             setIsSubmitting(false);
         }
     };
+
+    if (internshipSecured) {
+        return (
+            <DashboardLayout pageTitle="Portal Magang">
+                <button
+                    type="button"
+                    onClick={() => navigate("/portal", { state: { activeTab: "mandiri" } })}
+                    className="mb-6 flex items-center gap-2 rounded-lg bg-primary px-4.5 py-2 text-[13px] font-bold text-white transition-colors hover:bg-primary-hover"
+                >
+                    <ArrowLeft className="h-4 w-4" />
+                    Kembali
+                </button>
+                <div className="max-w-3xl rounded-xl border border-green-200 bg-green-50 p-6 sm:p-8">
+                    <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
+                        <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-green-100">
+                            <CheckCircle className="h-6 w-6 text-green-600" />
+                        </div>
+                        <div className="flex-1">
+                            <h1 className="text-xl font-bold text-green-800">
+                                Form 2 Tidak Dapat Diajukan Lagi
+                            </h1>
+                            <p className="mt-2 text-[14px] leading-relaxed text-green-700">
+                                {SECURED_INTERNSHIP_MESSAGE}
+                            </p>
+                            <button
+                                type="button"
+                                onClick={() => navigate("/guidance")}
+                                className="mt-5 w-full rounded-xl bg-primary px-5 py-3 text-[13px] font-bold text-white transition-colors hover:bg-primary-hover sm:w-auto"
+                            >
+                                Buka Bimbingan &amp; Logbook
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </DashboardLayout>
+        );
+    }
 
     return (
         <DashboardLayout pageTitle="Portal Magang">
@@ -289,9 +346,9 @@ export default function Form2NewPage() {
                             <button
                                 type="button"
                                 onClick={handleSubmit}
-                                disabled={!isFormValid || isSubmitting}
+                                disabled={!isFormValid || isSubmitting || internshipSecured}
                                 className={`flex w-full items-center justify-center gap-2 rounded-xl px-8 py-3.5 text-[15px] font-bold transition-colors sm:w-auto ${
-                                    isSubmitting || !isFormValid
+                                    isSubmitting || !isFormValid || internshipSecured
                                         ? "cursor-not-allowed bg-gray-300 text-gray-400"
                                         : "bg-primary text-white hover:bg-primary-hover"
                                 }`}

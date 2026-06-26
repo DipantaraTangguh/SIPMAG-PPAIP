@@ -170,6 +170,8 @@ export default function VacancyDetailPage() {
                     isApplying={detail.isApplying}
                     isApplied={detail.isApplied}
                     canApply={detail.canApply}
+                    internshipSecured={detail.internshipSecured}
+                    securedInternshipMessage={detail.securedInternshipMessage}
                     onFileChange={detail.handleFileChange}
                     onRemoveFile={detail.handleRemoveFile}
                     onApply={detail.handleApply}
