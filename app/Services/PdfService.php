@@ -23,12 +23,24 @@ class PdfService
             'kaprodiName' => $kaprodi->lecturer_name ?? '—',
             'kaprodiNidn' => $kaprodi->nidn ?? '—',
             'signatureSrc' => $this->signatureSource($kaprodi?->signature_path),
+            'studentSignatureSrc' => $this->studentSignatureSource($student->form1_data['studentSignaturePath'] ?? null),
             'logoSrc' => $this->logoSource(),
             'submittedDate' => optional($student->updated_at)->translatedFormat('d F Y') ?? '—',
             'approvalDate' => optional($student->form1_approved_at)->translatedFormat('d F Y') ?? '—',
         ])->setPaper('a4');
 
         return $pdf->download('Surat_Keterangan_Form1_'.$student->nim.'.pdf');
+    }
+
+    private function studentSignatureSource(?string $signaturePath): ?string
+    {
+        if (! $signaturePath) {
+            return null;
+        }
+
+        $path = StoredFilePath::resolve(storage_path('app/private'), $signaturePath);
+
+        return $path ? $this->imageDataUri($path) : null;
     }
 
     private function signatureSource(?string $signaturePath): ?string

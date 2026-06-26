@@ -60,17 +60,23 @@ export default function Form1Card({
     formData,
     errors,
     fileError,
+    signatureFileError,
     isSubmitting,
     isDragging,
+    isSignatureDragging,
     setIsDragging,
+    setIsSignatureDragging,
     isFormValid,
     updateField,
     handleFileChange,
+    handleSignatureFileChange,
     removeFile,
+    removeSignatureFile,
     handleSubmit,
     handleCancel,
 }) {
     const fileInputRef = useRef(null);
+    const signatureFileInputRef = useRef(null);
     const onDragOver = (e) => {
         e.preventDefault();
         setIsDragging(true);
@@ -82,9 +88,25 @@ export default function Form1Card({
         const file = e.dataTransfer.files[0];
         if (file) handleFileChange(file);
     };
+    const onSignatureDragOver = (e) => {
+        e.preventDefault();
+        setIsSignatureDragging(true);
+    };
+    const onSignatureDragLeave = () => setIsSignatureDragging(false);
+    const onSignatureDrop = (e) => {
+        e.preventDefault();
+        setIsSignatureDragging(false);
+        const file = e.dataTransfer.files[0];
+        if (file) handleSignatureFileChange(file);
+    };
     const onFileInputChange = (e) => {
         const file = e.target.files[0];
         if (file) handleFileChange(file);
+        e.target.value = '';
+    };
+    const onSignatureFileInputChange = (e) => {
+        const file = e.target.files[0];
+        if (file) handleSignatureFileChange(file);
         e.target.value = '';
     };
     const inputBase =
@@ -161,9 +183,8 @@ export default function Form1Card({
                             disabled={isSubmitting}
                         >
                             <option value="">Pilih skema magang</option>
-                            <option value="Mitra">Magang Mitra (Perusahaan)</option>
-                            <option value="Mandiri">Magang Mandiri</option>
-                            <option value="Kewirausahaan">Magang Kewirausahaan</option>
+                            <option value="Magang Perusahaan">Magang Perusahaan</option>
+                            <option value="Magang Kewirausahaan">Magang Kewirausahaan</option>
                         </select>
                         <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
                     </div>
@@ -187,9 +208,9 @@ export default function Form1Card({
                     />
                     {!errors.topikTempat && (
                         <HelperText>
-                            Untuk Magang skema mandiri tulis topik yang akan diajukan. Untuk
-                            magang skema perusahaan tulis nama instansi / perusahaan yang
-                            lengkap.
+                            Untuk Magang Perusahaan tulis nama instansi / perusahaan yang
+                            lengkap. Untuk Magang Kewirausahaan tulis topik atau rencana
+                            usaha yang akan diajukan.
                         </HelperText>
                     )}
                     <FieldError id="topikTempat-error" message={errors.topikTempat} />
@@ -271,6 +292,80 @@ export default function Form1Card({
                         <p className="mt-1 text-xs text-red-500" role="alert">{fileError}</p>
                     )}
                     <FieldError id="transkripFile-error" message={errors.transkripFile} />
+                </div>
+                <div>
+                    <FieldLabel htmlFor="studentSignatureInput">Upload Tanda Tangan Mahasiswa</FieldLabel>
+
+                    {formData.studentSignatureFile ? (
+                        <div className="flex items-center gap-3 rounded-xl border border-primary bg-primary-pale px-5 py-4">
+                            <FileText className="h-6 w-6 flex-shrink-0 text-primary" />
+                            <div className="min-w-0 flex-1">
+                                <p className="truncate text-sm font-medium text-gray-800">
+                                    {formData.studentSignatureFile.name}
+                                </p>
+                                <p className="text-xs text-gray-500">
+                                    {formatFileSize(formData.studentSignatureFile.size)}
+                                </p>
+                            </div>
+                            <button
+                                type="button"
+                                onClick={removeSignatureFile}
+                                className="flex h-7 w-7 items-center justify-center rounded-full text-gray-400 transition-colors hover:bg-gray-200 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-primary/20"
+                                aria-label="Hapus file tanda tangan"
+                            >
+                                <X className="h-4 w-4" />
+                            </button>
+                        </div>
+                    ) : (
+                        <div
+                            onDragOver={onSignatureDragOver}
+                            onDragLeave={onSignatureDragLeave}
+                            onDrop={onSignatureDrop}
+                            onClick={() => signatureFileInputRef.current?.click()}
+                            role="button"
+                            tabIndex={0}
+                            aria-label="Upload Tanda Tangan Mahasiswa. JPG atau PNG (Maks. 5MB)"
+                            aria-invalid={!!errors.studentSignatureFile}
+                            aria-describedby={errors.studentSignatureFile ? 'studentSignatureFile-error' : undefined}
+                            onKeyDown={(e) => {
+                                if (e.key === ' ' || e.key === 'Enter') {
+                                    e.preventDefault();
+                                    signatureFileInputRef.current?.click();
+                                }
+                            }}
+                            className={`
+                                flex cursor-pointer flex-col items-center justify-center rounded-xl
+                                border-2 border-dashed px-6 py-8 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-primary/20
+                                ${isSignatureDragging
+                                    ? 'border-primary bg-primary-pale'
+                                    : errors.studentSignatureFile
+                                        ? 'border-red-400 bg-red-50 hover:border-red-500'
+                                        : 'border-gray-300 hover:border-primary hover:bg-primary-pale'
+                                }
+                            `}
+                        >
+                            <CloudUpload className="mb-3 h-10 w-10 text-primary" />
+                            <p className="text-sm font-medium text-gray-800">
+                                Klik untuk unggah tanda tangan atau drag and drop
+                            </p>
+                            <p className="mt-1 text-xs text-gray-400">
+                                JPG atau PNG dengan latar transparan/putih (Maks. 5MB)
+                            </p>
+                            <input
+                                id="studentSignatureInput"
+                                ref={signatureFileInputRef}
+                                type="file"
+                                accept=".jpg,.jpeg,.png"
+                                onChange={onSignatureFileInputChange}
+                                className="hidden"
+                            />
+                        </div>
+                    )}
+
+                    {signatureFileError && (
+                        <p className="mt-1 text-xs text-red-500" role="alert">{signatureFileError}</p>
+                    )}
+                    <FieldError id="studentSignatureFile-error" message={errors.studentSignatureFile} />
                 </div>
                 <div>
                     <FieldLabel id="output-label">Output</FieldLabel>

@@ -51,8 +51,10 @@ class Form1Controller extends Controller
         $validated = $request->validated();
 
         $transkripPath = $request->file('transkrip')->store('transkrip', 'local');
+        $studentSignaturePath = $request->file('studentSignature')->store('student-signatures', 'local');
 
         unset($validated['transkrip']);
+        unset($validated['studentSignature']);
 
         // Academic values are authoritative server-side data, never request input.
         $form1Data = [
@@ -62,6 +64,7 @@ class Form1Controller extends Controller
             'skemaMagang' => $validated['skemaMagang'],
             'topikMagang' => $validated['topikMagang'],
             'outputTarget' => $validated['outputTarget'],
+            'studentSignaturePath' => $studentSignaturePath,
         ];
 
         $student->fill([

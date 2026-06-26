@@ -161,7 +161,11 @@
     <div class="sig-student">
         <p>Jakarta, {{ $submittedDate }}</p>
         <p>Hormat saya,</p>
-        <div class="sig-space"></div>
+        @if ($studentSignatureSrc)
+            <img class="sig-img" src="{{ $studentSignatureSrc }}" alt="Tanda tangan mahasiswa">
+        @else
+            <div class="sig-space"></div>
+        @endif
         <p class="sig-name">{{ $student->name }}</p>
         <p>NIM {{ $student->nim }}</p>
     </div>
