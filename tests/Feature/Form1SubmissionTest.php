@@ -192,8 +192,10 @@ class Form1SubmissionTest extends TestCase
             ]);
     }
 
-    public function test_completed_legacy_cycle_returns_an_archived_profile_summary(): void
+    public function test_completed_legacy_cycle_reports_status_without_fabricating_form1(): void
     {
+        // The API no longer synthesizes a form1 payload for archived cycles; the
+        // archived-profile view is rebuilt client-side from the student profile.
         $user = User::factory()->create(['role' => 'mahasiswa']);
         $student = Student::create([
             'user_id' => $user->id,
@@ -215,9 +217,6 @@ class Form1SubmissionTest extends TestCase
             ->getJson('/api/form1')
             ->assertOk()
             ->assertJsonPath('access_status', 'SiklusSelesai')
-            ->assertJsonPath('form1.semester', 8)
-            ->assertJsonPath('form1.jumlahSKS', 144)
-            ->assertJsonPath('form1.ipk', 3.8)
-            ->assertJsonPath('form1.isArchivedSummary', true);
+            ->assertJsonPath('form1', null);
     }
 }

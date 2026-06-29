@@ -4,9 +4,14 @@ namespace App\Policies;
 
 use App\Models\DefenseSubmission;
 use App\Models\User;
+use App\Services\DefenseAssessmentService;
 
 class DefenseSubmissionPolicy
 {
+    public function __construct(
+        private readonly DefenseAssessmentService $assessmentService,
+    ) {}
+
     public function viewAny(User $user): bool
     {
         $lecturerId = $user->lecturer?->id;
@@ -17,14 +22,7 @@ class DefenseSubmissionPolicy
 
         return $user->isDpm()
             || $user->isDosenPenguji()
-            || DefenseSubmission::query()
-                ->where(function ($query) use ($lecturerId): void {
-                    $query
-                        ->whereHas('student', fn ($studentQuery) => $studentQuery->where('dpm_id', $lecturerId))
-                        ->orWhere('dosen_penguji_1_id', $lecturerId)
-                        ->orWhere('dosen_penguji_2_id', $lecturerId);
-                })
-                ->exists();
+            || DefenseSubmission::query()->assessableBy($lecturerId)->exists();
     }
 
     public function view(User $user, DefenseSubmission $submission): bool
@@ -35,8 +33,7 @@ class DefenseSubmissionPolicy
                 && $user->lecturer?->study_program !== null
                 && $user->lecturer->study_program === $submission->student?->study_program
             )
-            || $this->assignedDpm($user, $submission)
-            || $this->assignedExaminer($user, $submission);
+            || $this->isAssignedAssessor($user, $submission);
     }
 
     public function create(User $user): bool
@@ -80,28 +77,11 @@ class DefenseSubmissionPolicy
     public function assess(User $user, DefenseSubmission $submission): bool
     {
         return $submission->status === 'Scheduled'
-            && (
-                $this->assignedDpm($user, $submission)
-                || $this->assignedExaminer($user, $submission)
-            );
+            && $this->isAssignedAssessor($user, $submission);
     }
 
-    private function assignedDpm(User $user, DefenseSubmission $submission): bool
+    private function isAssignedAssessor(User $user, DefenseSubmission $submission): bool
     {
-        $lecturerId = $user->lecturer?->id;
-
-        return $lecturerId !== null
-            && $submission->student?->dpm_id === $lecturerId;
-    }
-
-    private function assignedExaminer(User $user, DefenseSubmission $submission): bool
-    {
-        $lecturerId = $user->lecturer?->id;
-
-        return $lecturerId !== null
-            && in_array($lecturerId, [
-                $submission->dosen_penguji_1_id,
-                $submission->dosen_penguji_2_id,
-            ], true);
+        return $this->assessmentService->assessorRole($user, $submission) !== null;
     }
 }

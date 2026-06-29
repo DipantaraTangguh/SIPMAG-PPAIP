@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -60,5 +61,19 @@ class DefenseSubmission extends Model
     public function assessments()
     {
         return $this->hasMany(DefenseAssessment::class);
+    }
+
+    /**
+     * Submissions a lecturer is entitled to assess: those of the students they
+     * supervise (DPM) or where they are assigned as one of the two examiners.
+     */
+    public function scopeAssessableBy(Builder $query, int $lecturerId): Builder
+    {
+        return $query->where(function (Builder $query) use ($lecturerId): void {
+            $query
+                ->whereHas('student', fn (Builder $studentQuery) => $studentQuery->where('dpm_id', $lecturerId))
+                ->orWhere('dosen_penguji_1_id', $lecturerId)
+                ->orWhere('dosen_penguji_2_id', $lecturerId);
+        });
     }
 }

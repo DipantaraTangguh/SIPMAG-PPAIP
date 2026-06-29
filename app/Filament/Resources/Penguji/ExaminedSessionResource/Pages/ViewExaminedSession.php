@@ -112,11 +112,6 @@ class ViewExaminedSession extends ViewRecord
 
     private function currentAssessment(): ?DefenseAssessment
     {
-        /** @var User|null $user */
-        $user = Auth::user();
-
-        return $user
-            ? app(DefenseAssessmentService::class)->assessmentFor($user, $this->record)
-            : null;
+        return ExaminedSessionResource::currentAssessment($this->record);
     }
 }

@@ -2,10 +2,12 @@
 
 namespace App\Services;
 
+use App\Enums\AssessorRole;
 use App\Models\DefenseAssessment;
 use App\Models\DefenseSubmission;
 use App\Models\User;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -63,7 +65,7 @@ class DefenseAssessmentService
         });
     }
 
-    public function assessorRole(User $user, DefenseSubmission $submission): ?string
+    public function assessorRole(User $user, DefenseSubmission $submission): ?AssessorRole
     {
         $lecturerId = $user->lecturer?->id;
 
@@ -71,36 +73,19 @@ class DefenseAssessmentService
             return null;
         }
 
-        if ($submission->student?->dpm_id === $lecturerId) {
-            return 'dpm';
-        }
-
-        if ($submission->dosen_penguji_1_id === $lecturerId) {
-            return 'penguji_1';
-        }
-
-        if ($submission->dosen_penguji_2_id === $lecturerId) {
-            return 'penguji_2';
-        }
-
-        return null;
+        return match ($lecturerId) {
+            $submission->student?->dpm_id => AssessorRole::Dpm,
+            $submission->dosen_penguji_1_id => AssessorRole::ExaminerOne,
+            $submission->dosen_penguji_2_id => AssessorRole::ExaminerTwo,
+            default => null,
+        };
     }
 
     public function assessmentFor(User $user, DefenseSubmission $submission): ?DefenseAssessment
     {
         $role = $this->assessorRole($user, $submission);
 
-        if (! $role) {
-            return null;
-        }
-
-        if ($submission->relationLoaded('assessments')) {
-            return $submission->assessments->firstWhere('assessor_role', $role);
-        }
-
-        return $submission->assessments()
-            ->where('assessor_role', $role)
-            ->first();
+        return $role ? $this->assessmentForRole($submission, $role) : null;
     }
 
     public function weightedScore(DefenseAssessment $assessment): float
@@ -115,7 +100,7 @@ class DefenseAssessmentService
 
     public function finalScore(DefenseSubmission $submission): ?float
     {
-        $dpmScore = $this->scoreForRole($submission, 'dpm');
+        $dpmScore = $this->scoreForRole($submission, AssessorRole::Dpm);
         $examinerAverage = $this->examinerAverageScore($submission);
 
         if ($dpmScore === null || $examinerAverage === null) {
@@ -127,8 +112,8 @@ class DefenseAssessmentService
 
     public function examinerAverageScore(DefenseSubmission $submission): ?float
     {
-        $examinerOneScore = $this->scoreForRole($submission, 'penguji_1');
-        $examinerTwoScore = $this->scoreForRole($submission, 'penguji_2');
+        $examinerOneScore = $this->scoreForRole($submission, AssessorRole::ExaminerOne);
+        $examinerTwoScore = $this->scoreForRole($submission, AssessorRole::ExaminerTwo);
 
         if ($examinerOneScore === null || $examinerTwoScore === null) {
             return null;
@@ -137,11 +122,9 @@ class DefenseAssessmentService
         return round(($examinerOneScore + $examinerTwoScore) / 2, 2);
     }
 
-    public function scoreForRole(DefenseSubmission $submission, string $role): ?float
+    public function scoreForRole(DefenseSubmission $submission, AssessorRole $role): ?float
     {
-        $assessment = $submission->relationLoaded('assessments')
-            ? $submission->assessments->firstWhere('assessor_role', $role)
-            : $submission->assessments()->where('assessor_role', $role)->first();
+        $assessment = $this->assessmentForRole($submission, $role);
 
         return $assessment ? $this->weightedScore($assessment) : null;
     }
@@ -162,14 +145,25 @@ class DefenseAssessmentService
 
     public function completedAssessorCount(DefenseSubmission $submission): int
     {
-        $assessments = $submission->relationLoaded('assessments')
+        // A unique (submission, role) index plus the enum-constrained column
+        // guarantee at most one row per assessor role, so a row count is the
+        // number of distinct assessors who have submitted scores.
+        return $this->assessments($submission)->count();
+    }
+
+    private function assessmentForRole(DefenseSubmission $submission, AssessorRole $role): ?DefenseAssessment
+    {
+        return $this->assessments($submission)->firstWhere('assessor_role', $role);
+    }
+
+    /**
+     * @return Collection<int, DefenseAssessment>
+     */
+    private function assessments(DefenseSubmission $submission): Collection
+    {
+        return $submission->relationLoaded('assessments')
             ? $submission->assessments
             : $submission->assessments()->get();
-
-        return $assessments
-            ->whereIn('assessor_role', ['dpm', 'penguji_1', 'penguji_2'])
-            ->unique('assessor_role')
-            ->count();
     }
 
     /**

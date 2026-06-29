@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\AssessorRole;
 use Illuminate\Database\Eloquent\Model;
 
 class DefenseAssessment extends Model
@@ -18,6 +19,7 @@ class DefenseAssessment extends Model
     protected function casts(): array
     {
         return [
+            'assessor_role' => AssessorRole::class,
             'internship_performance_score' => 'decimal:2',
             'final_report_score' => 'decimal:2',
             'presentation_score' => 'decimal:2',

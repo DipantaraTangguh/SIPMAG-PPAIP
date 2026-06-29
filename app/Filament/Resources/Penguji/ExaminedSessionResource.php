@@ -47,14 +47,7 @@ class ExaminedSessionResource extends Resource
 
         return $user->isDpm()
             || $user->isDosenPenguji()
-            || DefenseSubmission::query()
-                ->where(function (Builder $query) use ($lecturerId): void {
-                    $query
-                        ->whereHas('student', fn (Builder $studentQuery) => $studentQuery->where('dpm_id', $lecturerId))
-                        ->orWhere('dosen_penguji_1_id', $lecturerId)
-                        ->orWhere('dosen_penguji_2_id', $lecturerId);
-                })
-                ->exists();
+            || DefenseSubmission::query()->assessableBy($lecturerId)->exists();
     }
 
     public static function canViewAny(): bool
@@ -89,12 +82,7 @@ class ExaminedSessionResource extends Resource
         return parent::getEloquentQuery()
             ->when(
                 $lecturerId,
-                fn (Builder $query) => $query->where(function (Builder $query) use ($lecturerId): void {
-                    $query
-                        ->whereHas('student', fn (Builder $studentQuery) => $studentQuery->where('dpm_id', $lecturerId))
-                        ->orWhere('dosen_penguji_1_id', $lecturerId)
-                        ->orWhere('dosen_penguji_2_id', $lecturerId);
-                }),
+                fn (Builder $query) => $query->assessableBy($lecturerId),
                 fn (Builder $query) => $query->whereRaw('1 = 0'),
             )
             ->with([
@@ -198,9 +186,10 @@ class ExaminedSessionResource extends Resource
                                     return 'Belum dinilai';
                                 }
 
-                                $score = app(DefenseAssessmentService::class)->weightedScore($assessment);
+                                $service = app(DefenseAssessmentService::class);
+                                $score = $service->weightedScore($assessment);
 
-                                return number_format($score, 2).' ('.app(DefenseAssessmentService::class)->letterGrade($score).')';
+                                return number_format($score, 2).' ('.$service->letterGrade($score).')';
                             })
                             ->badge()
                             ->color(fn (DefenseSubmission $record): string => self::currentAssessment($record) ? 'success' : 'warning'),
@@ -361,15 +350,10 @@ class ExaminedSessionResource extends Resource
         $user = Auth::user();
         $role = $user ? app(DefenseAssessmentService::class)->assessorRole($user, $record) : null;
 
-        return match ($role) {
-            'dpm' => 'DPM',
-            'penguji_1' => 'Examiner 1',
-            'penguji_2' => 'Examiner 2',
-            default => '-',
-        };
+        return $role?->label() ?? '-';
     }
 
-    private static function currentAssessment(DefenseSubmission $record): ?DefenseAssessment
+    public static function currentAssessment(DefenseSubmission $record): ?DefenseAssessment
     {
         /** @var User|null $user */
         $user = Auth::user();
