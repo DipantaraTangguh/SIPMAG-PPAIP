@@ -17,7 +17,6 @@ class DefenseSubmission extends Model
         'poster_path',
         'foto_kegiatan_1_path',
         'foto_kegiatan_2_path',
-        'krs_path',
         'status',
         'scheduled_date',
         'scheduled_time',
@@ -56,5 +55,10 @@ class DefenseSubmission extends Model
     public function examinerTwo()
     {
         return $this->belongsTo(Lecturer::class, 'dosen_penguji_2_id');
+    }
+
+    public function assessments()
+    {
+        return $this->hasMany(DefenseAssessment::class);
     }
 }

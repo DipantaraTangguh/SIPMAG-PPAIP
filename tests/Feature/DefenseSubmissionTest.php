@@ -25,7 +25,6 @@ class DefenseSubmissionTest extends TestCase
         $this->postJson('/api/defense', [
             'laporan' => $this->pdf('laporan.pdf'),
             'poster' => $this->pdf('poster.pdf'),
-            'krs' => $this->pdf('krs.pdf'),
         ])
             ->assertUnprocessable()
             ->assertJsonValidationErrors([
@@ -37,7 +36,7 @@ class DefenseSubmissionTest extends TestCase
         $this->assertSame([], Storage::disk('local')->allFiles('sidang'));
     }
 
-    public function test_defense_submission_persists_all_five_documents(): void
+    public function test_defense_submission_persists_all_four_documents(): void
     {
         Storage::fake('local');
 
@@ -49,7 +48,6 @@ class DefenseSubmissionTest extends TestCase
             'poster' => $this->pdf('poster.pdf'),
             'foto_kegiatan_1' => $this->pdf('foto-kegiatan-1.pdf'),
             'foto_kegiatan_2' => $this->pdf('foto-kegiatan-2.pdf'),
-            'krs' => $this->pdf('krs.pdf'),
         ])->assertCreated();
 
         $submission = $student->sidangSubmission()->firstOrFail();
@@ -58,11 +56,10 @@ class DefenseSubmissionTest extends TestCase
             $submission->poster_path,
             $submission->foto_kegiatan_1_path,
             $submission->foto_kegiatan_2_path,
-            $submission->krs_path,
         ];
 
-        $this->assertCount(5, array_filter($paths));
-        $this->assertCount(5, array_unique($paths));
+        $this->assertCount(4, array_filter($paths));
+        $this->assertCount(4, array_unique($paths));
 
         foreach ($paths as $path) {
             $this->assertTrue(Storage::disk('local')->exists($path));
@@ -87,7 +84,6 @@ class DefenseSubmissionTest extends TestCase
             'poster_path' => 'sidang/poster.pdf',
             'foto_kegiatan_1_path' => 'sidang/foto-1.pdf',
             'foto_kegiatan_2_path' => 'sidang/foto-2.pdf',
-            'krs_path' => 'sidang/krs.pdf',
             'status' => 'Pending',
         ]);
 
@@ -135,6 +131,53 @@ class DefenseSubmissionTest extends TestCase
             ->assertJsonPath('submission.dosen_penguji_2_id', $examinerTwo->id)
             ->assertJsonPath('submission.dosen_penguji_1', 'Dosen Penguji Satu')
             ->assertJsonPath('submission.dosen_penguji_2', 'Dosen Penguji Dua');
+    }
+
+    public function test_kaprodi_cannot_assign_student_dpm_as_an_examiner(): void
+    {
+        [, $student] = $this->createEligibleStudent();
+        $student->forceFill(['access_status' => 'MenungguSidang'])->save();
+
+        DefenseSubmission::create([
+            'student_id' => $student->id,
+            'laporan_path' => 'sidang/laporan.pdf',
+            'poster_path' => 'sidang/poster.pdf',
+            'foto_kegiatan_1_path' => 'sidang/foto-1.pdf',
+            'foto_kegiatan_2_path' => 'sidang/foto-2.pdf',
+            'status' => 'Pending',
+        ]);
+
+        $kaprodiUser = User::factory()->create(['role' => 'kaprodi']);
+        Lecturer::create([
+            'user_id' => $kaprodiUser->id,
+            'nidn' => fake()->unique()->numerify('##########'),
+            'lecturer_name' => 'Kaprodi Sistem Informasi',
+            'study_program' => $student->study_program,
+        ]);
+        $dpm = Lecturer::create([
+            'user_id' => User::factory()->create(['role' => 'dpm'])->id,
+            'nidn' => fake()->unique()->numerify('##########'),
+            'lecturer_name' => 'Dosen Pembimbing',
+            'study_program' => $student->study_program,
+        ]);
+        $examiner = Lecturer::create([
+            'user_id' => User::factory()->create(['role' => 'dosen_penguji'])->id,
+            'nidn' => fake()->unique()->numerify('##########'),
+            'lecturer_name' => 'Dosen Penguji',
+            'study_program' => $student->study_program,
+        ]);
+        $student->update(['dpm_id' => $dpm->id]);
+
+        $this->actingAs($kaprodiUser)
+            ->postJson("/api/kaprodi/defense/{$student->id}/schedule", [
+                'scheduled_date' => today()->addWeek()->toDateString(),
+                'scheduled_time' => '09:00',
+                'room' => 'Ruang 301',
+                'dosen_penguji_1_id' => $dpm->id,
+                'dosen_penguji_2_id' => $examiner->id,
+            ])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors('dosen_penguji_1_id');
     }
 
     /**

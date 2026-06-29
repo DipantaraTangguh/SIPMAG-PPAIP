@@ -72,7 +72,8 @@ Nilai utama aplikasi:
 - Status logbook lengkap setelah minimal 6 logbook disetujui.
 - Pengajuan sidang magang dengan upload dokumen.
 - Penjadwalan sidang oleh Kaprodi.
-- Akses Dosen Penguji phase 1 untuk melihat daftar sidang yang ditugaskan dan detail dokumen sidang secara read-only.
+- Akses DPM dan Dosen Penguji untuk melihat sidang terkait, membuka dokumen, dan mengisi penilaian.
+- Penilaian sidang tiga penilai dengan komponen 50/30/20, input cepat nilai akhir, dan konversi nilai huruf.
 - Penyelesaian siklus magang melalui endpoint Kaprodi dan juga aksi Filament PPAIP.
 - Panel profil dosen untuk upload tanda tangan digital.
 - Data mahasiswa lintas prodi untuk PPAIP dan data mahasiswa per prodi untuk Kaprodi.
@@ -91,7 +92,7 @@ Nilai utama aplikasi:
 - Repository publik dokumentasi foto magang belum terlihat, meskipun ada persetujuan publikasi di form sidang.
 - Notifikasi realtime, email, atau push notification belum terlihat.
 - Validasi "minimal 100 hari kerja magang" pada sidang hanya muncul sebagai teks UI; backend membuka sidang berdasarkan status `LogbookComplete`.
-- Penilaian sidang, berita acara, catatan revisi, dan approval hasil sidang oleh dosen penguji belum tersedia.
+- Berita acara, catatan revisi, approval hasil sidang, dan publikasi nilai kepada mahasiswa belum tersedia.
 - Fitur edit ulang pengajuan pembimbing setelah terkirim belum tersedia.
 - UI administratif non-mahasiswa sebagian besar menggunakan Filament, bukan React custom.
 
@@ -113,8 +114,8 @@ Nilai utama aplikasi:
 | --- | --- | --- |
 | Mahasiswa | Mengikuti alur magang, mengisi Form 1, mencari lowongan, mengajukan Form 2, upload LoA, mengisi logbook, daftar sidang, melihat status. | Role `mahasiswa`; akses React routes `/dashboard`, `/form1`, `/portal`, `/guidance`, `/defense`; akses API mahasiswa. |
 | Kaprodi | Mereview Form 1 mahasiswa prodinya, melihat transkrip, assign DPM, menjadwalkan sidang, melihat mahasiswa per prodi. | Role `kaprodi`; akses Filament resource Kaprodi dan API `/api/kaprodi/*`; data dibatasi `study_program`. |
-| DPM | Melihat mahasiswa bimbingan dan mereview logbook. | Role `dpm`; akses Filament resource DPM dan API `/api/dpm/*`; hanya mahasiswa dengan `dpm_id` dosen terkait. |
-| Dosen Penguji | Melihat jadwal sidang, mahasiswa yang diuji, dan dokumen sidang yang ditugaskan kepadanya. | Role `dosen_penguji` atau lecturer yang sedang ditugaskan sebagai penguji; akses Filament `/admin/penguji/defenses`; data dibatasi ke `dosen_penguji_1_id`/`dosen_penguji_2_id` miliknya. |
+| DPM | Melihat mahasiswa bimbingan, mereview logbook, dan memberi nilai sidang mahasiswa bimbingannya. | Role `dpm`; akses Filament resource DPM, `/admin/penguji/defenses`, dan API `/api/dpm/*`; hanya mahasiswa dengan `dpm_id` dosen terkait. |
+| Dosen Penguji | Melihat jadwal dan dokumen sidang yang ditugaskan serta memberi nilai sidang. | Role `dosen_penguji` atau lecturer yang sedang ditugaskan sebagai penguji; akses Filament `/admin/penguji/defenses`; data dibatasi ke `dosen_penguji_1_id`/`dosen_penguji_2_id` miliknya. |
 | PPAIP | Mengelola lowongan, data dosen, melihat mahasiswa semua prodi, mereview Form 2. | Role `ppaip`; akses Filament resource PPAIP dan API `/api/ppaip/*`; lintas prodi. |
 
 ## 5. User Flow
@@ -363,18 +364,18 @@ Status lainnya:
 | Validasi/aturan bisnis | Tanggal sidang API harus setelah hari ini; dosen penguji 1 dan 2 wajib berbeda; Kaprodi hanya prodi terkait; complete memerlukan status sidang `Scheduled`. |
 | Acceptance criteria | Mahasiswa melihat jadwal sidang setelah dijadwalkan; siklus dapat ditutup setelah sidang terjadwal. |
 
-### 6.14 Akses Dosen Penguji (Phase 1)
+### 6.14 Akses dan Penilaian Sidang oleh Dosen
 
 | Item | Detail |
 | --- | --- |
 | Nama fitur | Examined Sessions |
-| Deskripsi | Dosen Penguji masuk ke panel admin dan melihat daftar sidang yang ditugaskan kepadanya. |
+| Deskripsi | DPM dan Dosen Penguji melihat sidang terkait, membuka dokumen, lalu mengisi atau mengubah nilai. |
 | Lokasi halaman/route | Filament `/admin/penguji/defenses`; dokumen sidang via route terproteksi `/admin/defense-documents/{submission}/{document}/*` |
-| Aktor | Role `dosen_penguji`; lecturer role lain yang sedang ditugaskan sebagai `dosen_penguji_1_id` atau `dosen_penguji_2_id` juga dapat melihat sidang tersebut. |
-| Input | Filter status, pencarian tabel Filament |
-| Output | Nama mahasiswa, NIM, prodi, session ID, examiner ID, tanggal, waktu, ruangan/link, status, posisi penguji, dan daftar dokumen sidang. |
-| Validasi/aturan bisnis | Data dibatasi ke sidang yang memiliki `sidang_submissions.dosen_penguji_1_id` atau `sidang_submissions.dosen_penguji_2_id` sama dengan `lecturers.id` user login; resource read-only; tidak ada create/edit/delete/schedule/complete. |
-| Acceptance criteria | Penguji bisa login ke `/admin`, melihat menu `Examined Sessions`, hanya melihat sidang yang ditugaskan, membuka detail read-only, dan mengakses dokumen melalui route yang melakukan policy authorization dan `StoredFilePath::resolve`. |
+| Aktor | DPM mahasiswa, Penguji 1, dan Penguji 2 yang ditugaskan pada sidang. |
+| Input | Kinerja Magang 0-100, Laporan Akhir 0-100, Ujian Presentasi Hasil Magang 0-100; atau satu nilai cepat 0-100 yang diterapkan ke seluruh komponen. |
+| Output | Nilai berbobot tiap dosen, progres kelengkapan penilai, rata-rata akhir tiga dosen, dan nilai huruf. |
+| Validasi/aturan bisnis | DPM hanya mengakses mahasiswa dengan `students.dpm_id` miliknya; penguji hanya mengakses sidang dengan ID dosennya pada slot penguji; penilaian hanya untuk sidang `Scheduled`; submission/jadwal tetap read-only; nilai dapat diedit; mahasiswa tidak menerima nilai melalui API. |
+| Acceptance criteria | Ketiga dosen dapat memberi nilai seluruh komponen; input cepat menyamakan ketiga komponen; bobot 50/30/20 dihitung otomatis; nilai akhir baru tersedia setelah tiga penilai lengkap. |
 
 ### 6.15 Profil Dosen dan Tanda Tangan Digital
 
@@ -434,6 +435,11 @@ Status lainnya:
 | FR-026 | Sistem harus menyimpan file upload secara aman dan hanya menampilkan file melalui route terproteksi. |
 | FR-027 | Sistem harus menyediakan bulk download transkrip untuk Kaprodi/PPAIP sesuai otorisasi. |
 | FR-028 | Sistem harus memungkinkan Dosen Penguji melihat daftar dan detail sidang yang ditugaskan kepadanya secara read-only. |
+| FR-029 | Sistem harus memungkinkan DPM dan dua Dosen Penguji memberi dan mengubah nilai sidang yang menjadi tanggung jawabnya. |
+| FR-030 | Sistem harus menghitung nilai tiap dosen dari Kinerja Magang 50%, Laporan Akhir 30%, dan Ujian Presentasi 20%. |
+| FR-031 | Sistem harus menyediakan input cepat yang menerapkan satu nilai ke seluruh komponen. |
+| FR-032 | Sistem harus menghitung nilai akhir sebagai rata-rata nilai berbobot DPM, Penguji 1, dan Penguji 2, lalu mengonversinya ke nilai huruf. |
+| FR-033 | Sistem tidak boleh menampilkan nilai sidang kepada mahasiswa pada tahap implementasi saat ini. |
 
 ## 8. Requirement Non-Fungsional
 
@@ -500,13 +506,14 @@ Status lainnya:
 | --- | --- | --- | --- |
 | `User` / `users` | `name`, `email`, `password`, `role` (`mahasiswa`, `kaprodi`, `dpm`, `ppaip`, `dosen_penguji`), `failed_login_attempts`, `locked_until`, `last_login_at`, `deleted_at` | HasOne `Student`, HasOne `Lecturer` | Akun login dan role akses. |
 | `Student` / `students` | `user_id`, `dpm_id`, `nim`, `name`, `study_program`, `email`, `semester`, `jumlah_sks`, `ipk`, `access_status`, `is_independent`, `form1_data`, `form1_pdf_path`, `form1_rejection_reason`, `form1_approved_by`, `form1_approved_at`, `deleted_at` | BelongsTo `User`, BelongsTo `Lecturer` sebagai DPM, HasMany `Application`, HasMany `Form2Submission`, HasMany `Logbook`, HasOne `DefenseSubmission`, HasOne `SupervisorApplication` | Profil mahasiswa dan state utama siklus magang. |
-| `Lecturer` / `lecturers` | `user_id`, `nidn`, `lecturer_name`, `contact`, `study_program`, `signature_path` | BelongsTo `User`, HasMany supervised students | Data dosen, Kaprodi, DPM, dosen penguji, dan tanda tangan digital. |
+| `Lecturer` / `lecturers` | `user_id`, `nidn`, `lecturer_name`, `contact`, `study_program`, `signature_path` | BelongsTo `User`, HasMany supervised students, HasMany `DefenseAssessment` | Data dosen, Kaprodi, DPM, dosen penguji, dan tanda tangan digital. |
 | `Internship` / `internships` | `company_name`, `position`, `description`, `capacity`, `duration`, `bidang`, `start_date`, `job_description`, `skills`, `requirements`, `minimum_education`, `sistem_kerja`, `location`, `deadline`, `is_active` | HasMany `Application` | Data lowongan magang mitra. |
 | `Application` / `applications` | `student_id`, `internship_id`, `cv_file_path`, `loa_path`, `status`, `deleted_at` | BelongsTo `Student`, BelongsTo `Internship` | Lamaran mahasiswa ke lowongan mitra. |
 | `Form2Submission` / `form2_submissions` | `student_id`, `company_name`, `alamat_perusahaan`, `lingkup_magang`, `tanggal_mulai`, `tanggal_selesai`, `status`, `rejection_reason`, `pdf_path`, `submitted_at`, `deleted_at` | BelongsTo `Student` | Pengajuan magang mandiri. |
 | `SupervisorApplication` / `supervisor_applications` | `student_id`, `company_name`, `company_contact`, `nama_praktisi`, `jabatan_praktisi`, `no_telepon`, `email`, `mulai_magang`, `selesai_magang`, `loa_path`, `submitted_at`, `deleted_at` | BelongsTo `Student` | Pengajuan pembimbing dan periode magang. |
 | `Logbook` / `logbooks` | `student_id`, `tanggal`, `kegiatan_harian`, `hasil`, `status`, `dpm_note`, `deleted_at` | BelongsTo `Student` | Catatan aktivitas magang dan review DPM. |
-| `DefenseSubmission` / `sidang_submissions` | `student_id`, `laporan_path`, `poster_path`, `foto_kegiatan_1_path`, `foto_kegiatan_2_path`, `krs_path`, `status`, `scheduled_date`, `scheduled_time`, `room`, `dosen_penguji_1_id`, `dosen_penguji_2_id`, `scheduled_by`, `scheduled_at`, `submitted_at`, `deleted_at` | BelongsTo `Student`, BelongsTo `Lecturer` scheduler, examinerOne, examinerTwo | Pengajuan dan jadwal sidang magang. |
+| `DefenseSubmission` / `sidang_submissions` | `student_id`, `laporan_path`, `poster_path`, `foto_kegiatan_1_path`, `foto_kegiatan_2_path`, `krs_path`, `status`, `scheduled_date`, `scheduled_time`, `room`, `dosen_penguji_1_id`, `dosen_penguji_2_id`, `scheduled_by`, `scheduled_at`, `submitted_at`, `deleted_at` | BelongsTo `Student`, BelongsTo `Lecturer` scheduler, examinerOne, examinerTwo, HasMany `DefenseAssessment` | Pengajuan dan jadwal sidang magang. |
+| `DefenseAssessment` / `defense_assessments` | `defense_submission_id`, `lecturer_id`, `assessor_role`, `internship_performance_score`, `final_report_score`, `presentation_score` | BelongsTo `DefenseSubmission`, BelongsTo `Lecturer` | Nilai per komponen dari DPM, Penguji 1, atau Penguji 2. |
 
 ### 9.2 Relasi Penting
 
@@ -517,6 +524,7 @@ Status lainnya:
 - Satu `Student` dapat memiliki banyak `Application`, banyak `Form2Submission`, banyak `Logbook`.
 - Satu `Student` memiliki satu `SupervisorApplication` dan satu `DefenseSubmission`.
 - Satu `DefenseSubmission` memiliki dua dosen penguji dan satu scheduler dari tabel `lecturers`.
+- Satu `DefenseSubmission` memiliki maksimal satu penilaian untuk setiap peran: DPM, Penguji 1, dan Penguji 2.
 
 ### 9.3 Constraint dan Index Penting
 
@@ -531,6 +539,8 @@ Status lainnya:
 | `logbooks` | unique `student_id, tanggal` | Satu logbook per tanggal per mahasiswa. |
 | `logbooks` | index `student_id, status` | Mempercepat hitung logbook approved. |
 | `sidang_submissions` | unique `student_id` | Satu submission sidang per mahasiswa. |
+| `defense_assessments` | unique `defense_submission_id, assessor_role` | Mencegah dua nilai untuk peran penilai yang sama pada satu sidang. |
+| `defense_assessments` | index `lecturer_id, defense_submission_id` | Mempercepat pencarian nilai milik dosen. |
 
 ## 10. API / Route Documentation
 
@@ -736,9 +746,15 @@ Panel admin Filament:
 - Setelah submit sidang, status mahasiswa menjadi `MenungguSidang`.
 - Kaprodi hanya dapat menjadwalkan mahasiswa prodi terkait yang statusnya `MenungguSidang`.
 - Jadwal sidang API harus setelah hari ini.
-- Dosen penguji 1 dan 2 harus berbeda.
+- Dosen penguji 1 dan 2 harus berbeda serta tidak boleh sama dengan DPM mahasiswa.
 - Dosen Penguji hanya dapat melihat sidang jika `lecturers.id` miliknya sama dengan `dosen_penguji_1_id` atau `dosen_penguji_2_id`.
-- Resource Dosen Penguji bersifat read-only dan tidak dapat membuat, mengedit, menghapus, menjadwalkan, atau menyelesaikan sidang.
+- DPM hanya dapat melihat dan menilai sidang mahasiswa dengan `students.dpm_id` yang sesuai.
+- DPM dan kedua penguji menilai seluruh komponen: Kinerja Magang 50%, Laporan Akhir 30%, dan Ujian Presentasi Hasil Magang 20%.
+- Input cepat menerapkan nilai akhir yang dimasukkan ke seluruh komponen, sehingga hasil berbobot dosen sama dengan nilai input.
+- Nilai akhir sidang adalah rata-rata nilai berbobot DPM, Penguji 1, dan Penguji 2 serta baru tersedia setelah ketiganya menilai.
+- Konversi nilai: A 85-100; A- 80-84,99; B+ 75-79,99; B 70-74,99; C+ 65-69,99; C 60-64,99; D 50-59,99; E 0-49,99.
+- Resource submission tetap read-only; penilai tidak dapat membuat, menghapus, menjadwalkan, atau menyelesaikan sidang, tetapi dapat mengubah penilaiannya sendiri.
+- Nilai sidang belum ditampilkan kepada mahasiswa.
 - Siklus selesai hanya dapat diproses setelah sidang berstatus `Scheduled`.
 
 ### 12.8 Aturan File
@@ -771,7 +787,7 @@ Panel admin Filament:
 | Lamaran perusahaan | Model dan observer mendukung `Accepted`, `RejectedByCompany`, `Canceled`, tetapi tidak terlihat UI/admin untuk mengubah status lamaran perusahaan. |
 | Syarat 100 hari kerja | UI sidang menampilkan syarat minimal 100 hari kerja, tetapi backend hanya mensyaratkan `LogbookComplete`. |
 | Foto kegiatan sidang | Backend menerima image atau PDF, tetapi UI upload sidang hanya menerima `.pdf`. |
-| Penilaian sidang | Dosen Penguji baru memiliki akses baca jadwal dan dokumen. Input nilai, berita acara, catatan revisi, dan approval hasil sidang belum tersedia. |
+| Tindak lanjut sidang | Penilaian sudah tersedia, tetapi berita acara, catatan revisi, approval hasil sidang, dan publikasi nilai mahasiswa belum tersedia. |
 | Penyelesaian siklus | API `completeCycle` berada pada prefix Kaprodi, sementara Filament PPAIP juga memiliki action "Selesaikan Siklus". Perlu konfirmasi role final yang berwenang. |
 | Status setelah `SiklusSelesai` | State machine menjadikan `SiklusSelesai` terminal. Tidak terlihat alur reset ke siklus baru selain pembersihan beberapa field saat complete. |
 | Manajemen user | Tidak terlihat resource khusus untuk CRUD user/role. |
@@ -785,7 +801,7 @@ Panel admin Filament:
 - Siapa yang mengubah status lamaran mitra menjadi diterima/ditolak?
 - Apakah jumlah logbook 6 merupakan representasi final syarat magang, atau sementara untuk simulasi?
 - Apakah syarat 100 hari kerja perlu divalidasi backend berdasarkan tanggal/periode magang?
-- Bagaimana format final penilaian sidang, berita acara, dan revisi dari Dosen Penguji?
+- Bagaimana format berita acara, revisi, dan mekanisme publikasi nilai sidang kepada mahasiswa?
 - Apakah mahasiswa boleh memiliki lebih dari satu pengajuan Form 2 aktif?
 - Apakah siklus magang dapat dimulai ulang setelah `SiklusSelesai`?
 - Apakah data user/mahasiswa/dosen akan dikelola PPAIP melalui aplikasi atau impor dari sistem akademik lain?
@@ -801,7 +817,7 @@ Panel admin Filament:
 - Menambahkan notifikasi persisten dan/atau email untuk perubahan status Form 1, Form 2, DPM, logbook, dan sidang.
 - Menambahkan audit trail untuk aksi approval, reject, assign DPM, dan schedule sidang.
 - Menambahkan fitur komentar atau revisi terstruktur untuk Form 1, Form 2, logbook, dan dokumen sidang.
-- Menambahkan input nilai sidang, berita acara, catatan revisi, dan approval hasil sidang untuk Dosen Penguji.
+- Menambahkan berita acara, catatan revisi, approval hasil sidang, dan mekanisme publikasi nilai mahasiswa.
 - Menambahkan export laporan untuk PPAIP/Kaprodi, misalnya progres magang per prodi, jumlah mahasiswa per status, dan performa approval.
 - Menambahkan dashboard khusus PPAIP, Kaprodi, DPM, dan Dosen Penguji dengan statistik operasional.
 - Menambahkan validasi kapasitas lowongan agar jumlah pelamar/diterima tidak melebihi kapasitas.

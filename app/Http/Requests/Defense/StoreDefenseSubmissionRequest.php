@@ -18,7 +18,6 @@ class StoreDefenseSubmissionRequest extends FormRequest
             'poster' => 'required|file|mimes:pdf|mimetypes:application/pdf|max:5120',
             'foto_kegiatan_1' => 'required|file|mimes:jpg,jpeg,png,pdf|mimetypes:image/jpeg,image/png,application/pdf|max:5120',
             'foto_kegiatan_2' => 'required|file|mimes:jpg,jpeg,png,pdf|mimetypes:image/jpeg,image/png,application/pdf|max:5120',
-            'krs' => 'required|file|mimes:pdf|mimetypes:application/pdf|max:5120',
         ];
     }
 }

@@ -101,7 +101,6 @@ export function StudentWorkflowProvider({ children }) {
                         posterPath: sidangRes.value.submission.poster_path,
                         fotoKegiatan1Path: sidangRes.value.submission.foto_kegiatan_1_path,
                         fotoKegiatan2Path: sidangRes.value.submission.foto_kegiatan_2_path,
-                        krsPath: sidangRes.value.submission.krs_path,
                         scheduledDate: sidangRes.value.submission.scheduled_date,
                         scheduledTime: sidangRes.value.submission.scheduled_time,
                         room: sidangRes.value.submission.room,
@@ -336,7 +335,6 @@ export function StudentWorkflowProvider({ children }) {
         fd.append('poster', files.posterPresentasi || files.poster);
         fd.append('foto_kegiatan_1', files.fotoKegiatan1);
         fd.append('foto_kegiatan_2', files.fotoKegiatan2);
-        fd.append('krs', files.krsMataKuliah || files.krs);
 
         await api.upload('/defense', fd);
         await refreshProfile();

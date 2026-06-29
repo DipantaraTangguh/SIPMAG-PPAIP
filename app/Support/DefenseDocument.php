@@ -23,10 +23,6 @@ final class DefenseDocument
             'attribute' => 'foto_kegiatan_2_path',
             'label' => 'Foto Kegiatan 2',
         ],
-        'krs' => [
-            'attribute' => 'krs_path',
-            'label' => 'KRS',
-        ],
     ];
 
     /**

@@ -9,6 +9,7 @@ use App\Http\Resources\DefenseSubmissionResource;
 use App\Http\Resources\StudentResource;
 use App\Models\DefenseSubmission;
 use App\Models\Student;
+use App\Services\InternshipCycleCompletionService;
 use App\Services\StudentStateMachine;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -72,7 +73,6 @@ class DefenseController extends Controller
                     'poster_path' => $storedPaths['poster'],
                     'foto_kegiatan_1_path' => $storedPaths['foto_kegiatan_1'],
                     'foto_kegiatan_2_path' => $storedPaths['foto_kegiatan_2'],
-                    'krs_path' => $storedPaths['krs'],
                     'status' => 'Pending',
                 ]);
 
@@ -162,18 +162,12 @@ class DefenseController extends Controller
 
         Gate::authorize('complete', $submission);
 
-        $student->fill([
-            'dpm_id' => null,
-            'is_independent' => false,
-            'form1_data' => null,
-            'form1_pdf_path' => null,
-            'form1_rejection_reason' => null,
-        ]);
-        app(StudentStateMachine::class)->transition($student, 'SiklusSelesai');
+        $finalScore = app(InternshipCycleCompletionService::class)->complete($student);
 
         return response()->json([
             'message' => 'Siklus magang berhasil diselesaikan.',
             'access_status' => 'SiklusSelesai',
+            'final_score' => $finalScore,
         ]);
     }
 }

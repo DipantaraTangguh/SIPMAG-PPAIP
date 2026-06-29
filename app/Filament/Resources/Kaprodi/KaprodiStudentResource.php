@@ -333,11 +333,12 @@ class KaprodiStudentResource extends Resource
                         Forms\Components\Select::make('dosen_penguji_1_id')
                             ->label('Dosen Penguji 1')
                             ->required()
-                            ->options(function () {
+                            ->options(function (Student $record) {
                                 $prodi = static::currentUser()?->lecturer?->study_program;
 
                                 return Lecturer::whereNotNull('user_id')
                                     ->when($prodi, fn ($q) => $q->where('study_program', $prodi))
+                                    ->when($record->dpm_id, fn ($q) => $q->where('id', '!=', $record->dpm_id))
                                     ->pluck('lecturer_name', 'id');
                             })
                             ->searchable()
@@ -346,11 +347,12 @@ class KaprodiStudentResource extends Resource
                             ->label('Dosen Penguji 2')
                             ->required()
                             ->different('dosen_penguji_1_id')
-                            ->options(function () {
+                            ->options(function (Student $record) {
                                 $prodi = static::currentUser()?->lecturer?->study_program;
 
                                 return Lecturer::whereNotNull('user_id')
                                     ->when($prodi, fn ($q) => $q->where('study_program', $prodi))
+                                    ->when($record->dpm_id, fn ($q) => $q->where('id', '!=', $record->dpm_id))
                                     ->pluck('lecturer_name', 'id');
                             })
                             ->searchable()

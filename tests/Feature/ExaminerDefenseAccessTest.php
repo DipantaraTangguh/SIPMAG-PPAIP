@@ -171,7 +171,6 @@ class ExaminerDefenseAccessTest extends TestCase
             'poster_path' => 'sidang/poster.pdf',
             'foto_kegiatan_1_path' => 'sidang/foto-1.pdf',
             'foto_kegiatan_2_path' => 'sidang/foto-2.pdf',
-            'krs_path' => 'sidang/krs.pdf',
             'status' => 'Scheduled',
             'scheduled_date' => today()->addWeek()->toDateString(),
             'scheduled_time' => '09:00',

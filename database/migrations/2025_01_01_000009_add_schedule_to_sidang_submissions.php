@@ -9,7 +9,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('sidang_submissions', function (Blueprint $table) {
-            $table->enum('status', ['Pending', 'Scheduled'])->default('Pending')->after('krs_path');
+            $table->enum('status', ['Pending', 'Scheduled'])->default('Pending')->after('poster_path');
             $table->date('scheduled_date')->nullable()->after('status');
             $table->string('scheduled_time', 10)->nullable()->after('scheduled_date');
             $table->string('room', 100)->nullable()->after('scheduled_time');

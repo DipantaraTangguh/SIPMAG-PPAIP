@@ -16,7 +16,6 @@ class DefenseSubmissionResource extends JsonResource
             'poster_path' => $this->poster_path,
             'foto_kegiatan_1_path' => $this->foto_kegiatan_1_path,
             'foto_kegiatan_2_path' => $this->foto_kegiatan_2_path,
-            'krs_path' => $this->krs_path,
             'status' => $this->status,
             'scheduled_date' => $this->scheduled_date?->toDateString(),
             'scheduled_time' => $this->scheduled_time,

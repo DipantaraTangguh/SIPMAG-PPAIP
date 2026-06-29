@@ -1,11 +1,9 @@
 import React, { useState, useRef } from 'react';
 import {
-    CheckCircle,
     Check,
     FileText,
     Image as ImageIcon,
     ImagePlus,
-    FileSpreadsheet,
     FileCheck,
     ArrowRight,
     AlertCircle,
@@ -141,8 +139,7 @@ export default function DefenseFormView() {
         laporanAkhir: null,
         posterPresentasi: null,
         fotoKegiatan1: null,
-        fotoKegiatan2: null,
-        krsMataKuliah: null
+        fotoKegiatan2: null
     });
 
     const [checks, setChecks] = useState({
@@ -159,8 +156,7 @@ export default function DefenseFormView() {
         laporanAkhir: useRef(null),
         posterPresentasi: useRef(null),
         fotoKegiatan1: useRef(null),
-        fotoKegiatan2: useRef(null),
-        krsMataKuliah: useRef(null)
+        fotoKegiatan2: useRef(null)
     };
     
     const isFormValid = 
@@ -193,38 +189,6 @@ export default function DefenseFormView() {
             </p>
 
             <div className="flex flex-col items-start gap-8 lg:flex-row">
-                <div className="w-full flex-shrink-0 rounded-xl border border-l-4 border-gray-200 border-l-primary bg-white p-6 shadow-sm lg:sticky lg:top-6 lg:w-[280px]">
-                    <h3 className="font-bold text-[15px] text-primary mb-4">
-                        Persyaratan Umum
-                    </h3>
-                    <div className="flex flex-col gap-3">
-                        <div className="flex items-start gap-2.5">
-                            <div className="w-[22px] h-[22px] bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
-                                <CheckCircle className="text-green-500 w-[14px] h-[14px]" />
-                            </div>
-                            <p className="text-gray-600 text-[13px] leading-relaxed">
-                                Telah menyelesaikan minimal 100 hari kerja magang.
-                            </p>
-                        </div>
-                        <div className="flex items-start gap-2.5">
-                            <div className="w-[22px] h-[22px] bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
-                                <CheckCircle className="text-green-500 w-[14px] h-[14px]" />
-                            </div>
-                            <p className="text-gray-600 text-[13px] leading-relaxed">
-                                Logbook telah disetujui oleh Pembimbing Magang.
-                            </p>
-                        </div>
-                        <div className="flex items-start gap-2.5">
-                            <div className="w-[22px] h-[22px] bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
-                                <CheckCircle className="text-green-500 w-[14px] h-[14px]" />
-                            </div>
-                            <p className="text-gray-600 text-[13px] leading-relaxed">
-                                Laporan akhir telah direview oleh Dosen Pembimbing.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
                 <div className="w-full flex-1 rounded-xl border border-gray-200 bg-white p-5 shadow-sm sm:p-8">
                     <h2 className="font-bold text-[20px] text-[#1A1A1A] mb-6">
                         Lengkapi Dokumen Sidang
@@ -269,17 +233,6 @@ export default function DefenseFormView() {
                             hint="Rasio 3:4, Maksimal 5MB (Format .pdf)"
                             icon={ImagePlus}
                             fieldKey="fotoKegiatan2"
-                            maxSizeMB={5}
-                            files={files} setFiles={setFiles}
-                            fileErrors={fileErrors} setFileErrors={setFileErrors}
-                            dragOver={dragOver} setDragOver={setDragOver}
-                            inputRefs={inputRefs}
-                        />
-                        <UploadField
-                            label="KRS Bukti Pengambilan Mata Kuliah Magang (PDF)"
-                            hint="Pastikan nama mata kuliah tertera jelas (Format .pdf)"
-                            icon={FileSpreadsheet}
-                            fieldKey="krsMataKuliah"
                             maxSizeMB={5}
                             files={files} setFiles={setFiles}
                             fileErrors={fileErrors} setFileErrors={setFileErrors}

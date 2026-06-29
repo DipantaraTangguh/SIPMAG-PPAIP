@@ -4,7 +4,10 @@ namespace App\Filament\Resources\Penguji;
 
 use App\Filament\Resources\Penguji\ExaminedSessionResource\Pages\ListExaminedSessions;
 use App\Filament\Resources\Penguji\ExaminedSessionResource\Pages\ViewExaminedSession;
+use App\Models\DefenseAssessment;
 use App\Models\DefenseSubmission;
+use App\Models\User;
+use App\Services\DefenseAssessmentService;
 use App\Support\DefenseDocument;
 use Filament\Forms\Form;
 use Filament\Infolists\Components\Section;
@@ -41,10 +44,15 @@ class ExaminedSessionResource extends Resource
             return false;
         }
 
-        return $user->isDosenPenguji()
+        return $user->isDpm()
+            || $user->isDosenPenguji()
             || DefenseSubmission::query()
-                ->where('dosen_penguji_1_id', $lecturerId)
-                ->orWhere('dosen_penguji_2_id', $lecturerId)
+                ->where(function (Builder $query) use ($lecturerId): void {
+                    $query
+                        ->whereHas('student', fn (Builder $studentQuery) => $studentQuery->where('dpm_id', $lecturerId))
+                        ->orWhere('dosen_penguji_1_id', $lecturerId)
+                        ->orWhere('dosen_penguji_2_id', $lecturerId);
+                })
                 ->exists();
     }
 
@@ -82,15 +90,17 @@ class ExaminedSessionResource extends Resource
                 $lecturerId,
                 fn (Builder $query) => $query->where(function (Builder $query) use ($lecturerId): void {
                     $query
-                        ->where('dosen_penguji_1_id', $lecturerId)
+                        ->whereHas('student', fn (Builder $studentQuery) => $studentQuery->where('dpm_id', $lecturerId))
+                        ->orWhere('dosen_penguji_1_id', $lecturerId)
                         ->orWhere('dosen_penguji_2_id', $lecturerId);
                 }),
                 fn (Builder $query) => $query->whereRaw('1 = 0'),
             )
             ->with([
-                'student:id,nim,name,study_program,email,access_status',
+                'student:id,dpm_id,nim,name,study_program,email,access_status',
                 'examinerOne:id,lecturer_name,nidn',
                 'examinerTwo:id,lecturer_name,nidn',
+                'assessments:id,defense_submission_id,lecturer_id,assessor_role,internship_performance_score,final_report_score,presentation_score',
             ]);
     }
 
@@ -127,8 +137,8 @@ class ExaminedSessionResource extends Resource
                             ->label('Examiner ID')
                             ->state(fn (): ?int => Auth::user()?->lecturer?->id),
                         TextEntry::make('examiner_position')
-                            ->label('Examiner position')
-                            ->state(fn (DefenseSubmission $record): string => self::examinerPosition($record)),
+                            ->label('Assessor position')
+                            ->state(fn (DefenseSubmission $record): string => self::assessorPosition($record)),
                         TextEntry::make('scheduled_date')
                             ->label('Examiner date')
                             ->date('d M Y')
@@ -154,6 +164,86 @@ class ExaminedSessionResource extends Resource
                     ])
                     ->columns(2),
 
+                Section::make('Penilaian Saya')
+                    ->description('Setiap komponen dinilai pada skala 0-100.')
+                    ->schema([
+                        TextEntry::make('my_internship_performance_score')
+                            ->label('Kinerja Magang (50%)')
+                            ->state(fn (DefenseSubmission $record): string => self::weightedComponentState(
+                                self::currentAssessment($record),
+                                'internship_performance_score',
+                                DefenseAssessmentService::INTERNSHIP_PERFORMANCE_WEIGHT,
+                            )),
+                        TextEntry::make('my_final_report_score')
+                            ->label('Laporan Akhir (30%)')
+                            ->state(fn (DefenseSubmission $record): string => self::weightedComponentState(
+                                self::currentAssessment($record),
+                                'final_report_score',
+                                DefenseAssessmentService::FINAL_REPORT_WEIGHT,
+                            )),
+                        TextEntry::make('my_presentation_score')
+                            ->label('Ujian Presentasi Hasil Magang (20%)')
+                            ->state(fn (DefenseSubmission $record): string => self::weightedComponentState(
+                                self::currentAssessment($record),
+                                'presentation_score',
+                                DefenseAssessmentService::PRESENTATION_WEIGHT,
+                            )),
+                        TextEntry::make('my_weighted_score')
+                            ->label('Nilai Akhir Saya')
+                            ->state(function (DefenseSubmission $record): string {
+                                $assessment = self::currentAssessment($record);
+
+                                if (! $assessment) {
+                                    return 'Belum dinilai';
+                                }
+
+                                $score = app(DefenseAssessmentService::class)->weightedScore($assessment);
+
+                                return number_format($score, 2).' ('.app(DefenseAssessmentService::class)->letterGrade($score).')';
+                            })
+                            ->badge()
+                            ->color(fn (DefenseSubmission $record): string => self::currentAssessment($record) ? 'success' : 'warning'),
+                    ])
+                    ->columns(2),
+
+                Section::make('Rekap Nilai Sidang')
+                    ->description('Nilai akhir tersedia setelah DPM, Penguji 1, dan Penguji 2 selesai menilai.')
+                    ->schema([
+                        TextEntry::make('assessment_progress')
+                            ->label('Kelengkapan Penilaian')
+                            ->state(function (DefenseSubmission $record): string {
+                                $count = app(DefenseAssessmentService::class)->completedAssessorCount($record);
+
+                                return "{$count} dari 3 penilai";
+                            })
+                            ->badge()
+                            ->color(fn (DefenseSubmission $record): string => app(DefenseAssessmentService::class)->completedAssessorCount($record) === 3 ? 'success' : 'warning'),
+                        TextEntry::make('examiner_average_score')
+                            ->label('Rata-rata Dua Penguji')
+                            ->state(function (DefenseSubmission $record): string {
+                                $score = app(DefenseAssessmentService::class)->examinerAverageScore($record);
+
+                                return $score === null ? 'Menunggu kedua penguji' : number_format($score, 2);
+                            }),
+                        TextEntry::make('defense_final_score')
+                            ->label('Nilai Akhir Sidang')
+                            ->state(function (DefenseSubmission $record): string {
+                                $score = app(DefenseAssessmentService::class)->finalScore($record);
+
+                                return $score === null ? 'Menunggu seluruh penilai' : number_format($score, 2);
+                            }),
+                        TextEntry::make('defense_letter_grade')
+                            ->label('Nilai Huruf')
+                            ->state(function (DefenseSubmission $record): string {
+                                $service = app(DefenseAssessmentService::class);
+                                $score = $service->finalScore($record);
+
+                                return $score === null ? '-' : $service->letterGrade($score);
+                            })
+                            ->badge(),
+                    ])
+                    ->columns(2),
+
                 Section::make('Exam Documents')
                     ->schema([
                         TextEntry::make('laporan_document')
@@ -171,10 +261,6 @@ class ExaminedSessionResource extends Resource
                         TextEntry::make('foto_kegiatan_2_document')
                             ->label(DefenseDocument::label('foto_kegiatan_2'))
                             ->state(fn (DefenseSubmission $record): HtmlString => self::documentLinks($record, 'foto_kegiatan_2'))
-                            ->html(),
-                        TextEntry::make('krs_document')
-                            ->label(DefenseDocument::label('krs'))
-                            ->state(fn (DefenseSubmission $record): HtmlString => self::documentLinks($record, 'krs'))
                             ->html(),
                     ]),
             ]);
@@ -222,10 +308,28 @@ class ExaminedSessionResource extends Resource
                         default => 'gray',
                     }),
                 Tables\Columns\TextColumn::make('examiner_position')
-                    ->label('Examiner position')
-                    ->getStateUsing(fn (DefenseSubmission $record): string => self::examinerPosition($record))
+                    ->label('Assessor position')
+                    ->getStateUsing(fn (DefenseSubmission $record): string => self::assessorPosition($record))
                     ->badge()
-                    ->color(fn (string $state): string => $state === 'Examiner 1' ? 'info' : 'primary'),
+                    ->color(fn (string $state): string => match ($state) {
+                        'DPM' => 'success',
+                        'Examiner 1' => 'info',
+                        default => 'primary',
+                    }),
+                Tables\Columns\TextColumn::make('assessment_status')
+                    ->label('Assessment')
+                    ->getStateUsing(fn (DefenseSubmission $record): string => self::currentAssessment($record) ? 'Sudah dinilai' : 'Belum dinilai')
+                    ->badge()
+                    ->color(fn (string $state): string => $state === 'Sudah dinilai' ? 'success' : 'warning'),
+                Tables\Columns\TextColumn::make('my_score')
+                    ->label('My score')
+                    ->getStateUsing(function (DefenseSubmission $record): string {
+                        $assessment = self::currentAssessment($record);
+
+                        return $assessment
+                            ? number_format(app(DefenseAssessmentService::class)->weightedScore($assessment), 2)
+                            : '-';
+                    }),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('status')
@@ -250,13 +354,45 @@ class ExaminedSessionResource extends Resource
         ];
     }
 
-    private static function examinerPosition(DefenseSubmission $record): string
+    private static function assessorPosition(DefenseSubmission $record): string
     {
-        $lecturerId = Auth::user()?->lecturer?->id;
+        /** @var User|null $user */
+        $user = Auth::user();
+        $role = $user ? app(DefenseAssessmentService::class)->assessorRole($user, $record) : null;
 
-        return $record->dosen_penguji_1_id === $lecturerId
-            ? 'Examiner 1'
-            : 'Examiner 2';
+        return match ($role) {
+            'dpm' => 'DPM',
+            'penguji_1' => 'Examiner 1',
+            'penguji_2' => 'Examiner 2',
+            default => '-',
+        };
+    }
+
+    private static function currentAssessment(DefenseSubmission $record): ?DefenseAssessment
+    {
+        /** @var User|null $user */
+        $user = Auth::user();
+
+        return $user
+            ? app(DefenseAssessmentService::class)->assessmentFor($user, $record)
+            : null;
+    }
+
+    private static function weightedComponentState(
+        ?DefenseAssessment $assessment,
+        string $field,
+        float $weight,
+    ): string {
+        if (! $assessment) {
+            return 'Belum dinilai';
+        }
+
+        $score = (float) $assessment->{$field};
+        $weightedScore = round($score * $weight, 2);
+
+        return number_format($score, 2)
+            .' x '.number_format($weight * 100, 0).'% = '
+            .number_format($weightedScore, 2);
     }
 
     private static function documentLinks(DefenseSubmission $record, string $document): HtmlString

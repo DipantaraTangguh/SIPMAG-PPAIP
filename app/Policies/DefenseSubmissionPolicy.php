@@ -15,10 +15,15 @@ class DefenseSubmissionPolicy
             return false;
         }
 
-        return $user->isDosenPenguji()
+        return $user->isDpm()
+            || $user->isDosenPenguji()
             || DefenseSubmission::query()
-                ->where('dosen_penguji_1_id', $lecturerId)
-                ->orWhere('dosen_penguji_2_id', $lecturerId)
+                ->where(function ($query) use ($lecturerId): void {
+                    $query
+                        ->whereHas('student', fn ($studentQuery) => $studentQuery->where('dpm_id', $lecturerId))
+                        ->orWhere('dosen_penguji_1_id', $lecturerId)
+                        ->orWhere('dosen_penguji_2_id', $lecturerId);
+                })
                 ->exists();
     }
 
@@ -30,6 +35,7 @@ class DefenseSubmissionPolicy
                 && $user->lecturer?->study_program !== null
                 && $user->lecturer->study_program === $submission->student?->study_program
             )
+            || $this->assignedDpm($user, $submission)
             || $this->assignedExaminer($user, $submission);
     }
 
@@ -69,6 +75,23 @@ class DefenseSubmissionPolicy
             && $user->lecturer->study_program === $submission->student?->study_program
             && $submission->status === 'Scheduled'
             && $submission->student?->access_status === 'MenungguSidang';
+    }
+
+    public function assess(User $user, DefenseSubmission $submission): bool
+    {
+        return $submission->status === 'Scheduled'
+            && (
+                $this->assignedDpm($user, $submission)
+                || $this->assignedExaminer($user, $submission)
+            );
+    }
+
+    private function assignedDpm(User $user, DefenseSubmission $submission): bool
+    {
+        $lecturerId = $user->lecturer?->id;
+
+        return $lecturerId !== null
+            && $submission->student?->dpm_id === $lecturerId;
     }
 
     private function assignedExaminer(User $user, DefenseSubmission $submission): bool
