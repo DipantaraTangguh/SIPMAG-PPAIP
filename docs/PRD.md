@@ -185,7 +185,7 @@ Status utama mahasiswa disimpan pada `students.access_status`.
 | `HasApplication` | `HasDPM` | Kaprodi assign DPM setelah pengajuan pembimbing. |
 | `HasDPM` | `LogbookComplete` | Minimal 6 logbook disetujui DPM. |
 | `LogbookComplete` | `MenungguSidang` | Mahasiswa submit dokumen sidang. |
-| `MenungguSidang` | `SiklusSelesai` | Siklus diselesaikan setelah sidang terjadwal. |
+| `MenungguSidang` | `SiklusSelesai` | Siklus diselesaikan setelah sidang terjadwal dan tiga penilaian lengkap. |
 
 Status lainnya:
 
@@ -759,6 +759,7 @@ Panel admin Filament:
 - Nilai sidang belum ditampilkan kepada mahasiswa.
 - PPAIP dapat melihat progres jumlah penilai dan nilai akhir pada daftar mahasiswa.
 - Siklus selesai hanya dapat diproses setelah sidang berstatus `Scheduled` dan penilaian DPM, Penguji 1, serta Penguji 2 lengkap.
+- Penyelesaian siklus mempertahankan data Form 1 sebagai riwayat; data cycle lama yang telanjur kosong ditampilkan sebagai ringkasan akademik arsip pada tab Profil.
 
 ### 12.8 Aturan File
 

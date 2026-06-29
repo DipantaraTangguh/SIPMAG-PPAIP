@@ -4,6 +4,7 @@ import Form1ApprovedPanel from './Form1ApprovedPanel';
 import Form1RejectedPanel from './Form1RejectedPanel';
 import Form1BackButton from './Form1BackButton';
 import Form1HelpCard from './Form1HelpCard';
+import Form1CompletedPanel from './Form1CompletedPanel';
 
 export default function Form1StatusPanel({
     form1_status,
@@ -13,6 +14,7 @@ export default function Form1StatusPanel({
     formData,
 }) {
     const isApproved = form1_status === 'ApprovedForm1';
+    const isCompleted = form1_status === 'SiklusSelesai';
 
     return (
         <div className="flex flex-col gap-4">
@@ -37,7 +39,8 @@ export default function Form1StatusPanel({
                     formData={formData}
                 />
             )}
-            {!isApproved && <Form1BackButton />}
+            {isCompleted && <Form1CompletedPanel />}
+            {!isApproved && !isCompleted && <Form1BackButton />}
             <Form1HelpCard />
         </div>
     );

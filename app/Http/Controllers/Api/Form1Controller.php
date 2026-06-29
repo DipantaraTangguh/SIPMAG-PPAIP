@@ -161,7 +161,7 @@ class Form1Controller extends Controller
 
         Gate::authorize('view', $student);
 
-        if ($student->access_status !== 'ApprovedForm1') {
+        if (! $student->form1_approved_at || ! $student->form1_data) {
             return response()->json(['message' => 'Form 1 belum disetujui.'], 403);
         }
 

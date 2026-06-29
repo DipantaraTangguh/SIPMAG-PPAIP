@@ -45,6 +45,18 @@ class CycleCompletionAssessmentTest extends TestCase
         [$examinerTwoUser, $examinerTwo] = $this->lecturerUser('dosen_penguji', 'Penguji Dua');
         [$student, $submission] = $this->scheduledDefense($dpm, $examinerOne, $examinerTwo);
         $assessmentService = app(DefenseAssessmentService::class);
+        $form1Data = [
+            'semester' => 6,
+            'jumlahSKS' => 120,
+            'ipk' => 3.75,
+            'skemaMagang' => 'Magang Perusahaan',
+            'topikMagang' => 'PT Contoh',
+            'outputTarget' => 'Laporan Akhir',
+        ];
+        $student->update([
+            'form1_data' => $form1Data,
+            'form1_pdf_path' => 'transkrip/form1.pdf',
+        ]);
 
         $assessmentService->save($dpmUser, $submission, $this->scores(80));
         $assessmentService->save($examinerOneUser, $submission, $this->scores(82));
@@ -62,6 +74,8 @@ class CycleCompletionAssessmentTest extends TestCase
 
         $this->assertSame('SiklusSelesai', $student->access_status);
         $this->assertNull($student->dpm_id);
+        $this->assertSame($form1Data, $student->form1_data);
+        $this->assertSame('transkrip/form1.pdf', $student->form1_pdf_path);
         $this->assertSame(3, $submission->assessments()->count());
     }
 

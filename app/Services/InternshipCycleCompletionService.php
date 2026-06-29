@@ -52,9 +52,6 @@ class InternshipCycleCompletionService
             $lockedStudent->fill([
                 'dpm_id' => null,
                 'is_independent' => false,
-                'form1_data' => null,
-                'form1_pdf_path' => null,
-                'form1_rejection_reason' => null,
             ]);
             $this->stateMachine->transition($lockedStudent, 'SiklusSelesai');
 

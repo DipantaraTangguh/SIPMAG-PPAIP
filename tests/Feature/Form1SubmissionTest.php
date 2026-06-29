@@ -191,4 +191,33 @@ class Form1SubmissionTest extends TestCase
                 'message' => 'Data akademik mahasiswa belum lengkap. Hubungi admin akademik sebelum mengajukan Form 1.',
             ]);
     }
+
+    public function test_completed_legacy_cycle_returns_an_archived_profile_summary(): void
+    {
+        $user = User::factory()->create(['role' => 'mahasiswa']);
+        $student = Student::create([
+            'user_id' => $user->id,
+            'nim' => '1101214299',
+            'name' => 'Mahasiswa Siklus Selesai',
+            'study_program' => 'Sistem Informasi',
+            'email' => 'completed-cycle@example.test',
+            'semester' => 8,
+            'jumlah_sks' => 144,
+            'ipk' => 3.80,
+        ]);
+        $student->forceFill([
+            'access_status' => 'SiklusSelesai',
+            'form1_data' => null,
+            'form1_pdf_path' => null,
+        ])->save();
+
+        $this->actingAs($user)
+            ->getJson('/api/form1')
+            ->assertOk()
+            ->assertJsonPath('access_status', 'SiklusSelesai')
+            ->assertJsonPath('form1.semester', 8)
+            ->assertJsonPath('form1.jumlahSKS', 144)
+            ->assertJsonPath('form1.ipk', 3.8)
+            ->assertJsonPath('form1.isArchivedSummary', true);
+    }
 }
