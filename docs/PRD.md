@@ -74,6 +74,7 @@ Nilai utama aplikasi:
 - Penjadwalan sidang oleh Kaprodi.
 - Akses DPM dan Dosen Penguji untuk melihat sidang terkait, membuka dokumen, dan mengisi penilaian.
 - Penilaian sidang tiga penilai dengan komponen 50/30/20, input cepat nilai akhir, dan konversi nilai huruf.
+- Monitoring progres penilaian `0/3` sampai `3/3` serta nilai akhir oleh PPAIP.
 - Penyelesaian siklus magang melalui endpoint Kaprodi dan juga aksi Filament PPAIP.
 - Panel profil dosen untuk upload tanda tangan digital.
 - Data mahasiswa lintas prodi untuk PPAIP dan data mahasiswa per prodi untuk Kaprodi.
@@ -361,8 +362,8 @@ Status lainnya:
 | Aktor | Kaprodi; PPAIP juga memiliki aksi selesai siklus pada resource mahasiswa semua prodi |
 | Input | Tanggal sidang, waktu, ruangan/link, dosen penguji 1 dan 2 |
 | Output | Status sidang `Scheduled`, jadwal tampil ke mahasiswa, status akhir `SiklusSelesai` saat complete |
-| Validasi/aturan bisnis | Tanggal sidang API harus setelah hari ini; dosen penguji 1 dan 2 wajib berbeda; Kaprodi hanya prodi terkait; complete memerlukan status sidang `Scheduled`. |
-| Acceptance criteria | Mahasiswa melihat jadwal sidang setelah dijadwalkan; siklus dapat ditutup setelah sidang terjadwal. |
+| Validasi/aturan bisnis | Tanggal sidang API harus setelah hari ini; dosen penguji 1 dan 2 wajib berbeda; Kaprodi hanya prodi terkait; complete memerlukan status sidang `Scheduled` dan tiga penilaian lengkap. |
+| Acceptance criteria | Mahasiswa melihat jadwal sidang setelah dijadwalkan; PPAIP melihat progres dan nilai akhir; siklus hanya dapat ditutup setelah DPM serta kedua penguji selesai menilai. |
 
 ### 6.14 Akses dan Penilaian Sidang oleh Dosen
 
@@ -431,7 +432,7 @@ Status lainnya:
 | FR-022 | Sistem harus memungkinkan mahasiswa mengajukan sidang setelah logbook lengkap. |
 | FR-023 | Sistem harus memungkinkan Kaprodi menjadwalkan sidang untuk mahasiswa prodi terkait. |
 | FR-024 | Sistem harus menampilkan jadwal sidang ke mahasiswa setelah status sidang `Scheduled`. |
-| FR-025 | Sistem harus menyediakan penyelesaian siklus magang setelah sidang dijadwalkan. |
+| FR-025 | Sistem harus menyediakan penyelesaian siklus magang setelah sidang dijadwalkan dan penilaian DPM serta kedua penguji lengkap. |
 | FR-026 | Sistem harus menyimpan file upload secara aman dan hanya menampilkan file melalui route terproteksi. |
 | FR-027 | Sistem harus menyediakan bulk download transkrip untuk Kaprodi/PPAIP sesuai otorisasi. |
 | FR-028 | Sistem harus memungkinkan Dosen Penguji melihat daftar dan detail sidang yang ditugaskan kepadanya secara read-only. |
@@ -440,6 +441,7 @@ Status lainnya:
 | FR-031 | Sistem harus menyediakan input cepat yang menerapkan satu nilai ke seluruh komponen. |
 | FR-032 | Sistem harus menghitung nilai akhir sebagai rata-rata nilai berbobot DPM, Penguji 1, dan Penguji 2, lalu mengonversinya ke nilai huruf. |
 | FR-033 | Sistem tidak boleh menampilkan nilai sidang kepada mahasiswa pada tahap implementasi saat ini. |
+| FR-034 | Sistem harus menampilkan progres penilaian dan nilai akhir sidang kepada PPAIP. |
 
 ## 8. Requirement Non-Fungsional
 
@@ -755,7 +757,8 @@ Panel admin Filament:
 - Konversi nilai: A 85-100; A- 80-84,99; B+ 75-79,99; B 70-74,99; C+ 65-69,99; C 60-64,99; D 50-59,99; E 0-49,99.
 - Resource submission tetap read-only; penilai tidak dapat membuat, menghapus, menjadwalkan, atau menyelesaikan sidang, tetapi dapat mengubah penilaiannya sendiri.
 - Nilai sidang belum ditampilkan kepada mahasiswa.
-- Siklus selesai hanya dapat diproses setelah sidang berstatus `Scheduled`.
+- PPAIP dapat melihat progres jumlah penilai dan nilai akhir pada daftar mahasiswa.
+- Siklus selesai hanya dapat diproses setelah sidang berstatus `Scheduled` dan penilaian DPM, Penguji 1, serta Penguji 2 lengkap.
 
 ### 12.8 Aturan File
 

@@ -37,6 +37,7 @@ class ExaminedSessionResource extends Resource
 
     public static function canAccess(): bool
     {
+        /** @var User|null $user */
         $user = Auth::user();
         $lecturerId = $user?->lecturer?->id;
 
