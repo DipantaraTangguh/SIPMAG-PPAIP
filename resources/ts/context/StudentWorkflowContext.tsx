@@ -228,6 +228,8 @@ export function StudentWorkflowProvider({ children }) {
     const submitForm2 = useCallback(async (formData) => {
         const payload = {
             company_name:      formData.namaPerusahaan,
+            nama_pimpinan:     formData.namaPimpinan,
+            jabatan_pimpinan:  formData.jabatanPimpinan,
             alamat_perusahaan: formData.alamatPerusahaan,
             lingkup_magang:    formData.lingkupMagang,
             tanggal_mulai:     formData.tanggalMulai,

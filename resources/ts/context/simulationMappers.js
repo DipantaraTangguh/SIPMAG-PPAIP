@@ -50,6 +50,8 @@ export function mapForm2Submission(s) {
     return {
         id: s.id,
         companyName: s.company_name,
+        namaPimpinan: s.nama_pimpinan,
+        jabatanPimpinan: s.jabatan_pimpinan,
         position: s.lingkup_magang,
         alamatPerusahaan: s.alamat_perusahaan,
         tanggalMulai: s.tanggal_mulai,

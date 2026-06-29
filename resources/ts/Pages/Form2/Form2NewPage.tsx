@@ -12,27 +12,19 @@ import {
 } from "lucide-react";
 import DashboardLayout from "../../Components/Layouts/DashboardLayout";
 import { useAuth } from "../../context/AppContext";
-import {
-    useApplicationWorkflow,
-    useForm2Workflow,
-} from "../../context/StudentWorkflowContext";
+import { useForm2Workflow } from "../../context/StudentWorkflowContext";
 import {
     canSubmitForm2,
     hasSecuredInternship,
-    SECURED_INTERNSHIP_MESSAGE,
+    FORM2_LOCKED_MESSAGE,
 } from "../../utils/accessUtils";
 
 export default function Form2NewPage() {
     const navigate = useNavigate();
     const { student } = useAuth();
-    const { activeApplications } = useApplicationWorkflow();
-    const { submitForm2, form2Submissions } = useForm2Workflow();
+    const { submitForm2 } = useForm2Workflow();
 
-    const internshipSecured = hasSecuredInternship(
-        student?.accessStatus,
-        activeApplications,
-        form2Submissions,
-    );
+    const internshipSecured = hasSecuredInternship(student?.accessStatus);
 
     // Guard keras: Form 2 jangan kebuka sebelum Form 1 approved.
     useEffect(() => {
@@ -49,6 +41,8 @@ export default function Form2NewPage() {
     // Draft form disimpan lokal sampai submit.
     const [formData, setFormData] = useState({
         namaPerusahaan: "",
+        namaPimpinan: "",
+        jabatanPimpinan: "",
         alamatPerusahaan: "",
         tanggalMulai: "",
         tanggalSelesai: "",
@@ -87,7 +81,7 @@ export default function Form2NewPage() {
 
     const handleSubmit = async () => {
         if (internshipSecured) {
-            setSubmitError(SECURED_INTERNSHIP_MESSAGE);
+            setSubmitError(FORM2_LOCKED_MESSAGE);
             return;
         }
 
@@ -97,9 +91,9 @@ export default function Form2NewPage() {
         if (!formData.alamatPerusahaan.trim())
             newErrors.alamatPerusahaan = "Alamat perusahaan wajib diisi";
         if (!formData.tanggalMulai)
-            newErrors.tanggalMulai = "Tanggal mulai wajib diisi";
+            newErrors.tanggalMulai = "Bulan mulai wajib diisi";
         if (!formData.tanggalSelesai)
-            newErrors.tanggalSelesai = "Tanggal selesai wajib diisi";
+            newErrors.tanggalSelesai = "Bulan selesai wajib diisi";
         if (!formData.lingkupMagang.trim())
             newErrors.lingkupMagang = "Lingkup magang wajib diisi";
 
@@ -146,7 +140,7 @@ export default function Form2NewPage() {
                                 Form 2 Tidak Dapat Diajukan Lagi
                             </h1>
                             <p className="mt-2 text-[14px] leading-relaxed text-green-700">
-                                {SECURED_INTERNSHIP_MESSAGE}
+                                {FORM2_LOCKED_MESSAGE}
                             </p>
                             <button
                                 type="button"
@@ -237,6 +231,34 @@ export default function Form2NewPage() {
                                 </p>
                             )}
                         </div>
+                        <div className="mb-5 grid grid-cols-1 gap-5 sm:grid-cols-2">
+                            <div>
+                                <label className="mb-2 block text-[11px] font-bold uppercase tracking-wider text-gray-400">
+                                    NAMA PIMPINAN <span className="font-medium normal-case text-gray-400">(optional)</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    name="namaPimpinan"
+                                    value={formData.namaPimpinan}
+                                    onChange={handleChange}
+                                    placeholder="Contoh: Budi Santoso"
+                                    className="h-12 w-full rounded-lg border border-gray-200 px-3.5 outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/10"
+                                />
+                            </div>
+                            <div>
+                                <label className="mb-2 block text-[11px] font-bold uppercase tracking-wider text-gray-400">
+                                    JABATAN <span className="font-medium normal-case text-gray-400">(optional)</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    name="jabatanPimpinan"
+                                    value={formData.jabatanPimpinan}
+                                    onChange={handleChange}
+                                    placeholder="Contoh: Direktur Utama"
+                                    className="h-12 w-full rounded-lg border border-gray-200 px-3.5 outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/10"
+                                />
+                            </div>
+                        </div>
                         <div className="mb-5">
                             <label className="mb-2 block text-[11px] font-bold uppercase tracking-wider text-gray-400">
                                 ALAMAT LENGKAP PERUSAHAAN DAN KODE POS
@@ -262,10 +284,10 @@ export default function Form2NewPage() {
                         <div className="mb-5 grid grid-cols-1 gap-5 sm:grid-cols-2">
                             <div>
                                 <label className="mb-2 block text-[11px] font-bold uppercase tracking-wider text-gray-400">
-                                    TANGGAL MULAI
+                                    BULAN MULAI (PERKIRAAN)
                                 </label>
                                 <input
-                                    type="date"
+                                    type="month"
                                     name="tanggalMulai"
                                     value={formData.tanggalMulai}
                                     onChange={handleChange}
@@ -283,10 +305,10 @@ export default function Form2NewPage() {
                             </div>
                             <div>
                                 <label className="mb-2 block text-[11px] font-bold uppercase tracking-wider text-gray-400">
-                                    TANGGAL SELESAI
+                                    BULAN SELESAI (PERKIRAAN)
                                 </label>
                                 <input
-                                    type="date"
+                                    type="month"
                                     name="tanggalSelesai"
                                     value={formData.tanggalSelesai}
                                     onChange={handleChange}

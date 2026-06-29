@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Applications\StoreApplicationRequest;
 use App\Http\Resources\ApplicationResource;
 use App\Models\Application;
-use App\Models\Form2Submission;
 use App\Models\Internship;
 use App\Models\Student;
 use App\Services\StudentStateMachine;
@@ -27,7 +26,7 @@ class ApplicationController extends Controller
         'SiklusSelesai',
     ];
 
-    private const SECURED_INTERNSHIP_MESSAGE = 'Pengajuan magang Anda sudah disetujui. Anda sudah dapat menjalani magang sehingga tidak dapat melamar lowongan mitra atau mengajukan Form 2 lain.';
+    private const SECURED_INTERNSHIP_MESSAGE = 'DPM Anda sudah ditunjuk atau pengajuan DPM sudah disetujui, sehingga Anda tidak dapat melamar lowongan mitra lagi.';
 
     public function index(Request $request)
     {
@@ -83,16 +82,6 @@ class ApplicationController extends Controller
                     ]);
                 }
 
-                $activeCount = Application::where('student_id', $student->id)
-                    ->where('status', 'Applied')
-                    ->count();
-
-                if ($activeCount >= 5) {
-                    throw ValidationException::withMessages([
-                        'internship_id' => 'Maksimal 5 lamaran aktif.',
-                    ]);
-                }
-
                 $alreadyApplied = Application::where('student_id', $student->id)
                     ->where('internship_id', $internship->id)
                     ->exists();
@@ -142,20 +131,6 @@ class ApplicationController extends Controller
 
     private function studentHasSecuredInternship(Student $student): bool
     {
-        if (in_array($student->access_status, self::SECURED_INTERNSHIP_STATUSES, true)) {
-            return true;
-        }
-
-        $hasAcceptedPartnerApplication = Application::where('student_id', $student->id)
-            ->where('status', 'Accepted')
-            ->exists();
-
-        if ($hasAcceptedPartnerApplication) {
-            return true;
-        }
-
-        return Form2Submission::where('student_id', $student->id)
-            ->where('status', 'ApprovedForm2')
-            ->exists();
+        return in_array($student->access_status, self::SECURED_INTERNSHIP_STATUSES, true);
     }
 }

@@ -1,9 +1,6 @@
 import { useState, useCallback, useMemo } from 'react';
 import { useAuth } from '../context/AppContext';
-import {
-    useApplicationWorkflow,
-    useForm2Workflow,
-} from '../context/StudentWorkflowContext';
+import { useApplicationWorkflow } from '../context/StudentWorkflowContext';
 import {
     canAccessPortal,
     hasSecuredInternship,
@@ -13,7 +10,6 @@ import {
 export default function useVacancyDetail(vacancy) {
     const { student } = useAuth();
     const { activeApplications, applyToVacancy } = useApplicationWorkflow();
-    const { form2Submissions } = useForm2Workflow();
 
     const [cvFile, setCvFile] = useState(null);
     const [cvError, setCvError] = useState(null);
@@ -21,11 +17,7 @@ export default function useVacancyDetail(vacancy) {
     const [justApplied, setJustApplied] = useState(false);
 
     const accessStatus = student?.accessStatus;
-    const internshipSecured = hasSecuredInternship(
-        accessStatus,
-        activeApplications,
-        form2Submissions,
-    );
+    const internshipSecured = hasSecuredInternship(accessStatus);
     const canApply = canAccessPortal(accessStatus) && !internshipSecured;
 
     // Cek lowongan ini dulu, biar tombol nggak bisa apply dobel.
@@ -35,11 +27,6 @@ export default function useVacancyDetail(vacancy) {
             (app) => app.vacancyId === vacancy.id
         );
     }, [vacancy, activeApplications]);
-
-    // Portal mitra cuma boleh satu lamaran aktif.
-    const hasAnyApplication = useMemo(() => {
-        return (activeApplications || []).length > 0;
-    }, [activeApplications]);
 
     // Gabung state session dan context supaya UI tetap konsisten.
     const isApplied = justApplied || alreadyApplied;
@@ -87,7 +74,6 @@ export default function useVacancyDetail(vacancy) {
         isApplied,
         canApply,
         accessStatus,
-        hasAnyApplication,
         internshipSecured,
         securedInternshipMessage: SECURED_INTERNSHIP_MESSAGE,
         handleFileChange,

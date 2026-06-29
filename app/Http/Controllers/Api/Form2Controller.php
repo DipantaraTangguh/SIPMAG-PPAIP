@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Form2\RejectForm2Request;
 use App\Http\Requests\Form2\StoreForm2Request;
 use App\Http\Resources\Form2SubmissionResource;
-use App\Models\Application;
 use App\Models\Form2Submission;
 use App\Models\Student;
 use App\Models\User;
@@ -24,7 +23,7 @@ class Form2Controller extends Controller
         'SiklusSelesai',
     ];
 
-    private const SECURED_INTERNSHIP_MESSAGE = 'Pengajuan magang Anda sudah disetujui. Anda sudah dapat menjalani magang sehingga tidak dapat melamar lowongan mitra atau mengajukan Form 2 lain.';
+    private const SECURED_INTERNSHIP_MESSAGE = 'DPM Anda sudah ditunjuk atau pengajuan DPM sudah disetujui, sehingga Form 2 tidak dapat diajukan lagi.';
 
     public function index(Request $request)
     {
@@ -59,7 +58,10 @@ class Form2Controller extends Controller
 
         $validated = $request->validated();
 
+        $validated['tanggal_mulai'] = $validated['tanggal_mulai'].'-01';
+        $validated['tanggal_selesai'] = $validated['tanggal_selesai'].'-01';
         $validated['student_id'] = $student->id;
+        $validated['status'] = 'PendingReview';
 
         $submission = Form2Submission::create($validated);
 
@@ -148,20 +150,6 @@ class Form2Controller extends Controller
             return false;
         }
 
-        if (in_array($student->access_status, self::SECURED_INTERNSHIP_STATUSES, true)) {
-            return true;
-        }
-
-        $hasAcceptedPartnerApplication = Application::where('student_id', $student->id)
-            ->where('status', 'Accepted')
-            ->exists();
-
-        if ($hasAcceptedPartnerApplication) {
-            return true;
-        }
-
-        return Form2Submission::where('student_id', $student->id)
-            ->where('status', 'ApprovedForm2')
-            ->exists();
+        return in_array($student->access_status, self::SECURED_INTERNSHIP_STATUSES, true);
     }
 }

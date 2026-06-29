@@ -17,7 +17,7 @@ class ApprovedInternshipLockTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_accepted_partner_application_blocks_new_partner_applications(): void
+    public function test_accepted_partner_application_allows_new_partner_applications(): void
     {
         Storage::fake('local');
 
@@ -34,13 +34,13 @@ class ApprovedInternshipLockTest extends TestCase
             'internship_id' => $this->internship()->id,
             'cv_file' => UploadedFile::fake()->create('cv.pdf', 100, 'application/pdf'),
         ])
-            ->assertUnprocessable()
-            ->assertJsonValidationErrors('internship_id');
+            ->assertCreated();
 
-        $this->assertSame([], Storage::disk('local')->allFiles('cv'));
+        $this->assertSame(2, $student->applications()->count());
+        $this->assertCount(1, Storage::disk('local')->allFiles('cv'));
     }
 
-    public function test_accepted_partner_application_blocks_form2_submissions(): void
+    public function test_accepted_partner_application_allows_form2_submissions(): void
     {
         [$user, $student] = $this->studentUser('HasApplication');
         $this->actingAs($user);
@@ -52,11 +52,11 @@ class ApprovedInternshipLockTest extends TestCase
         ]);
 
         $this->postJson('/api/form2', $this->validForm2Payload())
-            ->assertUnprocessable()
-            ->assertJsonValidationErrors('company_name');
+            ->assertCreated()
+            ->assertJsonPath('submission.status', 'PendingReview');
     }
 
-    public function test_approved_form2_blocks_new_partner_applications_and_form2_submissions(): void
+    public function test_approved_form2_allows_new_partner_applications_and_more_form2_submissions(): void
     {
         Storage::fake('local');
 
@@ -66,6 +66,8 @@ class ApprovedInternshipLockTest extends TestCase
         Form2Submission::create([
             'student_id' => $student->id,
             'company_name' => 'PT Disetujui',
+            'nama_pimpinan' => 'Direktur Disetujui',
+            'jabatan_pimpinan' => 'Direktur',
             'alamat_perusahaan' => 'Jl. Disetujui No. 1',
             'lingkup_magang' => 'Pengembangan aplikasi',
             'tanggal_mulai' => '2026-07-01',
@@ -77,6 +79,29 @@ class ApprovedInternshipLockTest extends TestCase
             'internship_id' => $this->internship()->id,
             'cv_file' => UploadedFile::fake()->create('cv.pdf', 100, 'application/pdf'),
         ])
+            ->assertCreated();
+
+        $this->postJson('/api/form2', $this->validForm2Payload())
+            ->assertCreated()
+            ->assertJsonPath('submission.company_name', 'PT Contoh Indonesia')
+            ->assertJsonPath('submission.status', 'PendingReview');
+
+        $this->assertCount(1, Storage::disk('local')->allFiles('cv'));
+        $this->assertSame(2, $student->form2Submissions()->count());
+        $this->assertSame(1, $student->applications()->count());
+    }
+
+    public function test_dpm_assignment_blocks_new_partner_applications_and_form2_submissions(): void
+    {
+        Storage::fake('local');
+
+        [$user] = $this->studentUser('HasDPM');
+        $this->actingAs($user);
+
+        $this->withHeader('Accept', 'application/json')->post('/api/applications', [
+            'internship_id' => $this->internship()->id,
+            'cv_file' => UploadedFile::fake()->create('cv.pdf', 100, 'application/pdf'),
+        ])
             ->assertUnprocessable()
             ->assertJsonValidationErrors('internship_id');
 
@@ -85,7 +110,6 @@ class ApprovedInternshipLockTest extends TestCase
             ->assertJsonValidationErrors('company_name');
 
         $this->assertSame([], Storage::disk('local')->allFiles('cv'));
-        $this->assertSame(1, $student->form2Submissions()->count());
     }
 
     /**
@@ -125,10 +149,12 @@ class ApprovedInternshipLockTest extends TestCase
     {
         return [
             'company_name' => 'PT Contoh Indonesia',
+            'nama_pimpinan' => 'Budi Santoso',
+            'jabatan_pimpinan' => 'Direktur Utama',
             'alamat_perusahaan' => 'Jl. Rasuna Said No. 1',
             'lingkup_magang' => 'Pengembangan aplikasi internal',
-            'tanggal_mulai' => '2026-07-01',
-            'tanggal_selesai' => '2026-09-30',
+            'tanggal_mulai' => '2026-07',
+            'tanggal_selesai' => '2026-09',
         ];
     }
 }

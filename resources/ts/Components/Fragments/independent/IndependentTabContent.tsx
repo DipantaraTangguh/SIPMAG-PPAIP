@@ -1,10 +1,7 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../../context/AppContext';
-import {
-    useApplicationWorkflow,
-    useForm2Workflow,
-} from '../../../context/StudentWorkflowContext';
+import { useForm2Workflow } from '../../../context/StudentWorkflowContext';
 import { Info } from 'lucide-react';
 import IndependentInfoBanner from './IndependentInfoBanner';
 import IndependentSectionHeader from './IndependentSectionHeader';
@@ -14,14 +11,13 @@ import IndependentFilledState from './IndependentFilledState';
 import {
     canAccessPortal,
     hasSecuredInternship,
-    SECURED_INTERNSHIP_MESSAGE,
+    FORM2_LOCKED_MESSAGE,
 } from '../../../utils/accessUtils';
 
 export default function IndependentTabContent() {
     const navigate = useNavigate();
     const location = useLocation();
     const { student } = useAuth();
-    const { activeApplications } = useApplicationWorkflow();
     const { form2Submissions } = useForm2Workflow();
 
     const submissions = form2Submissions || [];
@@ -29,11 +25,7 @@ export default function IndependentTabContent() {
 
     // Form 2 baru kebuka setelah Form 1 aman.
     const isUnlocked = canAccessPortal(accessStatus); // Status ini sudah ikut helper akses terbaru.
-    const internshipSecured = hasSecuredInternship(
-        accessStatus,
-        activeApplications,
-        submissions,
-    );
+    const internshipSecured = hasSecuredInternship(accessStatus);
 
     // Warning tetap muncul kalau user nyasar via URL manual.
     const showWarning = !isUnlocked || location.state?.blockedReason === 'form1_required';
@@ -69,7 +61,7 @@ export default function IndependentTabContent() {
                 <div className="my-6 flex flex-col gap-3 rounded-xl border border-green-200 bg-green-50 px-4 py-3 sm:flex-row sm:items-center">
                     <Info className="h-[18px] w-[18px] flex-shrink-0 text-green-600" />
                     <p className="flex-1 text-[13px] leading-relaxed text-green-700">
-                        {SECURED_INTERNSHIP_MESSAGE}
+                        {FORM2_LOCKED_MESSAGE}
                     </p>
                     <button
                         type="button"

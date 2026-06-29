@@ -13,7 +13,7 @@ class ServerSideValidationTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_form2_requires_end_date_after_start_date(): void
+    public function test_form2_requires_end_month_after_or_equal_start_month(): void
     {
         $user = $this->studentUser('ApprovedForm1');
 
@@ -22,11 +22,32 @@ class ServerSideValidationTest extends TestCase
                 'company_name' => 'PT Contoh Indonesia',
                 'alamat_perusahaan' => 'Jl. Rasuna Said No. 1',
                 'lingkup_magang' => 'Pengembangan aplikasi internal',
-                'tanggal_mulai' => '2026-07-01',
-                'tanggal_selesai' => '2026-07-01',
+                'tanggal_mulai' => '2026-08',
+                'tanggal_selesai' => '2026-07',
             ])
             ->assertStatus(422)
             ->assertJsonValidationErrors(['tanggal_selesai']);
+    }
+
+    public function test_form2_accepts_estimated_months_and_optional_leader_fields(): void
+    {
+        $user = $this->studentUser('ApprovedForm1');
+
+        $this->actingAs($user)
+            ->postJson('/api/form2', [
+                'company_name' => 'PT Contoh Indonesia',
+                'nama_pimpinan' => 'Budi Santoso',
+                'jabatan_pimpinan' => 'Direktur Utama',
+                'alamat_perusahaan' => 'Jl. Rasuna Said No. 1',
+                'lingkup_magang' => 'Pengembangan aplikasi internal',
+                'tanggal_mulai' => '2026-07',
+                'tanggal_selesai' => '2026-09',
+            ])
+            ->assertCreated()
+            ->assertJsonPath('submission.nama_pimpinan', 'Budi Santoso')
+            ->assertJsonPath('submission.jabatan_pimpinan', 'Direktur Utama')
+            ->assertJsonPath('submission.tanggal_mulai', '2026-07-01')
+            ->assertJsonPath('submission.tanggal_selesai', '2026-09-01');
     }
 
     public function test_supervisor_application_validates_email_phone_and_date_range_on_server(): void

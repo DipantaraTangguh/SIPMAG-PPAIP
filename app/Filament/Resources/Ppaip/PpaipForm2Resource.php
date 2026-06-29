@@ -55,9 +55,11 @@ class PpaipForm2Resource extends Resource
                 Tables\Columns\TextColumn::make('student.name')->label('Mahasiswa')->searchable()->sortable(),
                 Tables\Columns\TextColumn::make('student.study_program')->label('Prodi'),
                 Tables\Columns\TextColumn::make('company_name')->label('Perusahaan')->searchable(),
+                Tables\Columns\TextColumn::make('nama_pimpinan')->label('Pimpinan')->placeholder('—')->toggleable(),
+                Tables\Columns\TextColumn::make('jabatan_pimpinan')->label('Jabatan')->placeholder('—')->toggleable(),
                 Tables\Columns\TextColumn::make('lingkup_magang')->label('Lingkup')->limit(30),
-                Tables\Columns\TextColumn::make('tanggal_mulai')->label('Mulai')->date('d M Y'),
-                Tables\Columns\TextColumn::make('tanggal_selesai')->label('Selesai')->date('d M Y'),
+                Tables\Columns\TextColumn::make('tanggal_mulai')->label('Bulan Mulai')->date('M Y'),
+                Tables\Columns\TextColumn::make('tanggal_selesai')->label('Bulan Selesai')->date('M Y'),
                 Tables\Columns\TextColumn::make('status')
                     ->label('Status')
                     ->badge()

@@ -1,10 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AppContext';
-import {
-    useApplicationWorkflow,
-    useForm2Workflow,
-} from '../../context/StudentWorkflowContext';
+import { useApplicationWorkflow } from '../../context/StudentWorkflowContext';
 import {
     canAccessPortal,
     hasSecuredInternship,
@@ -66,7 +63,6 @@ const mockActiveApplications = [
 export default function InternshipPortalPage() {
     const { student } = useAuth();
     const { activeApplications } = useApplicationWorkflow();
-    const { form2Submissions } = useForm2Workflow();
     const navigate = useNavigate();
     const location = useLocation();
     const accessStatus = student?.accessStatus;
@@ -126,14 +122,10 @@ export default function InternshipPortalPage() {
     };
 
     const showAccessBanner = !canAccessPortal(accessStatus); // Status ini sudah ikut helper akses terbaru.
-    const internshipSecured = hasSecuredInternship(
-        accessStatus,
-        activeApplications,
-        form2Submissions,
-    );
+    const internshipSecured = hasSecuredInternship(accessStatus);
 
     return (
-        <DashboardLayout pageTitle="Portal Magang">
+        <DashboardLayout pageTitle="Lowongan Magang">
             <div className="flex flex-col gap-5">
                 <TabNavigation
                     activeTab={activeTab}

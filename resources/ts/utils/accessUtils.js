@@ -19,24 +19,13 @@ export const SECURED_INTERNSHIP_STATUSES = [
 ];
 
 export const SECURED_INTERNSHIP_MESSAGE =
-    'Pengajuan magang Anda sudah disetujui. Anda sudah dapat menjalani magang sehingga tidak dapat melamar lowongan mitra atau mengajukan Form 2 lain.';
+    'DPM Anda sudah ditunjuk atau pengajuan DPM sudah disetujui, sehingga Anda tidak dapat melamar lowongan mitra lagi.';
 
-export const hasAcceptedPartnerApplication = (applications = []) =>
-    applications.some((application) => application.status === 'Accepted');
+export const FORM2_LOCKED_MESSAGE =
+    'DPM Anda sudah ditunjuk atau pengajuan DPM sudah disetujui, sehingga Form 2 tidak dapat diajukan lagi.';
 
-export const hasApprovedForm2Submission = (submissions = []) =>
-    submissions.some((submission) =>
-        ['ApprovedForm2', 'Disetujui'].includes(submission.status)
-    );
-
-export const hasSecuredInternship = (
-    accessStatus,
-    applications = [],
-    form2Submissions = [],
-) =>
-    SECURED_INTERNSHIP_STATUSES.includes(accessStatus) ||
-    hasAcceptedPartnerApplication(applications) ||
-    hasApprovedForm2Submission(form2Submissions);
+export const hasSecuredInternship = (accessStatus) =>
+    SECURED_INTERNSHIP_STATUSES.includes(accessStatus);
 
 export const LOGBOOK_ACCESS_STATUSES = [
     'HasDPM',

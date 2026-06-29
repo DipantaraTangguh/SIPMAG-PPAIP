@@ -8,9 +8,12 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Form2Submission extends Model
 {
     use SoftDeletes;
+
     protected $fillable = [
         'student_id',
         'company_name',
+        'nama_pimpinan',
+        'jabatan_pimpinan',
         'alamat_perusahaan',
         'lingkup_magang',
         'tanggal_mulai',
@@ -24,9 +27,9 @@ class Form2Submission extends Model
     protected function casts(): array
     {
         return [
-            'tanggal_mulai'   => 'date',
+            'tanggal_mulai' => 'date',
             'tanggal_selesai' => 'date',
-            'submitted_at'    => 'datetime',
+            'submitted_at' => 'datetime',
         ];
     }
 

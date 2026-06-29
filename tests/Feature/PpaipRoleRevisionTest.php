@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Exports\MitraApplicantsExport;
 use App\Filament\Resources\Ppaip\PpaipForm1Resource;
 use App\Filament\Resources\Ppaip\PpaipMitraApplicantResource;
 use App\Models\Application;
@@ -10,6 +11,9 @@ use App\Models\Student;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\File;
+use Maatwebsite\Excel\Excel as ExcelWriter;
+use Maatwebsite\Excel\Facades\Excel;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 use Tests\TestCase;
 
 class PpaipRoleRevisionTest extends TestCase
@@ -99,15 +103,36 @@ class PpaipRoleRevisionTest extends TestCase
 
         $response = $this->get(route('mitra-applications.export'))
             ->assertOk()
-            ->assertHeader('content-type', 'application/vnd.ms-excel; charset=UTF-8');
+            ->assertHeader(
+                'content-type',
+                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            );
 
-        $content = $response->streamedContent();
+        $this->assertStringContainsString(
+            '.xlsx',
+            $response->headers->get('content-disposition', ''),
+        );
 
-        $this->assertStringContainsString('Nama Mahasiswa', $content);
-        $this->assertStringContainsString($application->student->name, $content);
-        $this->assertStringContainsString($application->internship->company_name, $content);
-        $this->assertStringContainsString('<td style="mso-number-format:\'\\@\';">3.75</td>', $content);
-        $this->assertStringContainsString(basename($application->cv_file_path), $content);
+        $xlsx = Excel::raw(new MitraApplicantsExport, ExcelWriter::XLSX);
+        $tempPath = tempnam(sys_get_temp_dir(), 'mitra-applicants-').'.xlsx';
+        File::put($tempPath, $xlsx);
+
+        try {
+            $sheet = IOFactory::load($tempPath)->getActiveSheet();
+
+            $this->assertSame('Nama Mahasiswa', $sheet->getCell('E1')->getValue());
+            $this->assertSame($application->student->name, $sheet->getCell('E2')->getValue());
+            $this->assertSame($application->internship->company_name, $sheet->getCell('L2')->getValue());
+            $this->assertSame(3.75, $sheet->getCell('J2')->getValue());
+            $this->assertSame('0.00', $sheet->getStyle('J2')->getNumberFormat()->getFormatCode());
+            $this->assertStringContainsString(
+                basename($application->cv_file_path),
+                (string) $sheet->getCell('P2')->getValue(),
+            );
+            $this->assertStringStartsWith('=HYPERLINK(', (string) $sheet->getCell('P2')->getValue());
+        } finally {
+            File::delete($tempPath);
+        }
     }
 
     private function student(string $name): Student

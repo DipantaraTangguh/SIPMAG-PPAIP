@@ -11,7 +11,7 @@ import {
 
 const navItems = [
     { to: '/dashboard', label: 'Beranda', icon: Home },
-    { to: '/portal', label: 'Portal Magang', icon: Briefcase },
+    { to: '/portal', label: 'Lowongan Magang', icon: Briefcase },
     { to: '/guidance', label: 'Bimbingan & Logbook', icon: ClipboardList },
     { to: '/defense', label: 'Sidang Magang', icon: GraduationCap },
     { to: '/form1', label: 'Profil', icon: User },

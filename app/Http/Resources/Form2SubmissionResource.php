@@ -13,6 +13,8 @@ class Form2SubmissionResource extends JsonResource
             'id' => $this->id,
             'student_id' => $this->student_id,
             'company_name' => $this->company_name,
+            'nama_pimpinan' => $this->nama_pimpinan,
+            'jabatan_pimpinan' => $this->jabatan_pimpinan,
             'alamat_perusahaan' => $this->alamat_perusahaan,
             'lingkup_magang' => $this->lingkup_magang,
             'tanggal_mulai' => $this->tanggal_mulai?->toDateString(),
