@@ -24,7 +24,12 @@ class ViewExaminedSession extends ViewRecord
                 ->label(fn (): string => $this->currentAssessment() ? 'Edit Nilai' : 'Isi Nilai')
                 ->icon('heroicon-o-pencil-square')
                 ->color('primary')
-                ->visible(fn (): bool => Auth::user()?->can('assess', $this->record) === true)
+                ->visible(function (): bool {
+                    /** @var User|null $user */
+                    $user = Auth::user();
+
+                    return $user?->can('assess', $this->record) === true;
+                })
                 ->modalHeading('Penilaian Sidang Magang')
                 ->modalDescription('Isi nilai per komponen atau gunakan input cepat untuk menyamakan seluruh komponen.')
                 ->fillForm(function (): array {

@@ -37,6 +37,7 @@ Route::middleware('auth:sanctum')->group(function () {
         // Form 2 buat jalur mandiri.
         Route::get('/form2', [Form2Controller::class, 'index']);
         Route::post('/form2', [Form2Controller::class, 'store']);
+        Route::get('/form2/{id}/surat-pengantar', [Form2Controller::class, 'downloadSuratPengantar']);
 
         // Request DPM setelah jalur magang valid.
         Route::get('/supervisor-application', [SupervisorController::class, 'show']);

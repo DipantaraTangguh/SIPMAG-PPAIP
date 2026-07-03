@@ -1,6 +1,24 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { CheckCircle, Clock, XCircle, Download, FileEdit, Info } from 'lucide-react';
+import { api } from '../../../lib/api';
 function ApprovedCard({ data }) {
+    const [isDownloading, setIsDownloading] = useState(false);
+    const [downloadError, setDownloadError] = useState(null);
+
+    const handleDownload = async () => {
+        setDownloadError(null);
+        setIsDownloading(true);
+        try {
+            const filename = `Surat_Permohonan_Magang_${data.companyName || data.id}.pdf`;
+            await api.download(`/form2/${data.id}/surat-pengantar`, filename);
+        } catch (err) {
+            console.error('[Form2] Download error:', err);
+            setDownloadError(err.message || 'Gagal mengunduh dokumen.');
+        } finally {
+            setIsDownloading(false);
+        }
+    };
+
     return (
         <div className="flex flex-col gap-4 rounded-xl border border-gray-200 bg-white p-5 sm:flex-row sm:items-start sm:gap-4">
             <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-green-100">
@@ -16,14 +34,18 @@ function ApprovedCard({ data }) {
                 <div className="mt-2 inline-block rounded-full bg-green-100 px-3 py-1 text-[12px] font-bold text-green-600">
                     Disetujui
                 </div>
+                {downloadError && (
+                    <p className="mt-2 text-[12px] text-red-600">{downloadError}</p>
+                )}
             </div>
             <button
                 type="button"
-                onClick={() => window.open('#', '_blank')}
-                className="mt-3 flex flex-shrink-0 items-center gap-1.5 rounded-lg border border-gray-300 bg-white px-4 py-2 text-[13px] font-bold text-gray-700 transition-colors hover:border-primary hover:text-primary sm:mt-0"
+                onClick={handleDownload}
+                disabled={isDownloading}
+                className="mt-3 flex flex-shrink-0 items-center gap-1.5 rounded-lg border border-gray-300 bg-white px-4 py-2 text-[13px] font-bold text-gray-700 transition-colors hover:border-primary hover:text-primary disabled:cursor-not-allowed disabled:opacity-60 sm:mt-0"
             >
                 <Download className="h-3.5 w-3.5" />
-                Unduh Form 2
+                {isDownloading ? 'Memproses...' : 'Unduh Form 2'}
             </button>
         </div>
     );

@@ -9,6 +9,7 @@ use App\Http\Resources\Form2SubmissionResource;
 use App\Models\Form2Submission;
 use App\Models\Student;
 use App\Models\User;
+use App\Services\PdfService;
 use App\Services\StudentStateMachine;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -74,6 +75,19 @@ class Form2Controller extends Controller
             'message' => 'Form 2 berhasil diajukan.',
             'submission' => Form2SubmissionResource::make($submission)->resolve($request),
         ], 201);
+    }
+
+    public function downloadSuratPengantar(Request $request, int $id, PdfService $pdfService)
+    {
+        $submission = Form2Submission::with('student')->findOrFail($id);
+
+        Gate::authorize('view', $submission);
+
+        if ($submission->status !== 'ApprovedForm2') {
+            return response()->json(['message' => 'Form 2 belum disetujui.'], 403);
+        }
+
+        return $pdfService->downloadForm2RequestLetter($submission);
     }
 
     public function indexForPpaip(Request $request)
