@@ -91,6 +91,46 @@ Route::middleware(['web', 'auth'])->prefix('admin/defense-documents')->group(fun
     })->whereIn('document', DefenseDocument::keys())->name('defense-documents.download');
 });
 
+Route::middleware(['web', 'auth'])->prefix('admin/dpm/loa')->group(function () {
+    Route::get('/{student}/preview', function (Request $request, Student $student) {
+        $user = $request->user();
+        abort_unless($user?->role === 'dpm' && $user->lecturer?->id === $student->dpm_id, 403);
+
+        $application = $student->supervisorApplication;
+        if (! $application || ! $application->loa_path) {
+            abort(404, 'LoA tidak tersedia.');
+        }
+
+        $path = StoredFilePath::resolve(storage_path('app/private'), $application->loa_path);
+        if (! $path) {
+            abort(404, 'File tidak ditemukan.');
+        }
+
+        return response()->file($path, [
+            'Content-Type' => mime_content_type($path),
+        ]);
+    })->name('dpm.loa.preview');
+
+    Route::get('/{student}/download', function (Request $request, Student $student) {
+        $user = $request->user();
+        abort_unless($user?->role === 'dpm' && $user->lecturer?->id === $student->dpm_id, 403);
+
+        $application = $student->supervisorApplication;
+        if (! $application || ! $application->loa_path) {
+            abort(404, 'LoA tidak tersedia.');
+        }
+
+        $path = StoredFilePath::resolve(storage_path('app/private'), $application->loa_path);
+        if (! $path) {
+            abort(404, 'File tidak ditemukan.');
+        }
+
+        $ext = pathinfo($path, PATHINFO_EXTENSION);
+
+        return response()->download($path, "loa_{$student->nim}.{$ext}");
+    })->name('dpm.loa.download');
+});
+
 // Sisanya lempar ke React router.
 Route::get('/{any}', function () {
     return view('app');
