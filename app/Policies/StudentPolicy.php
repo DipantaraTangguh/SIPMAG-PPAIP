@@ -20,15 +20,7 @@ class StudentPolicy
             || $user->lecturer?->id === $student->dpm_id;
     }
 
-    public function viewTranscript(User $user, Student $student): bool
-    {
-        return $user->isPpaip() || $this->sameStudyProgramKaprodi($user, $student);
-    }
 
-    public function viewTranscripts(User $user): bool
-    {
-        return $user->isPpaip() || $user->isKaprodi();
-    }
 
     public function reviewForm1(User $user, Student $student): bool
     {

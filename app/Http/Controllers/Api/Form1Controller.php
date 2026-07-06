@@ -10,7 +10,6 @@ use App\Http\Resources\StudentResource;
 use App\Models\Student;
 use App\Services\PdfService;
 use App\Services\StudentStateMachine;
-use App\Support\StoredFilePath;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
@@ -50,10 +49,8 @@ class Form1Controller extends Controller
 
         $validated = $request->validated();
 
-        $transkripPath = $request->file('transkrip')->store('transkrip', 'local');
         $studentSignaturePath = $request->file('studentSignature')->store('student-signatures', 'local');
 
-        unset($validated['transkrip']);
         unset($validated['studentSignature']);
 
         // Academic values are authoritative server-side data, never request input.
@@ -69,7 +66,6 @@ class Form1Controller extends Controller
 
         $student->fill([
             'form1_data' => $form1Data,
-            'form1_pdf_path' => $transkripPath,
             'form1_rejection_reason' => null,
         ]);
 
@@ -168,22 +164,4 @@ class Form1Controller extends Controller
         return $pdfService->downloadForm1ApprovalLetter($student);
     }
 
-    public function downloadTranskrip(Request $request, int $studentId)
-    {
-        $lecturer = $request->user()->lecturer;
-        $student = Student::findOrFail($studentId);
-
-        Gate::authorize('viewTranscript', $student);
-
-        if (! $student->form1_pdf_path) {
-            return response()->json(['message' => 'Transkrip tidak tersedia.'], 404);
-        }
-
-        $path = StoredFilePath::resolve(storage_path('app/private'), $student->form1_pdf_path);
-        if (! $path) {
-            return response()->json(['message' => 'File tidak ditemukan.'], 404);
-        }
-
-        return response()->file($path);
-    }
 }

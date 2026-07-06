@@ -40,11 +40,6 @@ class Form1SubmissionTest extends TestCase
             'skemaMagang' => 'Magang Perusahaan',
             'topikMagang' => 'PT Contoh Indonesia',
             'outputTarget' => 'Laporan',
-            'transkrip' => UploadedFile::fake()->create(
-                'transkrip.pdf',
-                100,
-                'application/pdf',
-            ),
             'studentSignature' => UploadedFile::fake()->image('signature.png'),
         ]);
 
@@ -57,35 +52,7 @@ class Form1SubmissionTest extends TestCase
         $this->assertSame(3.75, $student->form1_data['ipk']);
         $this->assertArrayHasKey('studentSignaturePath', $student->form1_data);
         $this->assertSame('PendingReview', $student->access_status);
-        $this->assertTrue(Storage::disk('local')->exists($student->form1_pdf_path));
         $this->assertTrue(Storage::disk('local')->exists($student->form1_data['studentSignaturePath']));
-    }
-
-    public function test_form_1_requires_a_transcript(): void
-    {
-        $user = User::factory()->create(['role' => 'mahasiswa']);
-        Student::create([
-            'user_id' => $user->id,
-            'nim' => '1101214231',
-            'name' => 'Mahasiswa Tanpa Transkrip',
-            'study_program' => 'Sistem Informasi',
-            'email' => 'student@example.test',
-            'semester' => 6,
-            'tahun_akademik' => '2025/2026',
-            'jumlah_sks' => 120,
-            'ipk' => 3.50,
-            'access_status' => 'Unverified',
-        ]);
-
-        $this->actingAs($user);
-
-        $this->postJson('/api/form1', [
-            'skemaMagang' => 'Magang Perusahaan',
-            'topikMagang' => 'PT Contoh Indonesia',
-            'outputTarget' => 'Laporan',
-        ])
-            ->assertUnprocessable()
-            ->assertJsonValidationErrors('transkrip');
     }
 
     public function test_form_1_requires_a_student_signature(): void
@@ -110,11 +77,6 @@ class Form1SubmissionTest extends TestCase
             'skemaMagang' => 'Magang Perusahaan',
             'topikMagang' => 'PT Contoh Indonesia',
             'outputTarget' => 'Laporan',
-            'transkrip' => UploadedFile::fake()->create(
-                'transkrip.pdf',
-                100,
-                'application/pdf',
-            ),
         ])
             ->assertUnprocessable()
             ->assertJsonValidationErrors('studentSignature');
@@ -144,11 +106,6 @@ class Form1SubmissionTest extends TestCase
             'skemaMagang' => 'Mandiri',
             'topikMagang' => 'PT Contoh Indonesia',
             'outputTarget' => 'Laporan',
-            'transkrip' => UploadedFile::fake()->create(
-                'transkrip.pdf',
-                100,
-                'application/pdf',
-            ),
             'studentSignature' => UploadedFile::fake()->image('signature.png'),
         ])
             ->assertUnprocessable()
@@ -179,11 +136,6 @@ class Form1SubmissionTest extends TestCase
             'skemaMagang' => 'Magang Perusahaan',
             'topikMagang' => 'PT Contoh Indonesia',
             'outputTarget' => 'Laporan',
-            'transkrip' => UploadedFile::fake()->create(
-                'transkrip.pdf',
-                100,
-                'application/pdf',
-            ),
             'studentSignature' => UploadedFile::fake()->image('signature.png'),
         ])
             ->assertUnprocessable()

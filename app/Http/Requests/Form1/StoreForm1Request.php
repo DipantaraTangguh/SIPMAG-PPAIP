@@ -17,7 +17,6 @@ class StoreForm1Request extends FormRequest
             'skemaMagang' => 'required|string|in:Magang Perusahaan,Magang Kewirausahaan',
             'topikMagang' => 'required|string|max:2000',
             'outputTarget' => 'required|string|in:Produk,Prototype,Laporan',
-            'transkrip' => 'required|file|mimes:pdf,jpg,jpeg,png|mimetypes:application/pdf,image/jpeg,image/png|max:5120',
             'studentSignature' => 'required|file|mimes:jpg,jpeg,png|mimetypes:image/jpeg,image/png|max:5120',
         ];
     }

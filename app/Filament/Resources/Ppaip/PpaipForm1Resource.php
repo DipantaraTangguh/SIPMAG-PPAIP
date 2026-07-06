@@ -14,7 +14,6 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\HtmlString;
 
 class PpaipForm1Resource extends Resource
 {
@@ -115,14 +114,6 @@ class PpaipForm1Resource extends Resource
                             ->columnSpanFull(),
                     ])
                     ->columns(2),
-
-                Section::make('Berkas')
-                    ->schema([
-                        TextEntry::make('transkrip_document')
-                            ->label('Transkrip Nilai')
-                            ->state(fn (Student $record): HtmlString => self::transcriptLinks($record))
-                            ->html(),
-                    ]),
             ]);
     }
 
@@ -152,10 +143,6 @@ class PpaipForm1Resource extends Resource
                         'ApprovedForm1' => 'success',
                         default => 'gray',
                     }),
-                Tables\Columns\IconColumn::make('form1_pdf_path')
-                    ->label('Transkrip')
-                    ->icon(fn ($state) => $state ? 'heroicon-o-document-check' : 'heroicon-o-document')
-                    ->color(fn ($state) => $state ? 'success' : 'gray'),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->label('Diajukan')
                     ->dateTime('d M Y H:i')
@@ -178,11 +165,6 @@ class PpaipForm1Resource extends Resource
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
-                Tables\Actions\Action::make('downloadTranscript')
-                    ->label('Download Transkrip')
-                    ->icon('heroicon-o-arrow-down-tray')
-                    ->visible(fn (Student $record): bool => ! empty($record->form1_pdf_path))
-                    ->url(fn (Student $record): string => route('transkrip.download', $record)),
             ])
             ->bulkActions([])
             ->defaultSort('updated_at', 'desc');
@@ -196,22 +178,4 @@ class PpaipForm1Resource extends Resource
         ];
     }
 
-    private static function transcriptLinks(Student $record): HtmlString
-    {
-        if (! $record->form1_pdf_path) {
-            return new HtmlString('<span class="text-gray-400">Belum diunggah</span>');
-        }
-
-        $filename = e(basename($record->form1_pdf_path));
-        $previewUrl = e(route('transkrip.preview', $record));
-        $downloadUrl = e(route('transkrip.download', $record));
-
-        return new HtmlString(
-            '<div class="flex flex-wrap items-center gap-3">'.
-                '<span class="font-medium text-gray-700">'.$filename.'</span>'.
-                '<a href="'.$previewUrl.'" target="_blank" rel="noopener" class="text-sm text-blue-600 hover:underline">Preview</a>'.
-                '<a href="'.$downloadUrl.'" class="text-sm text-blue-600 hover:underline">Download</a>'.
-            '</div>'
-        );
-    }
 }

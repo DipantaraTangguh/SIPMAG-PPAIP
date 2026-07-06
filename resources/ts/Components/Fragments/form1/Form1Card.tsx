@@ -5,7 +5,6 @@ import {
     ChevronDown,
     ArrowRight,
     X,
-    FileText,
     Loader2,
 } from 'lucide-react';
 function FieldLabel({
@@ -59,35 +58,18 @@ export default function Form1Card({
     readOnlyFields,
     formData,
     errors,
-    fileError,
     signatureFileError,
     isSubmitting,
-    isDragging,
     isSignatureDragging,
-    setIsDragging,
     setIsSignatureDragging,
     isFormValid,
     updateField,
-    handleFileChange,
     handleSignatureFileChange,
-    removeFile,
     removeSignatureFile,
     handleSubmit,
     handleCancel,
 }) {
-    const fileInputRef = useRef(null);
     const signatureFileInputRef = useRef(null);
-    const onDragOver = (e) => {
-        e.preventDefault();
-        setIsDragging(true);
-    };
-    const onDragLeave = () => setIsDragging(false);
-    const onDrop = (e) => {
-        e.preventDefault();
-        setIsDragging(false);
-        const file = e.dataTransfer.files[0];
-        if (file) handleFileChange(file);
-    };
     const onSignatureDragOver = (e) => {
         e.preventDefault();
         setIsSignatureDragging(true);
@@ -98,11 +80,6 @@ export default function Form1Card({
         setIsSignatureDragging(false);
         const file = e.dataTransfer.files[0];
         if (file) handleSignatureFileChange(file);
-    };
-    const onFileInputChange = (e) => {
-        const file = e.target.files[0];
-        if (file) handleFileChange(file);
-        e.target.value = '';
     };
     const onSignatureFileInputChange = (e) => {
         const file = e.target.files[0];
@@ -215,84 +192,7 @@ export default function Form1Card({
                     )}
                     <FieldError id="topikTempat-error" message={errors.topikTempat} />
                 </div>
-                <div>
-                    <FieldLabel htmlFor="fileInput">Upload Transkrip Nilai Terbaru</FieldLabel>
- 
-                    {formData.transkripFile ? (
-                        <div className="flex items-center gap-3 rounded-xl border border-primary bg-primary-pale px-5 py-4">
-                            <FileText className="h-6 w-6 flex-shrink-0 text-primary" />
-                            <div className="min-w-0 flex-1">
-                                <p className="truncate text-sm font-medium text-gray-800">
-                                    {formData.transkripFile.name}
-                                </p>
-                                <p className="text-xs text-gray-500">
-                                    {formatFileSize(formData.transkripFile.size)}
-                                </p>
-                            </div>
-                            <button
-                                type="button"
-                                onClick={removeFile}
-                                className="flex h-7 w-7 items-center justify-center rounded-full text-gray-400 transition-colors hover:bg-gray-200 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-primary/20"
-                                aria-label="Hapus file"
-                            >
-                                <X className="h-4 w-4" />
-                            </button>
-                        </div>
-                    ) : (
-                        <div
-                            onDragOver={onDragOver}
-                            onDragLeave={onDragLeave}
-                            onDrop={onDrop}
-                            onClick={() => fileInputRef.current?.click()}
-                            role="button"
-                            tabIndex={0}
-                            aria-label="Upload Transkrip Nilai Terbaru. PDF, JPG, atau PNG (Maks. 5MB)"
-                            aria-invalid={!!errors.transkripFile}
-                            aria-describedby={errors.transkripFile ? 'transkripFile-error' : undefined}
-                            onKeyDown={(e) => {
-                                if (e.key === ' ' || e.key === 'Enter') {
-                                    e.preventDefault();
-                                    fileInputRef.current?.click();
-                                }
-                            }}
-                            className={`
-                                flex cursor-pointer flex-col items-center justify-center rounded-xl
-                                border-2 border-dashed px-6 py-10 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-primary/20
-                                ${isDragging
-                                    ? 'border-primary bg-primary-pale'
-                                    : errors.transkripFile
-                                        ? 'border-red-400 bg-red-50 hover:border-red-500'
-                                        : 'border-gray-300 hover:border-primary hover:bg-primary-pale'
-                                }
-                            `}
-                        >
-                            <CloudUpload
-                                className={`mb-3 h-10 w-10 ${
-                                    isDragging ? 'text-primary' : 'text-primary'
-                                }`}
-                            />
-                            <p className="text-sm font-medium text-gray-800">
-                                Klik untuk unggah atau drag and drop
-                            </p>
-                            <p className="mt-1 text-xs text-gray-400">
-                                PDF, JPG, atau PNG (Maks. 5MB)
-                            </p>
-                            <input
-                                id="fileInput"
-                                ref={fileInputRef}
-                                type="file"
-                                accept=".pdf,.jpg,.jpeg,.png"
-                                onChange={onFileInputChange}
-                                className="hidden"
-                            />
-                        </div>
-                    )}
- 
-                    {fileError && (
-                        <p className="mt-1 text-xs text-red-500" role="alert">{fileError}</p>
-                    )}
-                    <FieldError id="transkripFile-error" message={errors.transkripFile} />
-                </div>
+
                 <div>
                     <FieldLabel htmlFor="studentSignatureInput">Upload Tanda Tangan Mahasiswa</FieldLabel>
 
