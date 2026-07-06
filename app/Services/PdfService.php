@@ -4,8 +4,6 @@ namespace App\Services;
 
 use App\Models\Form2Submission;
 use App\Models\Student;
-use App\Support\StoredFilePath;
-use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Carbon;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -68,62 +66,28 @@ class PdfService
     {
         $student->loadMissing('form1Approver');
         $kaprodi = $student->form1Approver;
+        $form1 = $student->form1_data ?? [];
 
         Carbon::setLocale('id');
 
-        $pdf = Pdf::loadView('pdf.surat-keterangan', [
-            'student' => $student,
-            'form1' => $student->form1_data ?? [],
-            'kaprodiName' => $kaprodi->lecturer_name ?? '—',
-            'kaprodiNidn' => $kaprodi->nidn ?? '—',
-            'signatureSrc' => $this->signatureSource($kaprodi?->signature_path),
-            'studentSignatureSrc' => $this->studentSignatureSource($student->form1_data['studentSignaturePath'] ?? null),
-            'logoSrc' => $this->logoSource(),
-            'submittedDate' => optional($student->updated_at)->translatedFormat('d F Y') ?? '—',
-            'approvalDate' => optional($student->form1_approved_at)->translatedFormat('d F Y') ?? '—',
-        ])->setPaper('a4');
+        $pdfPath = $this->docxRenderer->render(public_path('assets/template-form-1.docx'), [
+            '<<Nama Kaprodi>>' => $kaprodi->lecturer_name ?? '—',
+            '<<Program Studi>>' => $student->study_program ?? '—',
+            '<<Nama Mahasiswa>>' => $student->name,
+            '<<NIM>>' => $student->nim,
+            '<<Semester>>' => (string) ($form1['semester'] ?? $student->semester ?? '—'),
+            '<<Jumlah SKS>>' => (string) ($form1['jumlahSKS'] ?? $student->jumlah_sks ?? '—'),
+            '<<IPK>>' => (string) ($form1['ipk'] ?? $student->ipk ?? '—'),
+            '<<Rencana Magang>>' => $form1['skemaMagang'] ?? '—',
+            '<<Tanggal Pengajuan>>' => optional($student->updated_at)->translatedFormat('d F Y') ?? '—',
+            '<<Tanggal Persetujuan>>' => optional($student->form1_approved_at)->translatedFormat('d F Y') ?? '—',
+            '<<NIDN>>' => $kaprodi->nidn ?? '—',
+        ]);
 
-        return $pdf->download('Surat_Keterangan_Form1_'.$student->nim.'.pdf');
-    }
+        abort_if($pdfPath === null, 503, 'Konversi PDF tidak tersedia. Pastikan LibreOffice terpasang atau atur LIBREOFFICE_PATH.');
 
-    private function studentSignatureSource(?string $signaturePath): ?string
-    {
-        if (! $signaturePath) {
-            return null;
-        }
-
-        $path = StoredFilePath::resolve(storage_path('app/private'), $signaturePath);
-
-        return $path ? $this->imageDataUri($path) : null;
-    }
-
-    private function signatureSource(?string $signaturePath): ?string
-    {
-        if (! $signaturePath) {
-            return null;
-        }
-
-        $path = StoredFilePath::resolve(storage_path('app/public'), $signaturePath);
-
-        return $path ? $this->imageDataUri($path) : null;
-    }
-
-    private function logoSource(): ?string
-    {
-        return $this->assetImageSource('assets/images/logo-ubakrie.png');
-    }
-
-    private function assetImageSource(string $relativePath): ?string
-    {
-        $path = public_path($relativePath);
-
-        return file_exists($path) ? $this->imageDataUri($path) : null;
-    }
-
-    private function imageDataUri(string $path): string
-    {
-        $mime = mime_content_type($path) ?: 'image/png';
-
-        return 'data:'.$mime.';base64,'.base64_encode(file_get_contents($path));
+        return response()
+            ->download($pdfPath, 'Surat_Keterangan_Form1_'.$student->nim.'.pdf')
+            ->deleteFileAfterSend(true);
     }
 }

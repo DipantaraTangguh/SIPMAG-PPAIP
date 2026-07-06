@@ -1,12 +1,5 @@
-import React, { useRef } from 'react';
-import {
-    Lock,
-    CloudUpload,
-    ChevronDown,
-    ArrowRight,
-    X,
-    Loader2,
-} from 'lucide-react';
+import React from "react";
+import { Lock, ChevronDown, ArrowRight, Loader2 } from "lucide-react";
 function FieldLabel({
     children,
     htmlFor,
@@ -28,7 +21,11 @@ function FieldLabel({
 }
 function FieldError({ id, message }) {
     if (!message) return null;
-    return <p id={id} className="mt-1 text-xs text-red-500" role="alert">{message}</p>;
+    return (
+        <p id={id} className="mt-1 text-xs text-red-500" role="alert">
+            {message}
+        </p>
+    );
 }
 function ReadOnlyInput({ id, value }) {
     return (
@@ -45,64 +42,43 @@ function ReadOnlyInput({ id, value }) {
     );
 }
 function HelperText({ children }) {
-    return (
-        <p className="mt-1 text-xs italic text-black">{children}</p>
-    );
+    return <p className="mt-1 text-xs italic text-black">{children}</p>;
 }
-function formatFileSize(bytes) {
-    if (bytes < 1024) return `${bytes} B`;
-    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-}
+
 export default function Form1Card({
     readOnlyFields,
     formData,
     errors,
-    signatureFileError,
     isSubmitting,
-    isSignatureDragging,
-    setIsSignatureDragging,
     isFormValid,
     updateField,
-    handleSignatureFileChange,
-    removeSignatureFile,
     handleSubmit,
     handleCancel,
 }) {
-    const signatureFileInputRef = useRef(null);
-    const onSignatureDragOver = (e) => {
-        e.preventDefault();
-        setIsSignatureDragging(true);
-    };
-    const onSignatureDragLeave = () => setIsSignatureDragging(false);
-    const onSignatureDrop = (e) => {
-        e.preventDefault();
-        setIsSignatureDragging(false);
-        const file = e.dataTransfer.files[0];
-        if (file) handleSignatureFileChange(file);
-    };
-    const onSignatureFileInputChange = (e) => {
-        const file = e.target.files[0];
-        if (file) handleSignatureFileChange(file);
-        e.target.value = '';
-    };
     const inputBase =
-        'w-full rounded-lg border px-4 py-3 text-sm text-gray-800 outline-none transition-colors duration-150 placeholder:text-gray-400';
+        "w-full rounded-lg border px-4 py-3 text-sm text-gray-800 outline-none transition-colors duration-150 placeholder:text-gray-400";
     const inputNormal = `${inputBase} border-gray-200 bg-white focus:border-primary focus:ring-2 focus:ring-primary/20`;
     const inputError = `${inputBase} border-red-500 bg-white focus:border-red-500 focus:ring-2 focus:ring-red-500/20`;
 
     return (
-        <form onSubmit={handleSubmit} className="rounded-xl border border-gray-200 bg-white p-5 sm:p-8">
+        <form
+            onSubmit={handleSubmit}
+            className="rounded-xl border border-gray-200 bg-white p-5 sm:p-8"
+        >
             <div className="mb-8">
                 <h3 className="text-xl font-bold text-gray-900">
                     Isi Form Magang-01
                 </h3>
                 <p className="mt-1 text-sm text-gray-500">
-                    Lengkapi data di bawah ini untuk mengajukan surat keterangan akademik.
+                    Lengkapi data di bawah ini untuk mengajukan surat keterangan
+                    akademik.
                 </p>
             </div>
             {errors.submit && (
-                <div className="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600" role="alert">
+                <div
+                    className="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600"
+                    role="alert"
+                >
                     {errors.submit}
                 </div>
             )}
@@ -119,23 +95,39 @@ export default function Form1Card({
                     </div>
                 </div>
                 <div>
-                    <FieldLabel htmlFor="programStudi">Program Studi</FieldLabel>
-                    <ReadOnlyInput id="programStudi" value={readOnlyFields.programStudi} />
+                    <FieldLabel htmlFor="programStudi">
+                        Program Studi
+                    </FieldLabel>
+                    <ReadOnlyInput
+                        id="programStudi"
+                        value={readOnlyFields.programStudi}
+                    />
                 </div>
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                     <div>
                         <FieldLabel htmlFor="semester">Semester</FieldLabel>
-                        <ReadOnlyInput id="semester" value={readOnlyFields.semester} />
+                        <ReadOnlyInput
+                            id="semester"
+                            value={readOnlyFields.semester}
+                        />
                     </div>
                     <div>
-                        <FieldLabel htmlFor="tahunAkademik">Tahun Akademik</FieldLabel>
-                        <ReadOnlyInput id="tahunAkademik" value={readOnlyFields.tahunAkademik} />
+                        <FieldLabel htmlFor="tahunAkademik">
+                            Tahun Akademik
+                        </FieldLabel>
+                        <ReadOnlyInput
+                            id="tahunAkademik"
+                            value={readOnlyFields.tahunAkademik}
+                        />
                     </div>
                 </div>
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                     <div>
                         <FieldLabel htmlFor="jumlahSks">Jumlah SKS</FieldLabel>
-                        <ReadOnlyInput id="jumlahSks" value={readOnlyFields.jumlahSks} />
+                        <ReadOnlyInput
+                            id="jumlahSks"
+                            value={readOnlyFields.jumlahSks}
+                        />
                     </div>
                     <div>
                         <FieldLabel htmlFor="ipk">IPK</FieldLabel>
@@ -143,41 +135,64 @@ export default function Form1Card({
                     </div>
                 </div>
                 <div className="w-full sm:w-1/2">
-                    <FieldLabel htmlFor="rencanaSkema">Rencana Skema Magang</FieldLabel>
+                    <FieldLabel htmlFor="rencanaSkema">
+                        Rencana Skema Magang
+                    </FieldLabel>
                     <div className="relative">
                         <select
                             id="rencanaSkema"
                             value={formData.rencanaSkema}
-                            onChange={(e) => updateField('rencanaSkema', e.target.value)}
+                            onChange={(e) =>
+                                updateField("rencanaSkema", e.target.value)
+                            }
                             aria-required="true"
                             aria-invalid={!!errors.rencanaSkema}
-                            aria-describedby={errors.rencanaSkema ? 'rencanaSkema-error' : undefined}
+                            aria-describedby={
+                                errors.rencanaSkema
+                                    ? "rencanaSkema-error"
+                                    : undefined
+                            }
                             className={`${
                                 errors.rencanaSkema ? inputError : inputNormal
                             } appearance-none pr-10 ${
-                                formData.rencanaSkema === '' ? 'text-gray-400' : ''
+                                formData.rencanaSkema === ""
+                                    ? "text-gray-400"
+                                    : ""
                             }`}
                             disabled={isSubmitting}
                         >
                             <option value="">Pilih skema magang</option>
-                            <option value="Magang Perusahaan">Magang Perusahaan</option>
-                            <option value="Magang Kewirausahaan">Magang Kewirausahaan</option>
+                            <option value="Magang Perusahaan">
+                                Magang Perusahaan
+                            </option>
+                            <option value="Magang Kewirausahaan">
+                                Magang Kewirausahaan
+                            </option>
                         </select>
                         <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
                     </div>
-                    <FieldError id="rencanaSkema-error" message={errors.rencanaSkema} />
+                    <FieldError
+                        id="rencanaSkema-error"
+                        message={errors.rencanaSkema}
+                    />
                 </div>
                 <div>
-                    <FieldLabel htmlFor="topikTempat">Topik / Tempat Magang</FieldLabel>
+                    <FieldLabel htmlFor="topikTempat">
+                        Topik / Lingkup Magang
+                    </FieldLabel>
                     <textarea
                         id="topikTempat"
                         rows={4}
-                        placeholder="Tuliskan rencana tempat atau topik magang anda..."
+                        placeholder="Tuliskan rencana tempat atau topik magang anda... Contoh: Digital Marketing"
                         value={formData.topikTempat}
-                        onChange={(e) => updateField('topikTempat', e.target.value)}
+                        onChange={(e) =>
+                            updateField("topikTempat", e.target.value)
+                        }
                         aria-required="true"
                         aria-invalid={!!errors.topikTempat}
-                        aria-describedby={errors.topikTempat ? 'topikTempat-error' : undefined}
+                        aria-describedby={
+                            errors.topikTempat ? "topikTempat-error" : undefined
+                        }
                         className={`${
                             errors.topikTempat ? inputError : inputNormal
                         } resize-none`}
@@ -185,98 +200,29 @@ export default function Form1Card({
                     />
                     {!errors.topikTempat && (
                         <HelperText>
-                            Untuk Magang Perusahaan tulis nama instansi / perusahaan yang
-                            lengkap. Untuk Magang Kewirausahaan tulis topik atau rencana
-                            usaha yang akan diajukan.
+                            Untuk Magang Perusahaan tulis nama instansi /
+                            perusahaan yang lengkap. Untuk Magang Kewirausahaan
+                            tulis topik atau rencana usaha yang akan diajukan.
                         </HelperText>
                     )}
-                    <FieldError id="topikTempat-error" message={errors.topikTempat} />
+                    <FieldError
+                        id="topikTempat-error"
+                        message={errors.topikTempat}
+                    />
                 </div>
 
-                <div>
-                    <FieldLabel htmlFor="studentSignatureInput">Upload Tanda Tangan Mahasiswa</FieldLabel>
-
-                    {formData.studentSignatureFile ? (
-                        <div className="flex items-center gap-3 rounded-xl border border-primary bg-primary-pale px-5 py-4">
-                            <FileText className="h-6 w-6 flex-shrink-0 text-primary" />
-                            <div className="min-w-0 flex-1">
-                                <p className="truncate text-sm font-medium text-gray-800">
-                                    {formData.studentSignatureFile.name}
-                                </p>
-                                <p className="text-xs text-gray-500">
-                                    {formatFileSize(formData.studentSignatureFile.size)}
-                                </p>
-                            </div>
-                            <button
-                                type="button"
-                                onClick={removeSignatureFile}
-                                className="flex h-7 w-7 items-center justify-center rounded-full text-gray-400 transition-colors hover:bg-gray-200 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-primary/20"
-                                aria-label="Hapus file tanda tangan"
-                            >
-                                <X className="h-4 w-4" />
-                            </button>
-                        </div>
-                    ) : (
-                        <div
-                            onDragOver={onSignatureDragOver}
-                            onDragLeave={onSignatureDragLeave}
-                            onDrop={onSignatureDrop}
-                            onClick={() => signatureFileInputRef.current?.click()}
-                            role="button"
-                            tabIndex={0}
-                            aria-label="Upload Tanda Tangan Mahasiswa. JPG atau PNG (Maks. 5MB)"
-                            aria-invalid={!!errors.studentSignatureFile}
-                            aria-describedby={errors.studentSignatureFile ? 'studentSignatureFile-error' : undefined}
-                            onKeyDown={(e) => {
-                                if (e.key === ' ' || e.key === 'Enter') {
-                                    e.preventDefault();
-                                    signatureFileInputRef.current?.click();
-                                }
-                            }}
-                            className={`
-                                flex cursor-pointer flex-col items-center justify-center rounded-xl
-                                border-2 border-dashed px-6 py-8 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-primary/20
-                                ${isSignatureDragging
-                                    ? 'border-primary bg-primary-pale'
-                                    : errors.studentSignatureFile
-                                        ? 'border-red-400 bg-red-50 hover:border-red-500'
-                                        : 'border-gray-300 hover:border-primary hover:bg-primary-pale'
-                                }
-                            `}
-                        >
-                            <CloudUpload className="mb-3 h-10 w-10 text-primary" />
-                            <p className="text-sm font-medium text-gray-800">
-                                Klik untuk unggah tanda tangan atau drag and drop
-                            </p>
-                            <p className="mt-1 text-xs text-gray-400">
-                                JPG atau PNG dengan latar transparan/putih (Maks. 5MB)
-                            </p>
-                            <input
-                                id="studentSignatureInput"
-                                ref={signatureFileInputRef}
-                                type="file"
-                                accept=".jpg,.jpeg,.png"
-                                onChange={onSignatureFileInputChange}
-                                className="hidden"
-                            />
-                        </div>
-                    )}
-
-                    {signatureFileError && (
-                        <p className="mt-1 text-xs text-red-500" role="alert">{signatureFileError}</p>
-                    )}
-                    <FieldError id="studentSignatureFile-error" message={errors.studentSignatureFile} />
-                </div>
                 <div>
                     <FieldLabel id="output-label">Output</FieldLabel>
-                    <div 
+                    <div
                         className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:gap-6"
                         role="radiogroup"
                         aria-labelledby="output-label"
                         aria-invalid={!!errors.output}
-                        aria-describedby={errors.output ? 'output-error' : undefined}
+                        aria-describedby={
+                            errors.output ? "output-error" : undefined
+                        }
                     >
-                        {['Produk', 'Prototype', 'Laporan'].map((opt) => (
+                        {["Produk", "Prototype", "Laporan"].map((opt) => (
                             <label
                                 key={opt}
                                 className="flex cursor-pointer items-center gap-2 text-sm text-black group"
@@ -284,10 +230,10 @@ export default function Form1Card({
                                 <span
                                     className={`flex h-5 w-5 items-center justify-center rounded-full border-2 transition-colors group-focus-within:ring-2 group-focus-within:ring-primary/20 ${
                                         formData.output === opt
-                                            ? 'border-primary'
+                                            ? "border-primary"
                                             : errors.output
-                                                ? 'border-red-500'
-                                                : 'border-gray-300'
+                                              ? "border-red-500"
+                                              : "border-gray-300"
                                     }`}
                                 >
                                     {formData.output === opt && (
@@ -299,7 +245,7 @@ export default function Form1Card({
                                     name="output"
                                     value={opt}
                                     checked={formData.output === opt}
-                                    onChange={() => updateField('output', opt)}
+                                    onChange={() => updateField("output", opt)}
                                     className="sr-only"
                                     disabled={isSubmitting}
                                 />
@@ -314,26 +260,33 @@ export default function Form1Card({
                         type="checkbox"
                         checked={formData.declarationChecked}
                         onChange={(e) =>
-                            updateField('declarationChecked', e.target.checked)
+                            updateField("declarationChecked", e.target.checked)
                         }
                         aria-invalid={!!errors.declarationChecked}
-                        aria-describedby={errors.declarationChecked ? 'declarationChecked-error' : undefined}
-                        className="mt-0.5 h-4 w-4 flex-shrink-0 cursor-pointer rounded border-gray-300 accent-primary focus:ring-primary/20"
+                        aria-describedby={
+                            errors.declarationChecked
+                                ? "declarationChecked-error"
+                                : undefined
+                        }
+                        className="mt-0.5 h-4 w-4 shrink-0 cursor-pointer rounded border-gray-300 accent-primary focus:ring-primary/20"
                         disabled={isSubmitting}
                     />
                     <span
                         className={`text-[13px] leading-relaxed ${
                             errors.declarationChecked
-                                ? 'font-medium text-red-500'
-                                : 'text-primary'
+                                ? "font-medium text-red-500"
+                                : "text-primary"
                         }`}
                     >
-                        *Saya menyatakan bahwa data di atas adalah benar dan saya telah
-                        memenuhi syarat minimum SKS untuk mengambil mata kuliah magang
-                        sesuai kurikulum Program Studi.
+                        *Saya menyatakan bahwa data di atas adalah benar dan
+                        saya telah memenuhi syarat minimum SKS untuk mengambil
+                        mata kuliah magang sesuai kurikulum Program Studi.
                     </span>
                 </label>
-                <FieldError id="declarationChecked-error" message={errors.declarationChecked} />
+                <FieldError
+                    id="declarationChecked-error"
+                    message={errors.declarationChecked}
+                />
             </div>
             <div className="mt-8 flex flex-col-reverse items-stretch justify-end gap-3 border-t border-gray-100 pt-6 sm:flex-row sm:items-center sm:gap-4">
                 <button
@@ -350,9 +303,10 @@ export default function Form1Card({
                     className={`
                         flex items-center justify-center gap-2 rounded-lg px-6 py-3 text-sm font-bold
                         transition-all duration-200
-                        ${isFormValid && !isSubmitting
-                            ? 'bg-primary text-white shadow hover:bg-primary-hover hover:shadow-md'
-                            : 'cursor-not-allowed bg-gray-300 text-gray-400'
+                        ${
+                            isFormValid && !isSubmitting
+                                ? "bg-primary text-white shadow hover:bg-primary-hover hover:shadow-md"
+                                : "cursor-not-allowed bg-gray-300 text-gray-400"
                         }
                     `}
                 >

@@ -49,23 +49,18 @@ class Form1Controller extends Controller
 
         $validated = $request->validated();
 
-        $studentSignaturePath = $request->file('studentSignature')->store('student-signatures', 'local');
-
-        unset($validated['studentSignature']);
-
         // Academic values are authoritative server-side data, never request input.
         $form1Data = [
-            'semester' => $student->semester,
-            'jumlahSKS' => $student->jumlah_sks,
-            'ipk' => $student->ipk,
-            'skemaMagang' => $validated['skemaMagang'],
-            'topikMagang' => $validated['topikMagang'],
+            'semester'     => $student->semester,
+            'jumlahSKS'    => $student->jumlah_sks,
+            'ipk'          => $student->ipk,
+            'skemaMagang'  => $validated['skemaMagang'],
+            'topikMagang'  => $validated['topikMagang'],
             'outputTarget' => $validated['outputTarget'],
-            'studentSignaturePath' => $studentSignaturePath,
         ];
 
         $student->fill([
-            'form1_data' => $form1Data,
+            'form1_data'             => $form1Data,
             'form1_rejection_reason' => null,
         ]);
 
@@ -107,13 +102,6 @@ class Form1Controller extends Controller
             ->firstOrFail();
 
         Gate::authorize('reviewForm1', $student);
-
-        // PDF butuh tanda tangan Kaprodi, jadi tahan dulu kalau belum ada.
-        if (! $lecturer->signature_path) {
-            return response()->json([
-                'message' => 'Anda harus mengunggah tanda tangan digital terlebih dahulu melalui menu "Profil Saya" sebelum dapat menyetujui Form 1.',
-            ], 422);
-        }
 
         app(StudentStateMachine::class)->transition($student, 'ApprovedForm1', [
             'form1_rejection_reason' => null,

@@ -38,7 +38,6 @@ class LecturerProfile extends Page implements HasForms
             'nidn'           => $lecturer->nidn ?? '',
             'contact'        => $lecturer->contact ?? '',
             'study_program'  => $lecturer->study_program ?? '',
-            'signature_path' => $lecturer->signature_path,
         ]);
     }
     public function form(Form $form): Form
@@ -63,20 +62,6 @@ class LecturerProfile extends Page implements HasForms
                             ->placeholder('—'),
                     ])
                     ->columns(2),
-
-                Forms\Components\Section::make('Tanda Tangan Digital')
-                    ->description('Unggah gambar tanda tangan Anda. Gambar ini akan digunakan pada dokumen resmi seperti Surat Keterangan Form Magang 01.')
-                    ->schema([
-                        Forms\Components\FileUpload::make('signature_path')
-                            ->label('File Tanda Tangan')
-                            ->helperText('Gunakan gambar PNG dengan latar transparan untuk hasil terbaik. Maks. 2 MB.')
-                            ->image()
-                            ->directory('signatures')
-                            ->disk('public')
-                            ->acceptedFileTypes(['image/png', 'image/jpeg'])
-                            ->maxSize(2048)
-                            ->columnSpanFull(),
-                    ]),
             ])
             ->statePath('data');
     }
@@ -85,9 +70,7 @@ class LecturerProfile extends Page implements HasForms
         $data = $this->form->getState();
         $lecturer = $this->getLecturer();
 
-        $lecturer->update([
-            'signature_path' => $data['signature_path'],
-        ]);
+        $lecturer->update([]);
 
         Notification::make()
             ->title('Tanda tangan berhasil disimpan')

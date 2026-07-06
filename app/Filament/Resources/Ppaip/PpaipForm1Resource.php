@@ -31,7 +31,10 @@ class PpaipForm1Resource extends Resource
 
     public static function canAccess(): bool
     {
-        return Auth::user()?->isPpaip() ?? false;
+        /** @var \App\Models\User|null $user */
+        $user = Auth::user();
+
+        return $user?->isPpaip() ?? false;
     }
 
     public static function canViewAny(): bool
@@ -95,7 +98,7 @@ class PpaipForm1Resource extends Resource
                             ->label('Rencana Skema Magang')
                             ->state(fn (Student $record): string => $record->form1_data['skemaMagang'] ?? '-'),
                         TextEntry::make('topik_magang')
-                            ->label('Topik / Tempat Magang')
+                            ->label('Topik / Lingkup Magang')
                             ->state(fn (Student $record): string => $record->form1_data['topikMagang'] ?? '-')
                             ->columnSpanFull(),
                         TextEntry::make('output_target')
@@ -128,7 +131,7 @@ class PpaipForm1Resource extends Resource
                     ->label('Skema')
                     ->getStateUsing(fn (Student $record): string => $record->form1_data['skemaMagang'] ?? '-'),
                 Tables\Columns\TextColumn::make('topik_magang')
-                    ->label('Topik / Tempat')
+                    ->label('Topik / Lingkup')
                     ->getStateUsing(fn (Student $record): string => $record->form1_data['topikMagang'] ?? '-')
                     ->limit(32),
                 Tables\Columns\TextColumn::make('output_target')
