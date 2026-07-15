@@ -22,6 +22,8 @@ class Form2Controller extends Controller
         'LogbookComplete',
         'MenungguSidang',
         'SiklusSelesai',
+        'SelesaiNonWajib',
+        'MenungguKonfirmasi',
     ];
 
     private const SECURED_INTERNSHIP_MESSAGE = 'DPM Anda sudah ditunjuk atau pengajuan DPM sudah disetujui, sehingga Form 2 tidak dapat diajukan lagi.';
@@ -116,10 +118,18 @@ class Form2Controller extends Controller
             'rejection_reason' => null,
         ]);
 
-        // Form 2 sudah aman, mahasiswa boleh lanjut ke tahap DPM.
         $student = $submission->student;
-        if ($student && $student->access_status === 'ApprovedForm1') {
-            app(StudentStateMachine::class)->transition($student, 'HasApplication');
+        if ($student) {
+            $jenis = $student->form1_data['jenisMagang'] ?? 'wajib';
+
+            if ($jenis === 'non_wajib' && in_array($student->access_status, ['ApprovedForm1', 'HasApplication'], true)) {
+                // Non-wajib: surat pengantar bukan bukti diterima. Mahasiswa wajib
+                // konfirmasi (upload LoA) dulu sebelum siklus dianggap selesai.
+                app(StudentStateMachine::class)->transition($student, 'MenungguKonfirmasi');
+            } elseif ($jenis !== 'non_wajib' && $student->access_status === 'ApprovedForm1') {
+                // Magang wajib: Form 2 sudah aman, mahasiswa lanjut ke tahap DPM.
+                app(StudentStateMachine::class)->transition($student, 'HasApplication');
+            }
         }
 
         return response()->json([

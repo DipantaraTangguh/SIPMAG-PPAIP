@@ -15,7 +15,12 @@ class InternshipCycleSnapshotService
 {
     public function __construct(private readonly DefenseAssessmentService $assessmentService) {}
 
-    public function record(Student $student): InternshipCycle
+    /**
+     * @param  array<string, mixed>  $overrides  Data konfirmasi mahasiswa (tempat
+     *                                           diterima, periode, LoA) yang lebih
+     *                                           akurat daripada tebakan sistem.
+     */
+    public function record(Student $student, array $overrides = []): InternshipCycle
     {
         $form1 = $student->form1_data ?? [];
         $jenis = ($form1['jenisMagang'] ?? 'wajib') === 'non_wajib' ? 'non_wajib' : 'wajib';
@@ -27,7 +32,7 @@ class InternshipCycleSnapshotService
 
         $cycleNumber = $student->internshipCycles()->count() + 1;
 
-        return $student->internshipCycles()->create([
+        return $student->internshipCycles()->create(array_merge([
             'cycle_number'     => $cycleNumber,
             'jenis_magang'     => $jenis,
             'outcome_status'   => $jenis === 'wajib' ? 'SiklusSelesai' : 'SelesaiNonWajib',
@@ -48,7 +53,7 @@ class InternshipCycleSnapshotService
             'letter_grade'     => $letterGrade,
             'started_at'       => $student->form1_approved_at,
             'completed_at'     => now(),
-        ]);
+        ], $overrides));
     }
 
     /**
@@ -83,6 +88,23 @@ class InternshipCycleSnapshotService
                 $supervisor->nama_praktisi,
                 $supervisor->mulai_magang,
                 $supervisor->selesai_magang,
+            ];
+        }
+
+        // Jalur mitra PPAIP: lamaran yang diterima jadi tempat magang.
+        $accepted = $student->applications()
+            ->where('status', 'Accepted')
+            ->with('internship:id,company_name,location,start_date')
+            ->latest('updated_at')
+            ->first();
+
+        if ($accepted?->internship) {
+            return [
+                $accepted->internship->company_name,
+                $accepted->internship->location,
+                null,
+                $accepted->internship->start_date,
+                null,
             ];
         }
 

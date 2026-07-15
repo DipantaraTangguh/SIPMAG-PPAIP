@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\Form2Controller;
 use App\Http\Controllers\Api\InternshipController;
 use App\Http\Controllers\Api\LogbookController;
 use App\Http\Controllers\Api\StudentController;
+use App\Http\Controllers\Api\StudentCycleController;
 use App\Http\Controllers\Api\SupervisorController;
 use Illuminate\Support\Facades\Route;
 
@@ -52,6 +53,11 @@ Route::middleware('auth:sanctum')->group(function () {
         // Sidang baru kebuka setelah logbook beres.
         Route::get('/defense', [DefenseController::class, 'show']);
         Route::post('/defense', [DefenseController::class, 'store']);
+
+        // Riwayat magang + reset siklus mandiri + konfirmasi non-wajib.
+        Route::get('/student/cycle/history', [StudentCycleController::class, 'history']);
+        Route::post('/student/cycle/reset', [StudentCycleController::class, 'reset']);
+        Route::post('/student/cycle/confirm', [StudentCycleController::class, 'confirm']);
     });
 
     // Kaprodi cuma main di prodi sendiri.

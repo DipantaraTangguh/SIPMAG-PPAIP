@@ -3,6 +3,7 @@
 namespace App\Observers;
 
 use App\Models\Application;
+use App\Services\StudentStateMachine;
 use Illuminate\Support\Facades\Log;
 
 class ApplicationObserver
@@ -36,5 +37,27 @@ class ApplicationObserver
                 'canceled_count'          => $canceledCount,
             ]);
         }
+
+        $this->completeNonWajibCycle($application);
+    }
+
+    /**
+     * Magang non-wajib: lamaran mitra diterima → mahasiswa tetap wajib
+     * konfirmasi + upload LoA sebelum siklus dianggap selesai (sama seperti
+     * jalur Form 2). Tidak pernah lanjut ke tahap DPM/logbook/sidang.
+     */
+    private function completeNonWajibCycle(Application $application): void
+    {
+        $student = $application->student;
+
+        if (
+            ! $student
+            || $student->access_status !== 'HasApplication'
+            || ($student->form1_data['jenisMagang'] ?? 'wajib') !== 'non_wajib'
+        ) {
+            return;
+        }
+
+        app(StudentStateMachine::class)->transition($student, 'MenungguKonfirmasi');
     }
 }

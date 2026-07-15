@@ -49,11 +49,20 @@ class Form1Controller extends Controller
 
         $validated = $request->validated();
 
+        // Magang wajib hanya boleh sekali. Setelah satu siklus wajib selesai
+        // (tercatat di internship_cycles), mahasiswa hanya bisa non-wajib.
+        if ($validated['jenisMagang'] === 'wajib' && $student->has_completed_wajib) {
+            return response()->json([
+                'message' => 'Anda sudah pernah menyelesaikan magang wajib. Silakan pilih magang non-wajib.',
+            ], 422);
+        }
+
         // Academic values are authoritative server-side data, never request input.
         $form1Data = [
             'semester'     => $student->semester,
             'jumlahSKS'    => $student->jumlah_sks,
             'ipk'          => $student->ipk,
+            'jenisMagang'  => $validated['jenisMagang'],
             'skemaMagang'  => $validated['skemaMagang'],
             'topikMagang'  => $validated['topikMagang'],
             'outputTarget' => $validated['outputTarget'],

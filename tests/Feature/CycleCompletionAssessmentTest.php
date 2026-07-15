@@ -77,6 +77,16 @@ class CycleCompletionAssessmentTest extends TestCase
         $this->assertSame($form1Data, $student->form1_data);
         $this->assertSame('transkrip/form1.pdf', $student->form1_pdf_path);
         $this->assertSame(3, $submission->assessments()->count());
+
+        // Penyelesaian siklus wajib harus terekam permanen di riwayat.
+        $cycle = $student->internshipCycles()->first();
+        $this->assertNotNull($cycle);
+        $this->assertSame(1, $cycle->cycle_number);
+        $this->assertSame('wajib', $cycle->jenis_magang);
+        $this->assertSame('SiklusSelesai', $cycle->outcome_status);
+        $this->assertSame($student->nim, $cycle->nim);
+        $this->assertSame(82.0, $cycle->final_score);
+        $this->assertSame('A-', $cycle->letter_grade);
     }
 
     public function test_ppaip_can_see_assessment_progress_and_final_score(): void

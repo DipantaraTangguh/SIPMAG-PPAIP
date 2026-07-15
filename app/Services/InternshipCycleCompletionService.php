@@ -11,6 +11,7 @@ class InternshipCycleCompletionService
     public function __construct(
         private readonly DefenseAssessmentService $assessmentService,
         private readonly StudentStateMachine $stateMachine,
+        private readonly InternshipCycleSnapshotService $snapshotService,
     ) {}
 
     public function canComplete(Student $student): bool
@@ -48,6 +49,9 @@ class InternshipCycleCompletionService
                     'assessments' => 'Penilaian DPM, Penguji 1, dan Penguji 2 harus lengkap sebelum siklus diselesaikan.',
                 ]);
             }
+
+            // Rekam riwayat siklus wajib sebelum field siklus dibersihkan.
+            $this->snapshotService->record($lockedStudent);
 
             $lockedStudent->fill([
                 'dpm_id' => null,

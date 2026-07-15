@@ -14,6 +14,7 @@ class Form1Resource extends JsonResource
         return [
             'form1' => $this->form1_data,
             'access_status' => $this->access_status,
+            'has_completed_wajib' => $this->has_completed_wajib,
             'pdf_path' => $this->form1_pdf_path,
             'rejection_reason' => $this->form1_rejection_reason,
             'approver' => $approver ? [

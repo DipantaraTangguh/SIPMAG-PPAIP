@@ -53,6 +53,14 @@ class SupervisorController extends Controller
             return response()->json(['message' => 'Anda belum menyelesaikan tahap sebelumnya.'], 403);
         }
 
+        // Magang non-wajib berhenti di Form 2 / lamaran mitra — tidak ada tahap
+        // DPM, logbook, maupun sidang.
+        if (($student->form1_data['jenisMagang'] ?? 'wajib') === 'non_wajib') {
+            return response()->json([
+                'message' => 'Magang non-wajib tidak melanjutkan ke tahap DPM dan sidang.',
+            ], 403);
+        }
+
         if (SupervisorApplication::where('student_id', $student->id)->exists()) {
             return response()->json(['message' => 'Pengajuan sudah pernah diajukan.'], 422);
         }

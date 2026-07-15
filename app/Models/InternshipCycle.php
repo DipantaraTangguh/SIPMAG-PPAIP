@@ -30,6 +30,7 @@ class InternshipCycle extends Model
         'tanggal_selesai',
         'final_score',
         'letter_grade',
+        'loa_path',
         'started_at',
         'completed_at',
     ];

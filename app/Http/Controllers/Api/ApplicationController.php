@@ -24,6 +24,8 @@ class ApplicationController extends Controller
         'LogbookComplete',
         'MenungguSidang',
         'SiklusSelesai',
+        'SelesaiNonWajib',
+        'MenungguKonfirmasi',
     ];
 
     private const SECURED_INTERNSHIP_MESSAGE = 'DPM Anda sudah ditunjuk atau pengajuan DPM sudah disetujui, sehingga Anda tidak dapat melamar lowongan mitra lagi.';
