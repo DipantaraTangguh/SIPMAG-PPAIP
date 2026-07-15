@@ -14,6 +14,7 @@ class StoreForm1Request extends FormRequest
     public function rules(): array
     {
         return [
+            'jenisMagang'  => 'required|string|in:wajib,non_wajib',
             'skemaMagang'  => 'required|string|in:Magang Perusahaan,Magang Kewirausahaan',
             'topikMagang'  => 'required|string|max:2000',
             'outputTarget' => 'required|string|in:Produk,Prototype,Laporan',

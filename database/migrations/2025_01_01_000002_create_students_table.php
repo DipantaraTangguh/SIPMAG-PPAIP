@@ -30,6 +30,8 @@ return new class extends Migration
                 'LogbookComplete',
                 'MenungguSidang',
                 'SiklusSelesai',
+                'SelesaiNonWajib',
+                'MenungguKonfirmasi',
             ])->default('Unverified');
             $table->boolean('is_independent')->default(false); // Mandiri track marker
             $table->json('form1_data')->nullable();            // stored Form 1 field values

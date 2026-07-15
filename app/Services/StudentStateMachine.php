@@ -33,12 +33,16 @@ class StudentStateMachine
         'Unverified'      => ['PendingReview'],
         'PendingReview'   => ['ApprovedForm1', 'RejectedForm1'],
         'RejectedForm1'   => ['PendingReview'],
-        'ApprovedForm1'   => ['HasApplication'],
-        'HasApplication'  => ['HasDPM'],
+        'ApprovedForm1'   => ['HasApplication', 'MenungguKonfirmasi'], // non-wajib: Form 2 approved → konfirmasi
+        'HasApplication'  => ['HasDPM', 'MenungguKonfirmasi'], // non-wajib mitra: diterima → konfirmasi LoA
         'HasDPM'          => ['LogbookComplete'],
         'LogbookComplete' => ['MenungguSidang'],
         'MenungguSidang'  => ['SiklusSelesai'],
-        'SiklusSelesai'   => [],  // terminal state — cycle reset handled externally
+        // Non-wajib jalur Form 2 wajib konfirmasi diterima (upload LoA) dulu;
+        // bila ditolak perusahaan boleh mundur untuk mengajukan Form 2 lagi.
+        'MenungguKonfirmasi' => ['SelesaiNonWajib', 'ApprovedForm1'],
+        'SiklusSelesai'   => ['Unverified'],     // reset siklus mandiri (magang wajib)
+        'SelesaiNonWajib' => ['Unverified'],     // reset siklus mandiri (magang non-wajib)
     ];
 
     /**

@@ -95,4 +95,18 @@ class Student extends Model
     {
         return $this->hasOne(SupervisorApplication::class);
     }
+
+    public function internshipCycles()
+    {
+        return $this->hasMany(InternshipCycle::class);
+    }
+
+    /**
+     * True bila mahasiswa sudah pernah menyelesaikan satu magang wajib.
+     * Dipakai untuk mengunci opsi "wajib" di Form 1 (wajib maksimal 1x).
+     */
+    public function getHasCompletedWajibAttribute(): bool
+    {
+        return $this->internshipCycles()->where('jenis_magang', 'wajib')->exists();
+    }
 }

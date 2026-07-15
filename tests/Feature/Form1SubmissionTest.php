@@ -33,6 +33,7 @@ class Form1SubmissionTest extends TestCase
             'semester'     => '99',
             'jumlahSKS'    => '999',
             'ipk'          => '4.00',
+            'jenisMagang'  => 'wajib',
             'skemaMagang'  => 'Magang Perusahaan',
             'topikMagang'  => 'PT Contoh Indonesia',
             'outputTarget' => 'Laporan',
@@ -67,6 +68,7 @@ class Form1SubmissionTest extends TestCase
         $this->actingAs($user);
 
         $this->withHeader('Accept', 'application/json')->post('/api/form1', [
+            'jenisMagang'  => 'wajib',
             'skemaMagang'  => 'Mandiri',
             'topikMagang'  => 'PT Contoh Indonesia',
             'outputTarget' => 'Laporan',
@@ -94,6 +96,7 @@ class Form1SubmissionTest extends TestCase
         $this->actingAs($user);
 
         $this->post('/api/form1', [
+            'jenisMagang'  => 'wajib',
             'skemaMagang'  => 'Magang Perusahaan',
             'topikMagang'  => 'PT Contoh Indonesia',
             'outputTarget' => 'Laporan',
@@ -102,6 +105,52 @@ class Form1SubmissionTest extends TestCase
             ->assertJson([
                 'message' => 'Data akademik mahasiswa belum lengkap. Hubungi admin akademik sebelum mengajukan Form 1.',
             ]);
+    }
+
+    public function test_form_1_locks_wajib_option_after_a_completed_wajib_cycle(): void
+    {
+        $user = User::factory()->create(['role' => 'mahasiswa']);
+        $student = Student::create([
+            'user_id'        => $user->id,
+            'nim'            => '1101214240',
+            'name'           => 'Mahasiswa Sudah Wajib',
+            'study_program'  => 'Sistem Informasi',
+            'email'          => 'sudah-wajib@example.test',
+            'semester'       => 7,
+            'tahun_akademik' => '2025/2026',
+            'jumlah_sks'     => 130,
+            'ipk'            => 3.60,
+            'access_status'  => 'Unverified',
+        ]);
+
+        $student->internshipCycles()->create([
+            'cycle_number'   => 1,
+            'jenis_magang'   => 'wajib',
+            'outcome_status' => 'SiklusSelesai',
+            'nim'            => $student->nim,
+            'nama'           => $student->name,
+            'study_program'  => $student->study_program,
+        ]);
+
+        $this->actingAs($user);
+
+        // Opsi wajib terkunci setelah satu siklus wajib selesai.
+        $this->withHeader('Accept', 'application/json')->post('/api/form1', [
+            'jenisMagang'  => 'wajib',
+            'skemaMagang'  => 'Magang Perusahaan',
+            'topikMagang'  => 'PT Contoh Indonesia',
+            'outputTarget' => 'Laporan',
+        ])->assertUnprocessable();
+
+        // Non-wajib tetap boleh, berkali-kali.
+        $this->post('/api/form1', [
+            'jenisMagang'  => 'non_wajib',
+            'skemaMagang'  => 'Magang Perusahaan',
+            'topikMagang'  => 'PT Contoh Indonesia',
+            'outputTarget' => 'Laporan',
+        ])->assertCreated();
+
+        $this->assertSame('non_wajib', $student->fresh()->form1_data['jenisMagang']);
     }
 
     public function test_completed_legacy_cycle_reports_status_without_fabricating_form1(): void

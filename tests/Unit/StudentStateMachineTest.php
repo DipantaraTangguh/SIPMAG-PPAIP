@@ -35,6 +35,13 @@ class StudentStateMachineTest extends TestCase
             'HasDPM → LogbookComplete'        => ['HasDPM', 'LogbookComplete'],
             'LogbookComplete → MenungguSidang'=> ['LogbookComplete', 'MenungguSidang'],
             'MenungguSidang → SiklusSelesai'  => ['MenungguSidang', 'SiklusSelesai'],
+            // Cabang non-wajib + konfirmasi + reset siklus mandiri.
+            'ApprovedForm1 → MenungguKonfirmasi'  => ['ApprovedForm1', 'MenungguKonfirmasi'],
+            'HasApplication → MenungguKonfirmasi' => ['HasApplication', 'MenungguKonfirmasi'],
+            'MenungguKonfirmasi → SelesaiNonWajib'=> ['MenungguKonfirmasi', 'SelesaiNonWajib'],
+            'MenungguKonfirmasi → ApprovedForm1'  => ['MenungguKonfirmasi', 'ApprovedForm1'],
+            'SiklusSelesai → Unverified'      => ['SiklusSelesai', 'Unverified'],
+            'SelesaiNonWajib → Unverified'    => ['SelesaiNonWajib', 'Unverified'],
         ];
     }
 
@@ -61,7 +68,11 @@ class StudentStateMachineTest extends TestCase
             'ApprovedForm1 → PendingReview'   => ['ApprovedForm1', 'PendingReview'],
             'HasDPM → MenungguSidang'         => ['HasDPM', 'MenungguSidang'],
             'LogbookComplete → SiklusSelesai' => ['LogbookComplete', 'SiklusSelesai'],
-            'SiklusSelesai → Unverified'      => ['SiklusSelesai', 'Unverified'],
+            'SiklusSelesai → HasDPM'          => ['SiklusSelesai', 'HasDPM'],
+            'SelesaiNonWajib → PendingReview' => ['SelesaiNonWajib', 'PendingReview'],
+            'MenungguKonfirmasi → HasDPM'     => ['MenungguKonfirmasi', 'HasDPM'],
+            'MenungguKonfirmasi → Unverified' => ['MenungguKonfirmasi', 'Unverified'],
+            'HasApplication → SelesaiNonWajib'=> ['HasApplication', 'SelesaiNonWajib'],
             'MenungguSidang → HasDPM'         => ['MenungguSidang', 'HasDPM'],
         ];
     }

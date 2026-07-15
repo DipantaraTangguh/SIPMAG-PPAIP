@@ -29,6 +29,7 @@ class InternshipCycleResource extends JsonResource
             'tanggal_selesai' => $this->tanggal_selesai?->toDateString(),
             'final_score' => $this->final_score,
             'letter_grade' => $this->letter_grade,
+            'loa_path' => $this->loa_path,
             'completed_at' => $this->completed_at?->toIso8601String(),
         ];
     }

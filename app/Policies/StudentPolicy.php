@@ -22,6 +22,12 @@ class StudentPolicy
 
 
 
+    public function resetCycle(User $user, Student $student): bool
+    {
+        return $user->student?->is($student) === true
+            && in_array($student->access_status, ['SiklusSelesai', 'SelesaiNonWajib'], true);
+    }
+
     public function reviewForm1(User $user, Student $student): bool
     {
         return $this->sameStudyProgramKaprodi($user, $student)
