@@ -5,6 +5,7 @@ import {
     Briefcase,
     ClipboardList,
     GraduationCap,
+    History,
     User,
     LogOut,
 } from 'lucide-react';
@@ -14,6 +15,7 @@ const navItems = [
     { to: '/portal', label: 'Lowongan Magang', icon: Briefcase },
     { to: '/guidance', label: 'Bimbingan & Logbook', icon: ClipboardList },
     { to: '/defense', label: 'Sidang Magang', icon: GraduationCap },
+    { to: '/history', label: 'Riwayat Magang', icon: History },
     { to: '/form1', label: 'Profil', icon: User },
 ];
 

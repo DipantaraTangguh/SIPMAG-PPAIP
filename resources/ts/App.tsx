@@ -15,6 +15,7 @@ import VacancyDetailPage from './Pages/Portal/VacancyDetailPage';
 import Form2NewPage from './Pages/Form2/Form2NewPage';
 import GuidancePage from './Pages/Guidance/GuidancePage';
 import InternshipDefensePage from './Pages/Defense/InternshipDefensePage';
+import MagangHistoryPage from './Pages/History/MagangHistoryPage';
 
 const STUDENT_ROLES = ['mahasiswa'];
 
@@ -99,6 +100,14 @@ export default function App() {
                             element={
                                 <ErrorBoundary>
                                     <ProtectedRoute allowedRoles={STUDENT_ROLES}><InternshipDefensePage /></ProtectedRoute>
+                                </ErrorBoundary>
+                            }
+                        />
+                        <Route
+                            path="/history"
+                            element={
+                                <ErrorBoundary>
+                                    <ProtectedRoute allowedRoles={STUDENT_ROLES}><MagangHistoryPage /></ProtectedRoute>
                                 </ErrorBoundary>
                             }
                         />
