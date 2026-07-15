@@ -1,8 +1,12 @@
 import React from "react";
-import { CheckCircle, Archive } from "lucide-react";
+import { CheckCircle, FileText } from "lucide-react";
 import CycleResetButton from "./CycleResetButton";
 
-export default function Form1CompletedPanel() {
+/**
+ * Panel status untuk magang non-wajib yang sudah selesai (SelesaiNonWajib).
+ * Alur non-wajib berhenti setelah surat pengantar (Form 2) disetujui PPAIP.
+ */
+export default function Form1NonWajibDonePanel() {
     return (
         <div className="rounded-xl border border-gray-200 border-l-4 border-l-green-600 bg-white p-6">
             <div className="flex flex-col items-center text-center">
@@ -10,19 +14,20 @@ export default function Form1CompletedPanel() {
                     <CheckCircle className="h-10 w-10 text-green-600" />
                 </div>
                 <h3 className="mt-3 text-xl font-bold text-green-700">
-                    Siklus Magang Selesai
+                    Magang Non-Wajib Selesai
                 </h3>
                 <p className="mt-2 max-w-sm text-sm leading-relaxed text-gray-600">
-                    Seluruh tahapan magang telah diselesaikan. Data Form
-                    Magang-01 tetap tersimpan sebagai riwayat akademik.
+                    Surat pengantar (Form 2) Anda telah disetujui atau lamaran
+                    mitra Anda diterima. Proses magang non-wajib selesai sampai
+                    di sini dan sudah tercatat di riwayat magang Anda.
                 </p>
             </div>
             <div className="mt-5 flex items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 p-4">
-                <Archive className="h-5 w-5 shrink-0 text-primary" />
+                <FileText className="h-5 w-5 shrink-0 text-primary" />
                 <p className="text-sm text-gray-600">
-                    Profil ini merupakan arsip dari siklus magang yang telah
-                    selesai. Anda dapat mereset siklus untuk mendaftar magang
-                    non-wajib.
+                    Magang non-wajib tidak melalui tahap DPM, logbook, maupun
+                    sidang. Surat pengantar (bila lewat Form 2) dapat diunduh
+                    dari halaman Form 2.
                 </p>
             </div>
             <CycleResetButton />

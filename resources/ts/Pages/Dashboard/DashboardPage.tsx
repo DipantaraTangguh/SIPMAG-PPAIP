@@ -29,6 +29,7 @@ function deriveStep(status) {
         case 'ApprovedForm1':
             return 2;
         case 'HasApplication':
+        case 'MenungguKonfirmasi':
             return 3;
         case 'HasDPM':
             return 4;
@@ -36,6 +37,7 @@ function deriveStep(status) {
         case 'MenungguSidang':
             return 5;
         case 'SiklusSelesai':
+        case 'SelesaiNonWajib':
             return 6; // All 5 steps completed
         default:
             return 1;
@@ -74,6 +76,10 @@ export default function DashboardPage() {
                 break;
             case 'SiklusSelesai':
                 navigate('/defense');
+                break;
+            case 'SelesaiNonWajib':
+            case 'MenungguKonfirmasi':
+                navigate('/form1/status');
                 break;
             default:
                 break;

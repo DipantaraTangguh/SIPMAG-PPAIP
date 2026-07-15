@@ -1,7 +1,8 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AppContext';
 import { useForm1Workflow } from '../context/StudentWorkflowContext';
+import { api } from '../lib/api';
 
 export default function useForm1() {
     const { student } = useAuth();
@@ -23,6 +24,7 @@ export default function useForm1() {
     );
     const prefill = location.state?.prefill;
     const [formData, setFormData] = useState({
+        jenisMagang: prefill?.jenisMagang ?? '',
         rencanaSkema: prefill?.rencanaSkema ?? '',
         topikTempat: prefill?.topikTempat ?? '',
         output: prefill?.output ?? '',
@@ -31,6 +33,18 @@ export default function useForm1() {
 
     const [errors, setErrors] = useState({});
     const [isSubmitting, setIsSubmitting] = useState(false);
+
+    // Kalau mahasiswa sudah pernah menyelesaikan magang wajib, opsi wajib dikunci.
+    const [hasCompletedWajib, setHasCompletedWajib] = useState(false);
+    useEffect(() => {
+        let active = true;
+        api.get('/form1')
+            .then((res) => {
+                if (active) setHasCompletedWajib(Boolean(res.has_completed_wajib));
+            })
+            .catch(() => { /* biarkan false, backend tetap menolak */ });
+        return () => { active = false; };
+    }, []);
 
     const updateField = useCallback((field, value) => {
         setFormData((prev) => ({ ...prev, [field]: value }));
@@ -44,6 +58,10 @@ export default function useForm1() {
     const validateForm = useCallback(() => {
         const e = {};
 
+        if (!formData.jenisMagang) e.jenisMagang = 'Pilih jenis magang terlebih dahulu';
+        if (formData.jenisMagang === 'wajib' && hasCompletedWajib) {
+            e.jenisMagang = 'Anda sudah pernah menyelesaikan magang wajib. Silakan pilih magang non-wajib.';
+        }
         if (!formData.rencanaSkema) e.rencanaSkema = 'Pilih skema magang terlebih dahulu';
         if (!formData.topikTempat.trim()) e.topikTempat = 'Topik/tempat magang wajib diisi';
         if (!formData.output) e.output = 'Pilih output yang ditargetkan';
@@ -51,15 +69,17 @@ export default function useForm1() {
 
         setErrors(e);
         return Object.keys(e).length === 0;
-    }, [formData]);
+    }, [formData, hasCompletedWajib]);
 
     const isFormValid = useMemo(
         () =>
+            formData.jenisMagang !== '' &&
+            !(formData.jenisMagang === 'wajib' && hasCompletedWajib) &&
             formData.rencanaSkema !== '' &&
             formData.topikTempat.trim() !== '' &&
             formData.output !== '' &&
             formData.declarationChecked,
-        [formData],
+        [formData, hasCompletedWajib],
     );
 
     const handleSubmit = useCallback(
@@ -71,6 +91,7 @@ export default function useForm1() {
 
             try {
                 const fd = new FormData();
+                fd.append('jenisMagang',  formData.jenisMagang);
                 fd.append('skemaMagang',  formData.rencanaSkema);
                 fd.append('topikMagang',  formData.topikTempat);
                 fd.append('outputTarget', formData.output);
@@ -97,6 +118,7 @@ export default function useForm1() {
         errors,
         isSubmitting,
         isFormValid,
+        hasCompletedWajib,
         updateField,
         handleSubmit,
         handleCancel,

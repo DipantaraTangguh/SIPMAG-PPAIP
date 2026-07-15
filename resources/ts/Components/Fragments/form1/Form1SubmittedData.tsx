@@ -43,6 +43,16 @@ export default function Form1SubmittedData({ formData }) {
                     valueClassName="text-primary"
                 />
                 <DataField
+                    label="Jenis Magang"
+                    value={
+                        formData.jenisMagang === "wajib"
+                            ? "Magang Wajib"
+                            : formData.jenisMagang === "non_wajib"
+                              ? "Magang Non-Wajib"
+                              : formData.jenisMagang
+                    }
+                />
+                <DataField
                     label="Rencana Skema Magang"
                     value={formData.rencanaSkema}
                 />
