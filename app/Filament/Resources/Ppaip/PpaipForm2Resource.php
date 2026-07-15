@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Ppaip;
 use App\Filament\Resources\Ppaip\PpaipForm2Resource\Pages\ListForm2;
 use App\Models\Form2Submission;
 use App\Models\User;
+use App\Services\Form2DecisionService;
 use Filament\Forms;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -89,18 +90,12 @@ class PpaipForm2Resource extends Resource
                     ->visible(fn (Form2Submission $record) => $record->status === 'PendingReview')
                     ->requiresConfirmation()
                     ->modalHeading('Setujui Form 2')
-                    ->modalDescription('Menyetujui Form 2 akan mengubah status mahasiswa menjadi HasApplication.')
-                    ->action(function (Form2Submission $record) {
-                        $record->update([
-                            'status' => 'ApprovedForm2',
-                            'rejection_reason' => null,
-                        ]);
-                        $student = $record->student;
-                        if ($student && $student->access_status === 'ApprovedForm1') {
-                            $student->access_status = 'HasApplication';
-                            $student->save();
-                        }
-                    }),
+                    ->modalDescription(fn (Form2Submission $record): string => ($record->student?->form1_data['jenisMagang'] ?? 'wajib') === 'non_wajib'
+                        ? 'Magang non-wajib: mahasiswa akan diminta konfirmasi penerimaan (upload LoA), lalu siklus selesai tanpa tahap DPM/sidang.'
+                        : 'Magang wajib: mahasiswa akan lanjut ke tahap pengajuan dosen pembimbing (DPM).')
+                    // Logika keputusan terpusat di Form2DecisionService (dipakai
+                    // juga endpoint API) — jangan tulis transisi manual di sini.
+                    ->action(fn (Form2Submission $record) => app(Form2DecisionService::class)->approve($record)),
 
                 Tables\Actions\Action::make('reject')
                     ->label('Tolak')
@@ -110,10 +105,7 @@ class PpaipForm2Resource extends Resource
                     ->form([
                         Forms\Components\Textarea::make('reason')->label('Alasan Penolakan')->required(),
                     ])
-                    ->action(fn (Form2Submission $record, array $data) => $record->update([
-                        'status' => 'RejectedForm2',
-                        'rejection_reason' => $data['reason'],
-                    ])),
+                    ->action(fn (Form2Submission $record, array $data) => app(Form2DecisionService::class)->reject($record, $data['reason'])),
             ])
             ->bulkActions([]);
     }
