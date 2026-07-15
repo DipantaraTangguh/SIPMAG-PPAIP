@@ -5,6 +5,8 @@ export const PORTAL_ACCESS_STATUSES = [
     'LogbookComplete',
     'MenungguSidang',
     'SiklusSelesai',
+    'SelesaiNonWajib',
+    'MenungguKonfirmasi',
 ];
 export const canAccessPortal = (accessStatus) =>
     PORTAL_ACCESS_STATUSES.includes(accessStatus);
@@ -16,6 +18,8 @@ export const SECURED_INTERNSHIP_STATUSES = [
     'LogbookComplete',
     'MenungguSidang',
     'SiklusSelesai',
+    'SelesaiNonWajib',
+    'MenungguKonfirmasi',
 ];
 
 export const SECURED_INTERNSHIP_MESSAGE =
@@ -41,4 +45,4 @@ export const SIDANG_ACCESS_STATUSES = [
 export const canAccessSidang = (accessStatus) =>
     SIDANG_ACCESS_STATUSES.includes(accessStatus);
 export const isCycleComplete = (accessStatus) =>
-    accessStatus === 'SiklusSelesai';
+    accessStatus === 'SiklusSelesai' || accessStatus === 'SelesaiNonWajib';

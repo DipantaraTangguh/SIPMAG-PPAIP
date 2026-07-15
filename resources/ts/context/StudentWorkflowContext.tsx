@@ -186,6 +186,44 @@ export function StudentWorkflowProvider({ children }) {
         }
     }, [refreshProfile, updateStudentLocally]);
 
+    // Konfirmasi hasil magang non-wajib (state MenungguKonfirmasi).
+    // formData: hasil=diterima (+ company/periode/LoA) atau hasil=ditolak.
+    const confirmCycle = useCallback(async (formData) => {
+        const res = await api.upload('/student/cycle/confirm', formData);
+        await refreshProfile();
+        updateStudentLocally({ accessStatus: res.access_status });
+        setState((s) => ({
+            ...s,
+            notifications: [
+                { id: Date.now(), message: res.message, time: 'Baru saja' },
+                ...s.notifications,
+            ],
+        }));
+        return res;
+    }, [refreshProfile, updateStudentLocally]);
+
+    // Reset siklus mandiri: hanya tersedia saat SiklusSelesai / SelesaiNonWajib.
+    // Riwayat magang tetap tersimpan di server (internship_cycles).
+    const resetCycle = useCallback(async () => {
+        await api.post('/student/cycle/reset');
+        await refreshProfile();
+        updateStudentLocally({ accessStatus: 'Unverified' });
+        setState((s) => ({
+            ...s,
+            form1Submission: null,
+            form2Submissions: [],
+            logbookEntries: [],
+            sidangSubmission: null,
+            sidangSchedule: null,
+            pengajuanPembimbing: null,
+            activeApplications: [],
+            notifications: [
+                { id: Date.now(), message: 'Siklus magang direset. Anda dapat mengajukan Form 1 kembali.', time: 'Baru saja' },
+                ...s.notifications,
+            ],
+        }));
+    }, [refreshProfile, updateStudentLocally]);
+
     const resetForm1 = useCallback(async () => {
         await refreshProfile();
         const form1Res = await api.get('/form1');
@@ -488,7 +526,9 @@ export function StudentWorkflowProvider({ children }) {
         form1Submission: state.form1Submission,
         submitForm1,
         resetForm1,
-    }), [state.form1Submission, submitForm1, resetForm1]);
+        resetCycle,
+        confirmCycle,
+    }), [state.form1Submission, submitForm1, resetForm1, resetCycle, confirmCycle]);
 
     const applicationValue = useMemo(() => ({
         activeApplications: state.activeApplications,
@@ -532,6 +572,8 @@ export function StudentWorkflowProvider({ children }) {
         notifications,
         submitForm1,
         resetForm1,
+        resetCycle,
+        confirmCycle,
         applyToVacancy,
         submitForm2,
         submitPengajuanPembimbing,
@@ -542,7 +584,7 @@ export function StudentWorkflowProvider({ children }) {
         refreshProfile,
         fetchAllStudentData,
     }), [
-        state, notifications, submitForm1, resetForm1,
+        state, notifications, submitForm1, resetForm1, resetCycle, confirmCycle,
         applyToVacancy, submitForm2, submitPengajuanPembimbing,
         addLogbookEntry, updateLogbookEntry, submitSidang,
         refreshProfile, fetchAllStudentData,

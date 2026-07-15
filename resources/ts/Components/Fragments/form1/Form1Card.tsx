@@ -51,6 +51,7 @@ export default function Form1Card({
     errors,
     isSubmitting,
     isFormValid,
+    hasCompletedWajib,
     updateField,
     handleSubmit,
     handleCancel,
@@ -133,6 +134,80 @@ export default function Form1Card({
                         <FieldLabel htmlFor="ipk">IPK</FieldLabel>
                         <ReadOnlyInput id="ipk" value={readOnlyFields.ipk} />
                     </div>
+                </div>
+                <div>
+                    <FieldLabel id="jenisMagang-label">Jenis Magang</FieldLabel>
+                    <div
+                        className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:gap-6"
+                        role="radiogroup"
+                        aria-labelledby="jenisMagang-label"
+                        aria-invalid={!!errors.jenisMagang}
+                        aria-describedby={
+                            errors.jenisMagang ? "jenisMagang-error" : undefined
+                        }
+                    >
+                        {[
+                            { value: "wajib", label: "Magang Wajib" },
+                            { value: "non_wajib", label: "Magang Non-Wajib" },
+                        ].map((opt) => {
+                            const locked =
+                                opt.value === "wajib" && hasCompletedWajib;
+                            return (
+                                <label
+                                    key={opt.value}
+                                    className={`flex items-center gap-2 text-sm group ${
+                                        locked
+                                            ? "cursor-not-allowed text-gray-400"
+                                            : "cursor-pointer text-black"
+                                    }`}
+                                >
+                                    <span
+                                        className={`flex h-5 w-5 items-center justify-center rounded-full border-2 transition-colors group-focus-within:ring-2 group-focus-within:ring-primary/20 ${
+                                            formData.jenisMagang === opt.value
+                                                ? "border-primary"
+                                                : errors.jenisMagang
+                                                  ? "border-red-500"
+                                                  : "border-gray-300"
+                                        }`}
+                                    >
+                                        {formData.jenisMagang === opt.value && (
+                                            <span className="h-2.5 w-2.5 rounded-full bg-primary" />
+                                        )}
+                                    </span>
+                                    <input
+                                        type="radio"
+                                        name="jenisMagang"
+                                        value={opt.value}
+                                        checked={
+                                            formData.jenisMagang === opt.value
+                                        }
+                                        onChange={() =>
+                                            updateField(
+                                                "jenisMagang",
+                                                opt.value,
+                                            )
+                                        }
+                                        className="sr-only"
+                                        disabled={isSubmitting || locked}
+                                    />
+                                    {opt.label}
+                                    {locked && (
+                                        <Lock className="h-3.5 w-3.5 text-gray-400" />
+                                    )}
+                                </label>
+                            );
+                        })}
+                    </div>
+                    {hasCompletedWajib && !errors.jenisMagang && (
+                        <HelperText>
+                            Anda sudah pernah menyelesaikan magang wajib,
+                            sehingga hanya dapat memilih magang non-wajib.
+                        </HelperText>
+                    )}
+                    <FieldError
+                        id="jenisMagang-error"
+                        message={errors.jenisMagang}
+                    />
                 </div>
                 <div className="w-full sm:w-1/2">
                     <FieldLabel htmlFor="rencanaSkema">
