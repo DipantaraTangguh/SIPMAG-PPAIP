@@ -9,8 +9,8 @@ use App\Http\Resources\Form2SubmissionResource;
 use App\Models\Form2Submission;
 use App\Models\Student;
 use App\Models\User;
+use App\Services\Form2DecisionService;
 use App\Services\PdfService;
-use App\Services\StudentStateMachine;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\ValidationException;
@@ -113,24 +113,8 @@ class Form2Controller extends Controller
 
         Gate::authorize('review', $submission);
 
-        $submission->update([
-            'status' => 'ApprovedForm2',
-            'rejection_reason' => null,
-        ]);
-
-        $student = $submission->student;
-        if ($student) {
-            $jenis = $student->form1_data['jenisMagang'] ?? 'wajib';
-
-            if ($jenis === 'non_wajib' && in_array($student->access_status, ['ApprovedForm1', 'HasApplication'], true)) {
-                // Non-wajib: surat pengantar bukan bukti diterima. Mahasiswa wajib
-                // konfirmasi (upload LoA) dulu sebelum siklus dianggap selesai.
-                app(StudentStateMachine::class)->transition($student, 'MenungguKonfirmasi');
-            } elseif ($jenis !== 'non_wajib' && $student->access_status === 'ApprovedForm1') {
-                // Magang wajib: Form 2 sudah aman, mahasiswa lanjut ke tahap DPM.
-                app(StudentStateMachine::class)->transition($student, 'HasApplication');
-            }
-        }
+        // Cabang wajib/non-wajib terpusat di service (dipakai juga Filament PPAIP).
+        app(Form2DecisionService::class)->approve($submission);
 
         return response()->json([
             'message' => 'Form 2 disetujui.',
@@ -148,10 +132,7 @@ class Form2Controller extends Controller
 
         Gate::authorize('review', $submission);
 
-        $submission->update([
-            'status' => 'RejectedForm2',
-            'rejection_reason' => $validated['reason'],
-        ]);
+        app(Form2DecisionService::class)->reject($submission, $validated['reason']);
 
         return response()->json([
             'message' => 'Form 2 ditolak.',
