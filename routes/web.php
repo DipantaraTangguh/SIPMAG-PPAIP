@@ -4,7 +4,6 @@ use App\Exports\MitraApplicantsExport;
 use App\Models\Application as InternshipApplication;
 use App\Models\DefenseSubmission;
 use App\Models\Student;
-use App\Models\User;
 use App\Support\DefenseDocument;
 use App\Support\StoredFilePath;
 use Illuminate\Http\Request;
@@ -13,7 +12,27 @@ use Illuminate\Support\Facades\Route;
 use Maatwebsite\Excel\Excel as ExcelWriter;
 use Maatwebsite\Excel\Facades\Excel;
 
+// Kirim file privat setelah divalidasi StoredFilePath: preview inline,
+// atau download dengan nama file bila $downloadName diisi (tanpa ekstensi).
+if (! function_exists('serveStoredFile')) {
+    function serveStoredFile(?string $storedPath, string $notFoundMessage, ?string $downloadName = null)
+    {
+        $path = StoredFilePath::resolve(storage_path('app/private'), $storedPath);
+        if (! $path) {
+            abort(404, $notFoundMessage);
+        }
 
+        if ($downloadName !== null) {
+            $ext = pathinfo($path, PATHINFO_EXTENSION);
+
+            return response()->download($path, "{$downloadName}.{$ext}");
+        }
+
+        return response()->file($path, [
+            'Content-Type' => mime_content_type($path),
+        ]);
+    }
+}
 
 Route::middleware(['web', 'auth'])->prefix('admin/mitra-applications')->group(function () {
     Route::get('/export', function (Request $request) {
@@ -28,36 +47,17 @@ Route::middleware(['web', 'auth'])->prefix('admin/mitra-applications')->group(fu
     Route::get('/{application}/cv/preview', function (Request $request, InternshipApplication $application) {
         abort_unless($request->user()?->isPpaip(), 403);
         Gate::authorize('view', $application);
-        if (! $application->cv_file_path) {
-            abort(404, 'CV tidak tersedia.');
-        }
 
-        $path = StoredFilePath::resolve(storage_path('app/private'), $application->cv_file_path);
-        if (! $path) {
-            abort(404, 'File tidak ditemukan.');
-        }
-
-        return response()->file($path, [
-            'Content-Type' => mime_content_type($path),
-        ]);
+        return serveStoredFile($application->cv_file_path, 'CV tidak tersedia.');
     })->name('mitra-applications.cv.preview');
 
     Route::get('/{application}/cv/download', function (Request $request, InternshipApplication $application) {
         abort_unless($request->user()?->isPpaip(), 403);
         Gate::authorize('view', $application);
-        if (! $application->cv_file_path) {
-            abort(404, 'CV tidak tersedia.');
-        }
 
-        $path = StoredFilePath::resolve(storage_path('app/private'), $application->cv_file_path);
-        if (! $path) {
-            abort(404, 'File tidak ditemukan.');
-        }
+        $name = 'cv_'.($application->student?->nim ?? $application->id);
 
-        $student = $application->student;
-        $ext = pathinfo($path, PATHINFO_EXTENSION);
-
-        return response()->download($path, 'cv_'.($student?->nim ?? $application->id).'.'.$ext);
+        return serveStoredFile($application->cv_file_path, 'CV tidak tersedia.', $name);
     })->name('mitra-applications.cv.download');
 });
 
@@ -65,29 +65,15 @@ Route::middleware(['web', 'auth'])->prefix('admin/defense-documents')->group(fun
     Route::get('/{submission}/{document}/preview', function (DefenseSubmission $submission, string $document) {
         Gate::authorize('view', $submission);
 
-        $path = DefenseDocument::resolvedPath($submission, $document);
-        if (! $path) {
-            abort(404, 'Dokumen sidang tidak ditemukan.');
-        }
-
-        return response()->file($path, [
-            'Content-Type' => mime_content_type($path),
-        ]);
+        return serveStoredFile(DefenseDocument::storedPath($submission, $document), 'Dokumen sidang tidak ditemukan.');
     })->whereIn('document', DefenseDocument::keys())->name('defense-documents.preview');
 
     Route::get('/{submission}/{document}/download', function (DefenseSubmission $submission, string $document) {
         Gate::authorize('view', $submission);
 
-        $path = DefenseDocument::resolvedPath($submission, $document);
-        if (! $path) {
-            abort(404, 'Dokumen sidang tidak ditemukan.');
-        }
+        $name = 'sidang_'.$submission->student?->nim.'_'.str($document)->replace('_', '-');
 
-        $ext = pathinfo($path, PATHINFO_EXTENSION);
-        $student = $submission->student;
-        $label = str($document)->replace('_', '-');
-
-        return response()->download($path, "sidang_{$student?->nim}_{$label}.{$ext}");
+        return serveStoredFile(DefenseDocument::storedPath($submission, $document), 'Dokumen sidang tidak ditemukan.', $name);
     })->whereIn('document', DefenseDocument::keys())->name('defense-documents.download');
 });
 
@@ -96,38 +82,14 @@ Route::middleware(['web', 'auth'])->prefix('admin/dpm/loa')->group(function () {
         $user = $request->user();
         abort_unless($user?->role === 'dpm' && $user->lecturer?->id === $student->dpm_id, 403);
 
-        $application = $student->supervisorApplication;
-        if (! $application || ! $application->loa_path) {
-            abort(404, 'LoA tidak tersedia.');
-        }
-
-        $path = StoredFilePath::resolve(storage_path('app/private'), $application->loa_path);
-        if (! $path) {
-            abort(404, 'File tidak ditemukan.');
-        }
-
-        return response()->file($path, [
-            'Content-Type' => mime_content_type($path),
-        ]);
+        return serveStoredFile($student->supervisorApplication?->loa_path, 'LoA tidak tersedia.');
     })->name('dpm.loa.preview');
 
     Route::get('/{student}/download', function (Request $request, Student $student) {
         $user = $request->user();
         abort_unless($user?->role === 'dpm' && $user->lecturer?->id === $student->dpm_id, 403);
 
-        $application = $student->supervisorApplication;
-        if (! $application || ! $application->loa_path) {
-            abort(404, 'LoA tidak tersedia.');
-        }
-
-        $path = StoredFilePath::resolve(storage_path('app/private'), $application->loa_path);
-        if (! $path) {
-            abort(404, 'File tidak ditemukan.');
-        }
-
-        $ext = pathinfo($path, PATHINFO_EXTENSION);
-
-        return response()->download($path, "loa_{$student->nim}.{$ext}");
+        return serveStoredFile($student->supervisorApplication?->loa_path, 'LoA tidak tersedia.', "loa_{$student->nim}");
     })->name('dpm.loa.download');
 });
 

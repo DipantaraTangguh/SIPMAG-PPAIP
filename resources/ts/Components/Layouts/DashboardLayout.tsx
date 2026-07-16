@@ -1,7 +1,6 @@
 import React from 'react';
 import { useAuth } from '../../context/AppContext';
 import Sidebar from './Sidebar';
-import PageTransition from './PageTransition';
 
 interface DashboardLayoutProps {
     children: React.ReactNode;
@@ -38,7 +37,7 @@ export default function DashboardLayout({
                     </div>
                 </header>
                 <main className="px-4 pb-24 sm:px-6 lg:px-10 lg:pb-10">
-                    <PageTransition>{children}</PageTransition>
+                    <div className="animate-fadeIn">{children}</div>
                 </main>
             </div>
         </div>
