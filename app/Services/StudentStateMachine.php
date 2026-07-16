@@ -25,9 +25,6 @@ class StudentStateMachine
 {
     /**
      * Map of: current state → allowed next states.
-     *
-     * The special wildcard key '*' lists states reachable from *any* state
-     * (currently unused, kept for forward-compatibility).
      */
     private const TRANSITIONS = [
         'Unverified'      => ['PendingReview'],
