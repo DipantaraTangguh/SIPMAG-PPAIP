@@ -159,22 +159,8 @@ export function StudentWorkflowProvider({ children }) {
     const submitForm1 = useCallback(async (formData) => {
         await api.upload('/form1', formData);
         await refreshProfile();
-        updateStudentLocally({ accessStatus: 'PendingReview' });
-        const form1Res = await api.get('/form1');
-        setState((s) => ({
-            ...s,
-            form1Submission: {
-                ...form1Res.form1,
-                status: form1Res.access_status,
-                rejectionReason: form1Res.rejection_reason,
-                pdfPath: form1Res.pdf_path,
-                approver: form1Res.approver || null,
-                submittedAt: form1Res.submitted_at
-                    ? new Date(form1Res.submitted_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })
-                    : null,
-            },
-        }));
-    }, [refreshProfile, updateStudentLocally]);
+        await fetchAllStudentData();
+    }, [refreshProfile, fetchAllStudentData]);
 
     // Konfirmasi hasil magang non-wajib (state MenungguKonfirmasi).
     // formData: hasil=diterima (+ company/periode/LoA) atau hasil=ditolak.
