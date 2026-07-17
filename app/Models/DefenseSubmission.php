@@ -43,11 +43,6 @@ class DefenseSubmission extends Model
         return $this->belongsTo(Student::class);
     }
 
-    public function scheduler()
-    {
-        return $this->belongsTo(Lecturer::class, 'scheduled_by');
-    }
-
     public function examinerOne()
     {
         return $this->belongsTo(Lecturer::class, 'dosen_penguji_1_id');

@@ -26,11 +26,6 @@ class Lecturer extends Model
         return $this->hasMany(Student::class, 'dpm_id');
     }
 
-    public function defenseAssessments()
-    {
-        return $this->hasMany(DefenseAssessment::class);
-    }
-
     public function scopeEligibleDpmForStudyProgram(Builder $query, string $studyProgram): Builder
     {
         return $query

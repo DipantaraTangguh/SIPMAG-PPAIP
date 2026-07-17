@@ -26,11 +26,6 @@ class DefenseAssessment extends Model
         ];
     }
 
-    public function defenseSubmission()
-    {
-        return $this->belongsTo(DefenseSubmission::class);
-    }
-
     public function lecturer()
     {
         return $this->belongsTo(Lecturer::class);

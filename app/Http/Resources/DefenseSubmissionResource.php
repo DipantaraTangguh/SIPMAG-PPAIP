@@ -27,7 +27,6 @@ class DefenseSubmissionResource extends JsonResource
             'submitted_at' => $this->submitted_at?->toJSON(),
             'scheduled_at' => $this->scheduled_at?->toJSON(),
             'student' => StudentResource::make($this->whenLoaded('student')),
-            'scheduler' => LecturerResource::make($this->whenLoaded('scheduler')),
             'examiner_one' => LecturerResource::make($this->whenLoaded('examinerOne')),
             'examiner_two' => LecturerResource::make($this->whenLoaded('examinerTwo')),
         ];
