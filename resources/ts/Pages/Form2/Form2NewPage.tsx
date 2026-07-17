@@ -14,7 +14,7 @@ import DashboardLayout from "../../Components/Layouts/DashboardLayout";
 import { useAuth } from "../../context/AppContext";
 import { useForm2Workflow } from "../../context/StudentWorkflowContext";
 import {
-    canSubmitForm2,
+    canAccessPortal,
     hasSecuredInternship,
     FORM2_LOCKED_MESSAGE,
 } from "../../utils/accessUtils";
@@ -28,7 +28,7 @@ export default function Form2NewPage() {
 
     // Guard keras: Form 2 jangan kebuka sebelum Form 1 approved.
     useEffect(() => {
-        if (!canSubmitForm2(student?.accessStatus)) {
+        if (!canAccessPortal(student?.accessStatus)) {
             navigate("/portal", {
                 state: {
                     activeTab: "mandiri",
