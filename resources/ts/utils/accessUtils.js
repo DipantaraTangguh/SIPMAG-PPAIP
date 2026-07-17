@@ -1,4 +1,4 @@
-export const PORTAL_ACCESS_STATUSES = [
+const PORTAL_ACCESS_STATUSES = [
     'ApprovedForm1',
     'HasApplication',
     'HasDPM',
@@ -10,10 +10,8 @@ export const PORTAL_ACCESS_STATUSES = [
 ];
 export const canAccessPortal = (accessStatus) =>
     PORTAL_ACCESS_STATUSES.includes(accessStatus);
-export const canSubmitForm2 = (accessStatus) =>
-    PORTAL_ACCESS_STATUSES.includes(accessStatus);
 
-export const SECURED_INTERNSHIP_STATUSES = [
+const SECURED_INTERNSHIP_STATUSES = [
     'HasDPM',
     'LogbookComplete',
     'MenungguSidang',
@@ -31,18 +29,10 @@ export const FORM2_LOCKED_MESSAGE =
 export const hasSecuredInternship = (accessStatus) =>
     SECURED_INTERNSHIP_STATUSES.includes(accessStatus);
 
-export const LOGBOOK_ACCESS_STATUSES = [
-    'HasDPM',
-    'LogbookComplete',
-    'MenungguSidang',
-    'SiklusSelesai',
-];
-export const SIDANG_ACCESS_STATUSES = [
+const SIDANG_ACCESS_STATUSES = [
     'LogbookComplete',
     'MenungguSidang',
     'SiklusSelesai',
 ];
 export const canAccessSidang = (accessStatus) =>
     SIDANG_ACCESS_STATUSES.includes(accessStatus);
-export const isCycleComplete = (accessStatus) =>
-    accessStatus === 'SiklusSelesai' || accessStatus === 'SelesaiNonWajib';

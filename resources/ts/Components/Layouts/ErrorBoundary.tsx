@@ -2,7 +2,6 @@ import React from 'react';
 
 interface ErrorBoundaryProps {
     children: React.ReactNode;
-    fallback?: React.ReactNode;
 }
 
 interface ErrorBoundaryState {
@@ -19,11 +18,6 @@ interface ErrorBoundaryState {
  *
  * Usage:
  *   <ErrorBoundary>
- *     <SomeComponent />
- *   </ErrorBoundary>
- *
- * Optional:
- *   <ErrorBoundary fallback={<p>Custom message</p>}>
  *     <SomeComponent />
  *   </ErrorBoundary>
  */
@@ -56,15 +50,9 @@ export default class ErrorBoundary extends React.Component<
 
     render() {
         const { hasError, error, errorInfo } = this.state;
-        const { children, fallback } = this.props;
 
         if (!hasError) {
-            return children;
-        }
-
-        // Allow callers to supply a fully custom fallback.
-        if (fallback) {
-            return fallback;
+            return this.props.children;
         }
 
         return (

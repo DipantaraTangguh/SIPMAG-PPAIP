@@ -3,7 +3,6 @@ import { api } from '../lib/api';
 import { useAuth } from './AppContext';
 import { mapForm2Submission } from './simulationMappers';
 
-const StudentWorkflowContext = createContext<any>(null);
 const Form1Context = createContext<any>(null);
 const ApplicationContext = createContext<any>(null);
 const Form2Context = createContext<any>(null);
@@ -21,7 +20,6 @@ const EMPTY_STATE = {
     sidangSubmission: null,
     sidangSchedule: null,
     activeApplications: [],
-    notifications: [],
 };
 
 export function StudentWorkflowProvider({ children }) {
@@ -159,31 +157,23 @@ export function StudentWorkflowProvider({ children }) {
     }, [fetchAllStudentData, isLoading, isLoggedIn, student?.id, userRole]);
 
     const submitForm1 = useCallback(async (formData) => {
-        try {
-            await api.upload('/form1', formData);
-            await refreshProfile();
-            updateStudentLocally({ accessStatus: 'PendingReview' });
-            const form1Res = await api.get('/form1');
-            setState((s) => ({
-                ...s,
-                form1Submission: {
-                    ...form1Res.form1,
-                    status: form1Res.access_status,
-                    rejectionReason: form1Res.rejection_reason,
-                    pdfPath: form1Res.pdf_path,
-                    approver: form1Res.approver || null,
-                    submittedAt: form1Res.submitted_at
-                        ? new Date(form1Res.submitted_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })
-                        : null,
-                },
-                notifications: [
-                    { id: Date.now(), message: 'Form 1 berhasil diajukan. Menunggu persetujuan Kaprodi.', time: 'Baru saja' },
-                    ...s.notifications,
-                ],
-            }));
-        } catch (err) {
-            throw err;
-        }
+        await api.upload('/form1', formData);
+        await refreshProfile();
+        updateStudentLocally({ accessStatus: 'PendingReview' });
+        const form1Res = await api.get('/form1');
+        setState((s) => ({
+            ...s,
+            form1Submission: {
+                ...form1Res.form1,
+                status: form1Res.access_status,
+                rejectionReason: form1Res.rejection_reason,
+                pdfPath: form1Res.pdf_path,
+                approver: form1Res.approver || null,
+                submittedAt: form1Res.submitted_at
+                    ? new Date(form1Res.submitted_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })
+                    : null,
+            },
+        }));
     }, [refreshProfile, updateStudentLocally]);
 
     // Konfirmasi hasil magang non-wajib (state MenungguKonfirmasi).
@@ -192,13 +182,6 @@ export function StudentWorkflowProvider({ children }) {
         const res = await api.upload('/student/cycle/confirm', formData);
         await refreshProfile();
         updateStudentLocally({ accessStatus: res.access_status });
-        setState((s) => ({
-            ...s,
-            notifications: [
-                { id: Date.now(), message: res.message, time: 'Baru saja' },
-                ...s.notifications,
-            ],
-        }));
         return res;
     }, [refreshProfile, updateStudentLocally]);
 
@@ -217,10 +200,6 @@ export function StudentWorkflowProvider({ children }) {
             sidangSchedule: null,
             pengajuanPembimbing: null,
             activeApplications: [],
-            notifications: [
-                { id: Date.now(), message: 'Siklus magang direset. Anda dapat mengajukan Form 1 kembali.', time: 'Baru saja' },
-                ...s.notifications,
-            ],
         }));
     }, [refreshProfile, updateStudentLocally]);
 
@@ -276,10 +255,6 @@ export function StudentWorkflowProvider({ children }) {
         setState((s) => ({
             ...s,
             form2Submissions: [mapForm2Submission(data.submission), ...s.form2Submissions],
-            notifications: [
-                { id: Date.now(), message: 'Form 2 berhasil diajukan. Menunggu review PPAIP.', time: 'Baru saja' },
-                ...s.notifications,
-            ],
         }));
     }, []);
     const submitPengajuanPembimbing = useCallback(async (formData) => {
@@ -310,10 +285,6 @@ export function StudentWorkflowProvider({ children }) {
                 selesaiMagang: formData.selesaiMagang ? new Date(formData.selesaiMagang).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : '',
                 submittedAt: new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }),
             },
-            notifications: [
-                { id: Date.now(), message: 'Pengajuan Pembimbing Magang berhasil dikirim.', time: 'Baru saja' },
-                ...s.notifications,
-            ],
         }));
 
         await refreshProfile();
@@ -338,10 +309,6 @@ export function StudentWorkflowProvider({ children }) {
         setState((s) => ({
             ...s,
             logbookEntries: [newEntry, ...s.logbookEntries],
-            notifications: [
-                { id: Date.now(), message: 'Logbook baru berhasil disimpan.', time: 'Baru saja' },
-                ...s.notifications,
-            ],
         }));
     }, []);
 
@@ -381,10 +348,6 @@ export function StudentWorkflowProvider({ children }) {
         setState((s) => ({
             ...s,
             sidangSubmission: { status: 'Pending', submittedAt: new Date().toISOString() },
-            notifications: [
-                { id: Date.now(), message: 'Dokumen sidang berhasil dikirim.', time: 'Baru saja' },
-                ...s.notifications,
-            ],
         }));
     }, [refreshProfile, updateStudentLocally]);
 
@@ -567,47 +530,22 @@ export function StudentWorkflowProvider({ children }) {
         notifications,
     }), [notifications]);
 
-    const value = useMemo(() => ({
-        ...state,
-        notifications,
-        submitForm1,
-        resetForm1,
-        resetCycle,
-        confirmCycle,
-        applyToVacancy,
-        submitForm2,
-        submitPengajuanPembimbing,
-        addLogbookEntry,
-        updateLogbookEntry,
-        submitSidang,
-        // Dipakai saat UI butuh narik ulang data tanpa reload page.
-        refreshProfile,
-        fetchAllStudentData,
-    }), [
-        state, notifications, submitForm1, resetForm1, resetCycle, confirmCycle,
-        applyToVacancy, submitForm2, submitPengajuanPembimbing,
-        addLogbookEntry, updateLogbookEntry, submitSidang,
-        refreshProfile, fetchAllStudentData,
-    ]);
-
     return (
-        <StudentWorkflowContext.Provider value={value}>
-            <Form1Context.Provider value={form1Value}>
-                <ApplicationContext.Provider value={applicationValue}>
-                    <Form2Context.Provider value={form2Value}>
-                        <GuidanceContext.Provider value={guidanceValue}>
-                            <LogbookContext.Provider value={logbookValue}>
-                                <DefenseContext.Provider value={defenseValue}>
-                                    <WorkflowNotificationsContext.Provider value={notificationValue}>
-                                        {children}
-                                    </WorkflowNotificationsContext.Provider>
-                                </DefenseContext.Provider>
-                            </LogbookContext.Provider>
-                        </GuidanceContext.Provider>
-                    </Form2Context.Provider>
-                </ApplicationContext.Provider>
-            </Form1Context.Provider>
-        </StudentWorkflowContext.Provider>
+        <Form1Context.Provider value={form1Value}>
+            <ApplicationContext.Provider value={applicationValue}>
+                <Form2Context.Provider value={form2Value}>
+                    <GuidanceContext.Provider value={guidanceValue}>
+                        <LogbookContext.Provider value={logbookValue}>
+                            <DefenseContext.Provider value={defenseValue}>
+                                <WorkflowNotificationsContext.Provider value={notificationValue}>
+                                    {children}
+                                </WorkflowNotificationsContext.Provider>
+                            </DefenseContext.Provider>
+                        </LogbookContext.Provider>
+                    </GuidanceContext.Provider>
+                </Form2Context.Provider>
+            </ApplicationContext.Provider>
+        </Form1Context.Provider>
     );
 }
 
@@ -615,10 +553,6 @@ function useRequiredContext(context: React.Context<any>, hookName: string) {
     const ctx = useContext(context);
     if (!ctx) throw new Error(`${hookName} must be used within StudentWorkflowProvider`);
     return ctx;
-}
-
-export function useStudentWorkflow() {
-    return useRequiredContext(StudentWorkflowContext, 'useStudentWorkflow');
 }
 
 export function useForm1Workflow() {

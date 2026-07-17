@@ -7,14 +7,10 @@ import React, {
     useState,
 } from 'react';
 import { api } from '../lib/api';
-import {
-    StudentWorkflowProvider,
-    useStudentWorkflow,
-} from './StudentWorkflowContext';
+import { StudentWorkflowProvider } from './StudentWorkflowContext';
 import { mapStudent } from './simulationMappers';
 
 const AuthStateContext = createContext<any>(null);
-const AppContext = createContext<any>(null);
 
 const EMPTY_AUTH_STATE = {
     isLoggedIn: false,
@@ -96,34 +92,10 @@ export function useAuth() {
     return ctx;
 }
 
-function AppContextAdapter({ children }) {
-    const auth = useAuth();
-    const workflow = useStudentWorkflow();
-
-    const value = useMemo(() => ({
-        ...workflow,
-        ...auth,
-    }), [auth, workflow]);
-
-    return (
-        <AppContext.Provider value={value}>
-            {children}
-        </AppContext.Provider>
-    );
-}
-
 export function AppProvider({ children }) {
     return (
         <AuthProvider>
-            <StudentWorkflowProvider>
-                <AppContextAdapter>{children}</AppContextAdapter>
-            </StudentWorkflowProvider>
+            <StudentWorkflowProvider>{children}</StudentWorkflowProvider>
         </AuthProvider>
     );
-}
-
-export function useAppContext() {
-    const ctx = useContext(AppContext);
-    if (!ctx) throw new Error('useAppContext must be used within AppProvider');
-    return ctx;
 }
