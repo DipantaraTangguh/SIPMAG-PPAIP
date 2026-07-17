@@ -36,26 +36,6 @@ class DefenseSubmissionPolicy
             || $this->isAssignedAssessor($user, $submission);
     }
 
-    public function create(User $user): bool
-    {
-        return false;
-    }
-
-    public function update(User $user, DefenseSubmission $submission): bool
-    {
-        return false;
-    }
-
-    public function delete(User $user, DefenseSubmission $submission): bool
-    {
-        return false;
-    }
-
-    public function deleteAny(User $user): bool
-    {
-        return false;
-    }
-
     public function schedule(User $user, DefenseSubmission $submission): bool
     {
         return $user->isKaprodi()
