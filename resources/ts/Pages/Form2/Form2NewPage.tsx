@@ -49,7 +49,9 @@ export default function Form2NewPage() {
         lingkupMagang: "",
     });
 
-    const [errors, setErrors] = useState<Partial<Record<keyof typeof formData, string>>>({});
+    const [errors, setErrors] = useState<
+        Partial<Record<keyof typeof formData, string>>
+    >({});
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitError, setSubmitError] = useState<string | null>(null);
 
@@ -124,7 +126,9 @@ export default function Form2NewPage() {
             <DashboardLayout pageTitle="Portal Magang">
                 <button
                     type="button"
-                    onClick={() => navigate("/portal", { state: { activeTab: "mandiri" } })}
+                    onClick={() =>
+                        navigate("/portal", { state: { activeTab: "mandiri" } })
+                    }
                     className="mb-6 flex items-center gap-2 rounded-lg bg-primary px-4.5 py-2 text-[13px] font-bold text-white transition-colors hover:bg-primary-hover"
                 >
                     <ArrowLeft className="h-4 w-4" />
@@ -132,7 +136,7 @@ export default function Form2NewPage() {
                 </button>
                 <div className="max-w-3xl rounded-xl border border-green-200 bg-green-50 p-6 sm:p-8">
                     <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
-                        <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-green-100">
+                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-green-100">
                             <CheckCircle className="h-6 w-6 text-green-600" />
                         </div>
                         <div className="flex-1">
@@ -234,7 +238,10 @@ export default function Form2NewPage() {
                         <div className="mb-5 grid grid-cols-1 gap-5 sm:grid-cols-2">
                             <div>
                                 <label className="mb-2 block text-[11px] font-bold uppercase tracking-wider text-gray-400">
-                                    NAMA PIMPINAN <span className="font-medium normal-case text-gray-400">(optional)</span>
+                                    NAMA PIMPINAN{" "}
+                                    <span className="font-medium normal-case text-gray-400">
+                                        (optional)
+                                    </span>
                                 </label>
                                 <input
                                     type="text"
@@ -247,7 +254,10 @@ export default function Form2NewPage() {
                             </div>
                             <div>
                                 <label className="mb-2 block text-[11px] font-bold uppercase tracking-wider text-gray-400">
-                                    JABATAN <span className="font-medium normal-case text-gray-400">(optional)</span>
+                                    JABATAN{" "}
+                                    <span className="font-medium normal-case text-gray-400">
+                                        (optional)
+                                    </span>
                                 </label>
                                 <input
                                     type="text"
@@ -368,9 +378,15 @@ export default function Form2NewPage() {
                             <button
                                 type="button"
                                 onClick={handleSubmit}
-                                disabled={!isFormValid || isSubmitting || internshipSecured}
+                                disabled={
+                                    !isFormValid ||
+                                    isSubmitting ||
+                                    internshipSecured
+                                }
                                 className={`flex w-full items-center justify-center gap-2 rounded-xl px-8 py-3.5 text-[15px] font-bold transition-colors sm:w-auto ${
-                                    isSubmitting || !isFormValid || internshipSecured
+                                    isSubmitting ||
+                                    !isFormValid ||
+                                    internshipSecured
                                         ? "cursor-not-allowed bg-gray-300 text-gray-400"
                                         : "bg-primary text-white hover:bg-primary-hover"
                                 }`}
