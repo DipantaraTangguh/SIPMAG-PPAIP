@@ -11,7 +11,7 @@ interface ErrorBoundaryState {
 }
 
 /**
- * ErrorBoundary — REL-01
+ * ErrorBoundary - REL-01
  *
  * Catches render / lifecycle errors in the subtree below this component
  * and shows a friendly fallback UI instead of a white screen.
@@ -72,7 +72,7 @@ export default class ErrorBoundary extends React.Component<
                         Halaman ini mengalami error tak terduga. Coba muat ulang atau kembali ke Dashboard.
                     </p>
 
-                    {/* Dev-only technical details — never shown in production */}
+                    {/* Dev-only technical details - never shown in production */}
                     {import.meta.env.DEV && error && (
                         <details style={styles.details}>
                             <summary style={styles.summary}>Detail teknis (dev only)</summary>
@@ -98,7 +98,7 @@ export default class ErrorBoundary extends React.Component<
 }
 
 // ---------------------------------------------------------------------------
-// Inline styles — no external CSS dependency so the boundary works even when
+// Inline styles - no external CSS dependency so the boundary works even when
 // the stylesheet itself fails to load.
 // ---------------------------------------------------------------------------
 const styles: Record<string, React.CSSProperties> = {

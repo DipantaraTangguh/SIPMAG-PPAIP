@@ -5,7 +5,7 @@ import { useForm1Workflow } from "../../../context/StudentWorkflowContext";
 
 /**
  * Panel state MenungguKonfirmasi (magang non-wajib jalur Form 2).
- * Surat pengantar sudah disetujui — sekarang mahasiswa wajib melaporkan
+ * Surat pengantar sudah disetujui - sekarang mahasiswa wajib melaporkan
  * hasilnya: diterima (upload LoA + tempat & periode aktual) atau ditolak
  * (kembali bisa mengajukan Form 2 ke perusahaan lain).
  */
@@ -193,7 +193,7 @@ export default function Form1KonfirmasiPanel() {
                             Mengirim…
                         </>
                     ) : (
-                        "Saya Diterima — Kirim Konfirmasi"
+                        "Saya Diterima - Kirim Konfirmasi"
                     )}
                 </button>
             </div>

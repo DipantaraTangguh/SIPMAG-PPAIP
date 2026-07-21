@@ -19,7 +19,7 @@ const navItems = [
     { to: '/form1', label: 'Profil', icon: User },
 ];
 
-export default function Sidebar({ nim = '—', onLogout, activePath }) {
+export default function Sidebar({ nim = '-', onLogout, activePath }) {
     const location = useLocation();
 
     const isActive = (path) => {

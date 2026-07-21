@@ -21,12 +21,12 @@ const STUDENT_ROLES = ['mahasiswa'];
 
 export default function App() {
     return (
-        // Root boundary — last-resort catch for AppProvider / BrowserRouter errors.
+        // Root boundary - last-resort catch for AppProvider / BrowserRouter errors.
         <ErrorBoundary>
             <AppProvider>
                 <BrowserRouter>
                     <Routes>
-                        {/* Auth route — isolated so a login-page crash can't block recovery */}
+                        {/* Auth route - isolated so a login-page crash can't block recovery */}
                         <Route
                             path="/login"
                             element={
@@ -36,7 +36,7 @@ export default function App() {
                             }
                         />
 
-                        {/* Protected routes — each wrapped individually so a crash on one page
+                        {/* Protected routes - each wrapped individually so a crash on one page
                             does not replace every other page with an error card. Users can
                             navigate away (e.g. to /dashboard) to recover without a full reload. */}
                         <Route

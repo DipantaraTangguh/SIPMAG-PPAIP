@@ -13,10 +13,10 @@ export default function Form1ApprovedPanel({
     pdfPath,
     pdfFileName = 'Surat_Keterangan_Form1.pdf',
     pdfSize = 'PDF',
-    approverName = '—',
-    approverNidn = '—',
-    approverRole = '—',
-    approvalDate = '—',
+    approverName = '-',
+    approverNidn = '-',
+    approverRole = '-',
+    approvalDate = '-',
     studentNim,
 }) {
     const navigate = useNavigate();

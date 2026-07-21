@@ -32,7 +32,7 @@ export default function GuidancePage() {
                     </h3>
                     <p className="mt-2 max-w-md text-sm text-gray-500">
                         Siklus magang non-wajib berhenti setelah surat pengantar
-                        (Form 2) disetujui atau lamaran mitra Anda diterima —
+                        (Form 2) disetujui atau lamaran mitra Anda diterima -
                         tanpa tahap DPM, logbook, maupun sidang.
                     </p>
                 </div>

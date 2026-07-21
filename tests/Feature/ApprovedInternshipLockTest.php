@@ -112,6 +112,31 @@ class ApprovedInternshipLockTest extends TestCase
         $this->assertSame([], Storage::disk('local')->allFiles('cv'));
     }
 
+    public function test_menunggu_konfirmasi_allows_new_form2_submissions(): void
+    {
+        [$user, $student] = $this->studentUser('MenungguKonfirmasi');
+        $this->actingAs($user);
+
+        // Mahasiswa non-wajib yang sudah punya Form 2 approved tetap boleh submit lagi.
+        Form2Submission::create([
+            'student_id' => $student->id,
+            'company_name' => 'PT Sudah Disetujui',
+            'nama_pimpinan' => 'Direktur',
+            'jabatan_pimpinan' => 'Direktur Utama',
+            'alamat_perusahaan' => 'Jl. Sudah No. 1',
+            'lingkup_magang' => 'Pengembangan',
+            'tanggal_mulai' => '2026-07-01',
+            'tanggal_selesai' => '2026-09-30',
+            'status' => 'ApprovedForm2',
+        ]);
+
+        $this->postJson('/api/form2', $this->validForm2Payload())
+            ->assertCreated()
+            ->assertJsonPath('submission.status', 'PendingReview');
+
+        $this->assertSame(2, $student->form2Submissions()->count());
+    }
+
     /**
      * @return array{User, Student}
      */

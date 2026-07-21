@@ -15,8 +15,8 @@ export default function DashboardLayout({
 }: DashboardLayoutProps) {
     const { student, logout } = useAuth();
 
-    const studentName = student?.name ?? "—";
-    const nim = student?.nim ?? "—";
+    const studentName = student?.name ?? "-";
+    const nim = student?.nim ?? "-";
     const initials = studentName
         .split(" ")
         .map((w) => w[0])

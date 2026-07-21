@@ -18,8 +18,8 @@ return new class extends Migration
             $table->string('bidang')->nullable();           // e.g. "Software Engineering"
             $table->date('start_date')->nullable();         // start of internship period
             $table->json('job_description')->nullable();    // array of bullet strings
-            $table->json('skills')->nullable();             // array — Keahlian Utama
-            $table->json('requirements')->nullable();       // array — Persyaratan
+            $table->json('skills')->nullable();             // array - Keahlian Utama
+            $table->json('requirements')->nullable();       // array - Persyaratan
             $table->string('minimum_education')->nullable();
             $table->string('sistem_kerja')->nullable();     // WFO / WFH / Hybrid
             $table->string('location')->nullable();

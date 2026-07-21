@@ -55,7 +55,7 @@ class PpaipLecturerResource extends Resource
                 Tables\Columns\TextColumn::make('nidn')->label('NIDN')->searchable(),
                 Tables\Columns\TextColumn::make('lecturer_name')->label('Nama')->searchable()->sortable(),
                 Tables\Columns\TextColumn::make('contact')->label('Kontak'),
-                Tables\Columns\TextColumn::make('study_program')->label('Prodi')->placeholder('—'),
+                Tables\Columns\TextColumn::make('study_program')->label('Prodi')->placeholder('-'),
                 Tables\Columns\TextColumn::make('user.role')->label('Role')->badge(),
                 Tables\Columns\TextColumn::make('supervisedStudents_count')
                     ->label('Bimbingan')

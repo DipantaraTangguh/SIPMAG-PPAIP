@@ -19,7 +19,7 @@ class StudentStateMachineTest extends TestCase
     }
 
     // -------------------------------------------------------------------------
-    // can() — should return true for every documented valid transition
+    // can() - should return true for every documented valid transition
     // -------------------------------------------------------------------------
 
     /** @return array<string, array{string, string}> */
@@ -55,7 +55,7 @@ class StudentStateMachineTest extends TestCase
     }
 
     // -------------------------------------------------------------------------
-    // can() — should return false for illegal jumps
+    // can() - should return false for illegal jumps
     // -------------------------------------------------------------------------
 
     /** @return array<string, array{string, string}> */
@@ -87,7 +87,7 @@ class StudentStateMachineTest extends TestCase
     }
 
     // -------------------------------------------------------------------------
-    // transition() — valid move persists and changes the status
+    // transition() - valid move persists and changes the status
     // -------------------------------------------------------------------------
 
     public function test_transition_updates_and_saves_model_on_valid_move(): void
@@ -123,7 +123,7 @@ class StudentStateMachineTest extends TestCase
     }
 
     // -------------------------------------------------------------------------
-    // transition() — invalid move throws InvalidStateTransitionException
+    // transition() - invalid move throws InvalidStateTransitionException
     // -------------------------------------------------------------------------
 
     #[DataProvider('invalidTransitions')]

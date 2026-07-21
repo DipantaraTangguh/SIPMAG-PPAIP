@@ -17,7 +17,6 @@ const SECURED_INTERNSHIP_STATUSES = [
     'MenungguSidang',
     'SiklusSelesai',
     'SelesaiNonWajib',
-    'MenungguKonfirmasi',
 ];
 
 export const SECURED_INTERNSHIP_MESSAGE =

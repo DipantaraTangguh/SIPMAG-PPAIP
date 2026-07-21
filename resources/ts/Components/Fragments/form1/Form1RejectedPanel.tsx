@@ -35,7 +35,7 @@ export default function Form1RejectedPanel({ rejectionReason, formData }) {
                         </p>
                     </div>
                     <p className="mt-2 text-sm text-red-600">
-                        {rejectionReason || '—'}
+                        {rejectionReason || '-'}
                     </p>
                     <p className="mt-2 text-xs italic text-gray-400">
                         Ditolak oleh Kaprodi
