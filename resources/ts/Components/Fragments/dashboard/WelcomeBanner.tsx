@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function WelcomeBanner({ name = '—' }) {
+export default function WelcomeBanner({ name = '-' }) {
     return (
         <div className="rounded-xl border border-gray-200 bg-white p-5 sm:p-8">
             <h2 className="mb-2 text-xl font-bold leading-tight text-gray-900 sm:text-2xl">

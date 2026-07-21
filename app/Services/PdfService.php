@@ -35,12 +35,12 @@ class PdfService
         $pdfPath = $this->docxRenderer->render(public_path('assets/template-form-2.docx'), [
             '<<Nomor Surat>>' => $this->form2LetterNumber($submission, $letterDate),
             '<<Nama Perusahaan>>' => $submission->company_name,
-            '<<Nama Pimpinan>>' => $submission->nama_pimpinan ?? '—',
-            '<<Jabatan>>' => $submission->jabatan_pimpinan ?? '—',
+            '<<Nama Pimpinan>>' => $submission->nama_pimpinan ?? '-',
+            '<<Jabatan>>' => $submission->jabatan_pimpinan ?? '-',
             '<<Alamat Lengkap Perusahaan>>' => $submission->alamat_perusahaan,
-            '<<rencana bulan magang>>' => $months ? $months.' bulan' : '—',
-            '<<bulan mulai>>' => $start?->translatedFormat('F Y') ?? '—',
-            '<<bulan selesai>>' => $end?->translatedFormat('F Y') ?? '—',
+            '<<rencana bulan magang>>' => $months ? $months.' bulan' : '-',
+            '<<bulan mulai>>' => $start?->translatedFormat('F Y') ?? '-',
+            '<<bulan selesai>>' => $end?->translatedFormat('F Y') ?? '-',
             '<<nama lengkap>>' => $student->name,
             '<<NIM>>' => $student->nim,
             '<<Jurusan>>' => $student->study_program,
@@ -71,17 +71,17 @@ class PdfService
         Carbon::setLocale('id');
 
         $pdfPath = $this->docxRenderer->render(public_path('assets/template-form-1.docx'), [
-            '<<Nama Kaprodi>>' => $kaprodi->lecturer_name ?? '—',
-            '<<Program Studi>>' => $student->study_program ?? '—',
+            '<<Nama Kaprodi>>' => $kaprodi->lecturer_name ?? '-',
+            '<<Program Studi>>' => $student->study_program ?? '-',
             '<<Nama Mahasiswa>>' => $student->name,
             '<<NIM>>' => $student->nim,
-            '<<Semester>>' => (string) ($form1['semester'] ?? $student->semester ?? '—'),
-            '<<Jumlah SKS>>' => (string) ($form1['jumlahSKS'] ?? $student->jumlah_sks ?? '—'),
-            '<<IPK>>' => (string) ($form1['ipk'] ?? $student->ipk ?? '—'),
-            '<<Rencana Magang>>' => $form1['skemaMagang'] ?? '—',
-            '<<Tanggal Pengajuan>>' => optional($student->updated_at)->translatedFormat('d F Y') ?? '—',
-            '<<Tanggal Persetujuan>>' => optional($student->form1_approved_at)->translatedFormat('d F Y') ?? '—',
-            '<<NIDN>>' => $kaprodi->nidn ?? '—',
+            '<<Semester>>' => (string) ($form1['semester'] ?? $student->semester ?? '-'),
+            '<<Jumlah SKS>>' => (string) ($form1['jumlahSKS'] ?? $student->jumlah_sks ?? '-'),
+            '<<IPK>>' => (string) ($form1['ipk'] ?? $student->ipk ?? '-'),
+            '<<Rencana Magang>>' => $form1['skemaMagang'] ?? '-',
+            '<<Tanggal Pengajuan>>' => optional($student->updated_at)->translatedFormat('d F Y') ?? '-',
+            '<<Tanggal Persetujuan>>' => optional($student->form1_approved_at)->translatedFormat('d F Y') ?? '-',
+            '<<NIDN>>' => $kaprodi->nidn ?? '-',
         ]);
 
         abort_if($pdfPath === null, 503, 'Konversi PDF tidak tersedia. Pastikan LibreOffice terpasang atau atur LIBREOFFICE_PATH.');

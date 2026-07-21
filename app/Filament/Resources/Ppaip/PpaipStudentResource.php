@@ -63,7 +63,7 @@ class PpaipStudentResource extends Resource
                         'HasDPM' => 'primary',
                         default => 'gray',
                     }),
-                Tables\Columns\TextColumn::make('dpm.lecturer_name')->label('DPM')->placeholder('—'),
+                Tables\Columns\TextColumn::make('dpm.lecturer_name')->label('DPM')->placeholder('-'),
                 Tables\Columns\TextColumn::make('approved_logbook_count')->label('Logbook')->sortable(),
                 Tables\Columns\TextColumn::make('assessment_progress')
                     ->label('Penilaian Sidang')
@@ -130,7 +130,7 @@ class PpaipStudentResource extends Resource
                 Tables\Actions\ViewAction::make(),
 
                 // ACTION: Selesaikan Siklus Magang.
-                // PRD §5.4 — hanya PPAIP yang boleh trigger cycle reset.
+                // PRD §5.4 - hanya PPAIP yang boleh trigger cycle reset.
                 // Muncul setelah sidang sudah dijadwalkan (status Scheduled).
                 Tables\Actions\Action::make('completeCycle')
                     ->label('Selesaikan Siklus')

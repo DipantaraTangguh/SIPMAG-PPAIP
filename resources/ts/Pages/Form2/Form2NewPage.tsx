@@ -56,8 +56,8 @@ export default function Form2NewPage() {
     const [submitError, setSubmitError] = useState<string | null>(null);
 
     // Data profil dikunci dan selalu berasal dari user yang sedang login.
-    const studentName = student?.name ?? "—";
-    const studentNim = student?.nim ?? "—";
+    const studentName = student?.name ?? "-";
+    const studentNim = student?.nim ?? "-";
 
     // Validasi ringan sebelum data dilempar ke context/API.
     const isFormValid =
@@ -172,7 +172,7 @@ export default function Form2NewPage() {
             </button>
             <div className="mb-6">
                 <h1 className="text-2xl font-bold leading-tight text-[#1A1A1A] sm:text-[28px]">
-                    Ajukan Form 2 — Surat Pengantar Magang
+                    Ajukan Form 2 - Surat Pengantar Magang
                 </h1>
                 <p className="mt-1 text-[14px] leading-relaxed text-gray-500">
                     Isi data perusahaan yang akan Anda tuju untuk permohonan

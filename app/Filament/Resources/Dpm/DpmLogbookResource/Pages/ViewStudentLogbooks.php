@@ -17,7 +17,7 @@ class ViewStudentLogbooks extends ViewRecord
 
     public function getTitle(): string
     {
-        return 'Logbook — ' . $this->record->name . ' (' . $this->record->nim . ')';
+        return 'Logbook - ' . $this->record->name . ' (' . $this->record->nim . ')';
     }
 
     public function getRelationManagers(): array

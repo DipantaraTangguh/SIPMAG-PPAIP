@@ -82,7 +82,7 @@ class NonWajibFlowTest extends TestCase
         $this->assertSame('MenungguKonfirmasi', $student->access_status);
         $this->assertSame(0, $student->internshipCycles()->count());
 
-        // Form 2 terkunci selama menunggu konfirmasi.
+        // Mahasiswa boleh submit Form 2 baru meskipun sudah MenungguKonfirmasi.
         $studentUser->refresh();
         $this->actingAs($studentUser)->postJson('/api/form2', [
             'company_name'      => 'PT Lain',
@@ -90,7 +90,7 @@ class NonWajibFlowTest extends TestCase
             'lingkup_magang'    => 'Magang lagi',
             'tanggal_mulai'     => '2026-11',
             'tanggal_selesai'   => '2026-12',
-        ])->assertUnprocessable();
+        ])->assertCreated();
 
         // Mahasiswa konfirmasi diterima + upload LoA; tempat/periode aktual
         // (boleh berbeda dari Form 2) yang masuk riwayat.

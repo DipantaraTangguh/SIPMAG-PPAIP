@@ -9,7 +9,7 @@ function DataField({ label, value, valueClassName = "" }) {
             <p
                 className={`mt-1 text-sm font-semibold text-gray-900 ${valueClassName}`}
             >
-                {value || "—"}
+                {value || "-"}
             </p>
         </div>
     );
@@ -65,7 +65,7 @@ export default function Form1SubmittedData({ formData }) {
             <div className="mt-6 border-t border-gray-100 pt-4">
                 <div className="flex items-center gap-1.5 text-[13px] italic text-gray-500">
                     <Calendar className="h-3.5 w-3.5 text-gray-400" />
-                    <span>Diajukan pada {formData.submittedAt || "—"}</span>
+                    <span>Diajukan pada {formData.submittedAt || "-"}</span>
                 </div>
             </div>
         </div>

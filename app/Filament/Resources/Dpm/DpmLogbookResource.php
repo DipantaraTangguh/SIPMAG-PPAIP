@@ -84,7 +84,7 @@ class DpmLogbookResource extends Resource
                     ->icon('heroicon-o-document-text')
                     ->color('info')
                     ->visible(fn (Student $record) => ! empty($record->supervisorApplication?->loa_path))
-                    ->modalHeading(fn (Student $record) => 'LoA — '.$record->name.' ('.$record->nim.')')
+                    ->modalHeading(fn (Student $record) => 'LoA - '.$record->name.' ('.$record->nim.')')
                     ->modalContent(function (Student $record): HtmlString {
                         $previewUrl = route('dpm.loa.preview', $record);
                         $downloadUrl = route('dpm.loa.download', $record);

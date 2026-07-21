@@ -17,7 +17,7 @@ function pickLogoColor(seed = '') {
 }
 
 function formatIdDate(iso, { withDay = false } = {}) {
-    if (!iso) return '—';
+    if (!iso) return '-';
     const date = new Date(iso.slice(0, 10));
     return date.toLocaleDateString('id-ID', {
         day: 'numeric',
@@ -41,18 +41,18 @@ function mapInternshipDetail(i) {
         id: i.id,
         companyName: company,
         position: i.position,
-        location: i.location || '—',
+        location: i.location || '-',
         logoColor: pickLogoColor(company),
         logoInitial: (company.trim()[0] || '?').toUpperCase(),
-        kapasitas: i.capacity || '—',
-        sistemKerja: i.sistem_kerja || '—',
-        durasi: i.duration || '—',
-        bidang: i.bidang || '—',
+        kapasitas: i.capacity || '-',
+        sistemKerja: i.sistem_kerja || '-',
+        durasi: i.duration || '-',
+        bidang: i.bidang || '-',
         mulaiMagang: formatIdDate(i.start_date, { withDay: true }),
         deadline: formatIdDate(i.deadline),
         deadlineDaysLeft: daysUntil(i.deadline),
         deskripsiPekerjaan: Array.isArray(i.job_description) ? i.job_description : [],
-        pendidikanMinimal: i.minimum_education || '—',
+        pendidikanMinimal: i.minimum_education || '-',
         keahlianUtama: Array.isArray(i.skills) ? i.skills : [],
         persyaratan: Array.isArray(i.requirements) ? i.requirements : [],
     };
@@ -63,7 +63,7 @@ function mapSimilar(i) {
         id: i.id,
         companyName: company,
         position: i.position,
-        location: i.location || '—',
+        location: i.location || '-',
         logoColor: pickLogoColor(company),
         logoInitial: (company.trim()[0] || '?').toUpperCase(),
     };

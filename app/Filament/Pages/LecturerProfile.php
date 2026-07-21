@@ -59,7 +59,7 @@ class LecturerProfile extends Page implements HasForms
                         Forms\Components\TextInput::make('study_program')
                             ->label('Program Studi')
                             ->disabled()
-                            ->placeholder('—'),
+                            ->placeholder('-'),
                     ])
                     ->columns(2),
             ])

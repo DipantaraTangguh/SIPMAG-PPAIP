@@ -28,7 +28,7 @@ function mapInternship(i) {
         ? new Date(deadlineDate).toLocaleDateString('id-ID', {
             day: 'numeric', month: 'short', year: 'numeric',
         })
-        : '—';
+        : '-';
     return {
         id: i.id,
         companyName: company,

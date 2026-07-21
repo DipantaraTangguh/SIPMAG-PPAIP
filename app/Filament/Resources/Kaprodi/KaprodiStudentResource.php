@@ -124,7 +124,7 @@ class KaprodiStudentResource extends Resource
                         'HasDPM' => 'primary',
                         default => 'gray',
                     }),
-                Tables\Columns\TextColumn::make('dpm.lecturer_name')->label('DPM')->placeholder('—'),
+                Tables\Columns\TextColumn::make('dpm.lecturer_name')->label('DPM')->placeholder('-'),
                 Tables\Columns\TextColumn::make('approved_logbook_count')->label('Logbook')->sortable(),
                 Tables\Columns\IconColumn::make('form1_pdf_path')
                     ->label('Transkrip')
@@ -153,7 +153,7 @@ class KaprodiStudentResource extends Resource
                     ->icon('heroicon-o-eye')
                     ->color('info')
                     ->visible(fn (Student $record) => ! empty($record->form1_pdf_path))
-                    ->modalHeading(fn (Student $record) => 'Transkrip — '.$record->name.' ('.$record->nim.')')
+                    ->modalHeading(fn (Student $record) => 'Transkrip - '.$record->name.' ('.$record->nim.')')
                     ->modalContent(function (Student $record): HtmlString {
                         $previewUrl = route('transkrip.preview', $record->id);
                         $downloadUrl = route('transkrip.download', $record->id);

@@ -2,8 +2,8 @@ import React from 'react';
 import { UserCircle, Mail } from 'lucide-react';
 
 export default function DpmCard({ dpm = null }) {
-    const name = dpm?.name ?? '—';
-    const email = dpm?.email ?? '—';
+    const name = dpm?.name ?? '-';
+    const email = dpm?.email ?? '-';
 
     return (
         <div className="flex items-center gap-5 rounded-xl border border-gray-200 bg-white p-6 border-l-4 border-l-primary">

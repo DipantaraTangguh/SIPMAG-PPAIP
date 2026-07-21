@@ -24,7 +24,7 @@ function formatPeriod(start, end) {
     const a = fmt(start);
     const b = fmt(end);
     if (a && b) return `${a} – ${b}`;
-    return a || b || "—";
+    return a || b || "-";
 }
 
 function formatCompletedAt(value) {
@@ -34,7 +34,7 @@ function formatCompletedAt(value) {
               month: "long",
               year: "numeric",
           })
-        : "—";
+        : "-";
 }
 
 function jenisLabel(jenis) {
@@ -50,7 +50,7 @@ function DetailField({ label, value, valueClassName = "" }) {
             <p
                 className={`mt-1 text-sm font-semibold text-gray-900 ${valueClassName}`}
             >
-                {value ?? "—"}
+                {value ?? "-"}
             </p>
         </div>
     );
@@ -69,7 +69,7 @@ function CycleDetail({ cycle }) {
                 </span>
                 <div>
                     <h3 className="text-lg font-bold text-gray-900">
-                        Magang #{cycle.cycle_number} —{" "}
+                        Magang #{cycle.cycle_number} -{" "}
                         {jenisLabel(cycle.jenis_magang)}
                     </h3>
                     <p className="text-xs text-gray-400">
@@ -164,7 +164,7 @@ function CycleDetail({ cycle }) {
                     value={
                         cycle.final_score != null
                             ? `${cycle.final_score} (${cycle.letter_grade})`
-                            : "— (magang non-wajib tidak dinilai)"
+                            : "- (magang non-wajib tidak dinilai)"
                     }
                     valueClassName={
                         cycle.final_score != null ? "text-green-700" : ""
@@ -256,7 +256,7 @@ export default function MagangHistoryPage() {
                                         <span className="min-w-0 flex-1">
                                             <span className="flex flex-wrap items-center gap-2">
                                                 <span className="text-sm font-semibold text-gray-900">
-                                                    Magang #{c.cycle_number} —{" "}
+                                                    Magang #{c.cycle_number} -{" "}
                                                     {jenisLabel(c.jenis_magang)}
                                                 </span>
                                                 {c.letter_grade && (
@@ -268,7 +268,7 @@ export default function MagangHistoryPage() {
                                             <span className="mt-0.5 block truncate text-sm text-gray-600">
                                                 {c.company_name ??
                                                     c.topik_magang ??
-                                                    "—"}
+                                                    "-"}
                                             </span>
                                             <span className="mt-0.5 flex items-center gap-1 text-xs text-gray-400">
                                                 <CalendarRange className="h-3 w-3" />
