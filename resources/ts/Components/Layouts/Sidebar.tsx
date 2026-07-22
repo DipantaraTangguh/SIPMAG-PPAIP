@@ -8,19 +8,24 @@ import {
     History,
     User,
     LogOut,
+    Lock,
 } from 'lucide-react';
+import { useForm1Workflow } from '../../context/StudentWorkflowContext';
 
 const navItems = [
     { to: '/dashboard', label: 'Beranda', icon: Home },
     { to: '/portal', label: 'Lowongan Magang', icon: Briefcase },
-    { to: '/guidance', label: 'Bimbingan & Logbook', icon: ClipboardList },
-    { to: '/defense', label: 'Sidang Magang', icon: GraduationCap },
+    // Non-wajib tidak pernah sampai tahap DPM/logbook/sidang.
+    { to: '/guidance', label: 'Bimbingan & Logbook', icon: ClipboardList, lockedForNonWajib: true },
+    { to: '/defense', label: 'Sidang Magang', icon: GraduationCap, lockedForNonWajib: true },
     { to: '/history', label: 'Riwayat Magang', icon: History },
     { to: '/form1', label: 'Profil', icon: User },
 ];
 
 export default function Sidebar({ nim = '-', onLogout, activePath }) {
     const location = useLocation();
+    const { form1Submission } = useForm1Workflow();
+    const isNonWajib = form1Submission?.jenisMagang === 'non_wajib';
 
     const isActive = (path) => {
         const current = activePath || location.pathname;
@@ -39,25 +44,34 @@ export default function Sidebar({ nim = '-', onLogout, activePath }) {
                 aria-label="Navigasi Utama"
                 className="flex min-w-0 flex-1 items-stretch justify-around gap-0 overflow-x-auto px-1 lg:flex-col lg:justify-start lg:gap-1 lg:px-3"
             >
-                {navItems.map(({ to, label, icon: Icon }) => {
+                {navItems.map(({ to, label, icon: Icon, lockedForNonWajib }) => {
                     const active = isActive(to);
+                    const locked = lockedForNonWajib && isNonWajib;
 
                     return (
                         <NavLink
                             key={to}
                             to={to}
                             aria-current={active ? 'page' : undefined}
+                            title={locked ? `${label} tidak berlaku untuk magang non-wajib` : undefined}
                             className={`
                                 group flex min-w-[68px] flex-1 flex-col items-center justify-center gap-1 rounded-lg px-2 py-2
                                 text-[10px] font-medium leading-tight transition-colors duration-150
                                 lg:min-w-0 lg:flex-none lg:flex-row lg:justify-start lg:gap-3 lg:px-4 lg:py-3 lg:text-sm
-                                ${active
-                                    ? 'bg-white/10 font-semibold text-white lg:border-l-[3px] lg:border-white'
-                                    : 'text-white/70 hover:bg-white/10 hover:text-white lg:border-l-[3px] lg:border-transparent'
+                                ${locked
+                                    ? 'text-white/35 hover:bg-white/5 hover:text-white/50 lg:border-l-[3px] lg:border-transparent'
+                                    : active
+                                        ? 'bg-white/10 font-semibold text-white lg:border-l-[3px] lg:border-white'
+                                        : 'text-white/70 hover:bg-white/10 hover:text-white lg:border-l-[3px] lg:border-transparent'
                                 }
                             `}
                         >
-                            <Icon className="h-[18px] w-[18px] flex-shrink-0" />
+                            <span className="relative">
+                                <Icon className="h-[18px] w-[18px] flex-shrink-0" />
+                                {locked && (
+                                    <Lock className="absolute -bottom-1 -right-1.5 h-2.5 w-2.5 rounded-full bg-primary-dark p-px" />
+                                )}
+                            </span>
                             <span className="line-clamp-2 text-center lg:text-left">{label}</span>
                         </NavLink>
                     );
