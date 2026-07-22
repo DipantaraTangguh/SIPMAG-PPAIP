@@ -5,10 +5,11 @@ import {
     UserCheck,
     BookOpen,
     Award,
+    BadgeCheck,
     Check,
 } from "lucide-react";
 
-const steps = [
+const WAJIB_STEPS = [
     { key: "syarat_akademik", label: "Syarat Akademik", icon: ClipboardCheck },
     { key: "lamaran", label: "Lamaran", icon: FileText },
     {
@@ -20,7 +21,16 @@ const steps = [
     { key: "sidang", label: "Sidang", icon: Award },
 ];
 
-export default function CycleStepper({ currentStep = 1 }) {
+// Magang non-wajib berhenti setelah konfirmasi LoA — tanpa DPM/logbook/sidang.
+const NON_WAJIB_STEPS = [
+    { key: "syarat_akademik", label: "Syarat Akademik", icon: ClipboardCheck },
+    { key: "pengantar_lamaran", label: "Pengantar / Lamaran", icon: FileText },
+    { key: "konfirmasi", label: "Konfirmasi Magang", icon: BadgeCheck },
+];
+
+export default function CycleStepper({ currentStep = 1, variant = "wajib" }) {
+    const steps = variant === "non_wajib" ? NON_WAJIB_STEPS : WAJIB_STEPS;
+
     return (
         <div className="rounded-xl border border-gray-200 bg-white px-4 py-5 sm:px-8 sm:py-7">
             <div className="flex items-start justify-between gap-2 overflow-x-auto pb-1 sm:items-center">

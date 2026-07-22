@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AppContext';
 import {
     useDefenseWorkflow,
+    useForm1Workflow,
     useLogbookWorkflow,
     useWorkflowNotifications,
 } from '../../context/StudentWorkflowContext';
@@ -44,18 +45,39 @@ function deriveStep(status) {
     }
 }
 
+// Non-wajib berhenti di konfirmasi LoA — tanpa DPM/logbook/sidang.
+function deriveNonWajibStep(status) {
+    switch (status) {
+        case 'Unverified':
+        case 'PendingReview':
+        case 'RejectedForm1':
+            return 1;
+        case 'ApprovedForm1':
+        case 'HasApplication':
+            return 2;
+        case 'MenungguKonfirmasi':
+            return 3;
+        case 'SelesaiNonWajib':
+            return 4; // 3 langkah selesai
+        default:
+            return 1;
+    }
+}
+
 export default function DashboardPage() {
     const { student } = useAuth();
     const { notifications } = useWorkflowNotifications();
     const { logbookEntries } = useLogbookWorkflow();
     const { sidangSchedule } = useDefenseWorkflow();
+    const { form1Submission } = useForm1Workflow();
     const navigate = useNavigate();
 
     const name = student?.name;
     const accessStatus = student?.accessStatus;
+    const isNonWajib = form1Submission?.jenisMagang === 'non_wajib';
     const logbookCount = (logbookEntries || []).filter(e => e.status === 'Disetujui' || e.status === 'Approved').length;
     const dpm = student?.dpm;
-    const currentStep = deriveStep(accessStatus);
+    const currentStep = isNonWajib ? deriveNonWajibStep(accessStatus) : deriveStep(accessStatus);
 
     const handleQuickAction = () => {
         switch (accessStatus) {
@@ -90,7 +112,7 @@ export default function DashboardPage() {
         <DashboardLayout>
             <div className="flex flex-col gap-6">
                 <WelcomeBanner name={name} />
-                <CycleStepper currentStep={currentStep} />
+                <CycleStepper currentStep={currentStep} variant={isNonWajib ? 'non_wajib' : 'wajib'} />
                 <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1fr_340px]">
                     <div className="flex flex-col gap-6">
                         <DpmCard dpm={dpm} />
