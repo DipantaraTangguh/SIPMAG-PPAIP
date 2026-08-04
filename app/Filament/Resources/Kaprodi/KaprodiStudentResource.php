@@ -55,7 +55,7 @@ class KaprodiStudentResource extends Resource
 
         return parent::getEloquentQuery()
             ->where('study_program', $prodi)
-            ->with(['dpm', 'sidangSubmission'])
+            ->with(['dpm', 'sidangSubmission', 'supervisorApplication:id,student_id,loa_path'])
             ->withCount(['logbooks as approved_logbook_count' => fn ($query) => $query->where('status', 'Approved')]);
     }
 
@@ -130,8 +130,8 @@ class KaprodiStudentResource extends Resource
                     }),
                 Tables\Columns\TextColumn::make('dpm.lecturer_name')->label('DPM')->placeholder('-'),
                 Tables\Columns\TextColumn::make('approved_logbook_count')->label('Logbook')->sortable(),
-                Tables\Columns\IconColumn::make('form1_pdf_path')
-                    ->label('Transkrip')
+                Tables\Columns\IconColumn::make('supervisorApplication.loa_path')
+                    ->label('LoA')
                     ->icon(fn ($state) => $state ? 'heroicon-o-document-check' : 'heroicon-o-document')
                     ->color(fn ($state) => $state ? 'success' : 'gray'),
             ])
@@ -151,23 +151,23 @@ class KaprodiStudentResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make(),
 
-                // Preview transkrip via modal biar Kaprodi nggak perlu pindah tab.
-                Tables\Actions\Action::make('previewTranskrip')
-                    ->label('Lihat Transkrip')
+                // Preview LoA via modal biar Kaprodi bisa verifikasi keaslian sebelum tunjuk DPM.
+                Tables\Actions\Action::make('previewLoa')
+                    ->label('Lihat LoA')
                     ->icon('heroicon-o-eye')
                     ->color('info')
-                    ->visible(fn (Student $record) => ! empty($record->form1_pdf_path))
-                    ->modalHeading(fn (Student $record) => 'Transkrip - '.$record->name.' ('.$record->nim.')')
+                    ->visible(fn (Student $record) => ! empty($record->supervisorApplication?->loa_path))
+                    ->modalHeading(fn (Student $record) => 'LoA - '.$record->name.' ('.$record->nim.')')
                     ->modalContent(function (Student $record): HtmlString {
-                        $previewUrl = route('transkrip.preview', $record->id);
-                        $downloadUrl = route('transkrip.download', $record->id);
-                        $ext = pathinfo($record->form1_pdf_path, PATHINFO_EXTENSION);
+                        $previewUrl = route('kaprodi.loa.preview', $record);
+                        $downloadUrl = route('kaprodi.loa.download', $record);
+                        $ext = pathinfo($record->supervisorApplication->loa_path, PATHINFO_EXTENSION);
                         $isPdf = strtolower($ext) === 'pdf';
 
                         if ($isPdf) {
                             $preview = '<iframe src="'.$previewUrl.'" class="w-full rounded-lg border" style="height:70vh;"></iframe>';
                         } else {
-                            $preview = '<img src="'.$previewUrl.'" alt="Transkrip" class="max-w-full max-h-[70vh] mx-auto rounded-lg shadow" />';
+                            $preview = '<img src="'.$previewUrl.'" alt="LoA" class="max-w-full max-h-[70vh] mx-auto rounded-lg shadow" />';
                         }
 
                         return new HtmlString(
@@ -177,7 +177,7 @@ class KaprodiStudentResource extends Resource
                                     '<a href="'.$downloadUrl.'" '.
                                        'class="inline-flex items-center gap-2 rounded-lg bg-primary-600 px-4 py-2 text-sm font-medium text-white shadow hover:bg-primary-700 transition">'.
                                         '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>'.
-                                        'Unduh Transkrip'.
+                                        'Unduh LoA'.
                                     '</a>'.
                                 '</div>'.
                             '</div>'
@@ -265,15 +265,6 @@ class KaprodiStudentResource extends Resource
 
                             $periode = "{$mulai} s/d {$selesai}";
 
-                            $loaLinks = '<span class="text-gray-400">Belum diunggah</span>';
-                            if ($supApp->loa_path) {
-                                $previewUrl = e(route('kaprodi.loa.preview', $record));
-                                $downloadUrl = e(route('kaprodi.loa.download', $record));
-                                $loaLinks = '<a href="'.$previewUrl.'" target="_blank" rel="noopener" class="text-primary-600 underline">Pratinjau</a>'.
-                                    ' &middot; '.
-                                    '<a href="'.$downloadUrl.'" class="text-primary-600 underline">Unduh</a>';
-                            }
-
                             $fields[] = Forms\Components\Placeholder::make('nomination_info')
                                 ->label(new HtmlString('<strong>Pengajuan Pembimbing</strong>'))
                                 ->content(new HtmlString(
@@ -283,8 +274,7 @@ class KaprodiStudentResource extends Resource
                                     '<strong>No. Telepon:</strong> '.($supApp->no_telepon ?? '-').'<br />'.
                                     '<strong>Email:</strong> '.($supApp->email ?? '-').'<br />'.
                                     "<strong>Periode:</strong> {$periode}<br />".
-                                    "<strong>Diajukan:</strong> {$diajukan}<br />".
-                                    "<strong>Bukti LoA:</strong> {$loaLinks}"
+                                    "<strong>Diajukan:</strong> {$diajukan}"
                                 ));
                         }
 
