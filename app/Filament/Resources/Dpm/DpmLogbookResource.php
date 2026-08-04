@@ -19,6 +19,10 @@ class DpmLogbookResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-book-open';
     protected static ?string $navigationLabel = 'Logbook Bimbingan';
     protected static ?string $navigationGroup = 'Bimbingan';
+
+    protected static ?string $modelLabel = 'Logbook';
+
+    protected static ?string $pluralModelLabel = 'Logbook';
     protected static ?int $navigationSort = 1;
     protected static ?string $slug = 'dpm/logbooks';
     public static function canAccess(): bool

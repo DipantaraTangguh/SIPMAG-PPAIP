@@ -26,6 +26,10 @@ class PpaipMitraApplicantResource extends Resource
 
     protected static ?string $navigationGroup = 'Review';
 
+    protected static ?string $modelLabel = 'Pelamar Mitra';
+
+    protected static ?string $pluralModelLabel = 'Pelamar Mitra';
+
     protected static ?int $navigationSort = 2;
 
     protected static ?string $slug = 'ppaip/mitra-applicants';

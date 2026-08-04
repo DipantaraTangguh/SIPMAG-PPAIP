@@ -31,6 +31,10 @@ class ExaminedSessionResource extends Resource
 
     protected static ?string $navigationGroup = 'Sidang';
 
+    protected static ?string $modelLabel = 'Sidang';
+
+    protected static ?string $pluralModelLabel = 'Sidang Diuji';
+
     protected static ?int $navigationSort = 1;
 
     protected static ?string $slug = 'penguji/defenses';
