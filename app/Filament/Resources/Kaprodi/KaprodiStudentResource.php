@@ -374,6 +374,86 @@ class KaprodiStudentResource extends Resource
 
             ])
             ->bulkActions([
+                // Jadwalkan sidang serentak (tanggal/waktu/ruang/penguji sama)
+                // buat semua mahasiswa terpilih yang sudah siap sidang.
+                Tables\Actions\BulkAction::make('scheduleSidangBulk')
+                    ->label('Jadwalkan Sidang Serentak')
+                    ->icon('heroicon-o-calendar-days')
+                    ->color('info')
+                    ->deselectRecordsAfterCompletion()
+                    ->modalHeading('Jadwalkan Sidang Serentak')
+                    ->modalDescription('Jadwal, ruangan, dan penguji berikut akan diterapkan ke semua mahasiswa terpilih yang siap sidang.')
+                    ->form([
+                        Forms\Components\DatePicker::make('scheduled_date')
+                            ->label('Tanggal Sidang')
+                            ->required()
+                            ->minDate(now()->addDay()),
+                        Forms\Components\TimePicker::make('scheduled_time')
+                            ->label('Waktu Sidang')
+                            ->seconds(false),
+                        Forms\Components\TextInput::make('room')
+                            ->label('Ruangan / Link')
+                            ->maxLength(100),
+                        Forms\Components\Select::make('dosen_penguji_1_id')
+                            ->label('Dosen Penguji 1')
+                            ->required()
+                            ->options(function () {
+                                $prodi = static::currentUser()?->lecturer?->study_program;
+
+                                return Lecturer::whereNotNull('user_id')
+                                    ->when($prodi, fn ($q) => $q->where('study_program', $prodi))
+                                    ->pluck('lecturer_name', 'id');
+                            })
+                            ->searchable()
+                            ->preload(),
+                        Forms\Components\Select::make('dosen_penguji_2_id')
+                            ->label('Dosen Penguji 2')
+                            ->required()
+                            ->different('dosen_penguji_1_id')
+                            ->options(function () {
+                                $prodi = static::currentUser()?->lecturer?->study_program;
+
+                                return Lecturer::whereNotNull('user_id')
+                                    ->when($prodi, fn ($q) => $q->where('study_program', $prodi))
+                                    ->pluck('lecturer_name', 'id');
+                            })
+                            ->searchable()
+                            ->preload(),
+                    ])
+                    ->action(function (Collection $records, array $data) {
+                        $lecturerId = static::currentUser()?->lecturer?->id;
+
+                        $eligible = $records->filter(fn (Student $s) => $s->access_status === 'MenungguSidang' &&
+                            $s->sidangSubmission &&
+                            $s->sidangSubmission->status === 'Pending'
+                        );
+
+                        foreach ($eligible as $student) {
+                            $student->sidangSubmission->update([
+                                'status' => 'Scheduled',
+                                'scheduled_date' => $data['scheduled_date'],
+                                'scheduled_time' => $data['scheduled_time'] ?? null,
+                                'room' => $data['room'] ?? null,
+                                'dosen_penguji_1_id' => $data['dosen_penguji_1_id'],
+                                'dosen_penguji_2_id' => $data['dosen_penguji_2_id'],
+                                'scheduled_by' => $lecturerId,
+                                'scheduled_at' => now(),
+                            ]);
+                        }
+
+                        $skipped = $records->count() - $eligible->count();
+                        $body = "{$eligible->count()} sidang berhasil dijadwalkan.";
+                        if ($skipped > 0) {
+                            $body .= " {$skipped} mahasiswa dilewati (belum siap sidang).";
+                        }
+
+                        Notification::make()
+                            ->title('Jadwal sidang serentak diterapkan')
+                            ->body($body)
+                            ->success()
+                            ->send();
+                    }),
+
                 // Bulk download transkrip buat kebutuhan review.
                 Tables\Actions\BulkAction::make('bulkDownloadTranskrip')
                     ->label('Download Transkrip')
