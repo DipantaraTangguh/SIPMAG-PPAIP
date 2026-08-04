@@ -265,6 +265,15 @@ class KaprodiStudentResource extends Resource
 
                             $periode = "{$mulai} s/d {$selesai}";
 
+                            $loaLinks = '<span class="text-gray-400">Belum diunggah</span>';
+                            if ($supApp->loa_path) {
+                                $previewUrl = e(route('kaprodi.loa.preview', $record));
+                                $downloadUrl = e(route('kaprodi.loa.download', $record));
+                                $loaLinks = '<a href="'.$previewUrl.'" target="_blank" rel="noopener" class="text-primary-600 underline">Pratinjau</a>'.
+                                    ' &middot; '.
+                                    '<a href="'.$downloadUrl.'" class="text-primary-600 underline">Unduh</a>';
+                            }
+
                             $fields[] = Forms\Components\Placeholder::make('nomination_info')
                                 ->label(new HtmlString('<strong>Pengajuan Pembimbing</strong>'))
                                 ->content(new HtmlString(
@@ -274,7 +283,8 @@ class KaprodiStudentResource extends Resource
                                     '<strong>No. Telepon:</strong> '.($supApp->no_telepon ?? '-').'<br />'.
                                     '<strong>Email:</strong> '.($supApp->email ?? '-').'<br />'.
                                     "<strong>Periode:</strong> {$periode}<br />".
-                                    "<strong>Diajukan:</strong> {$diajukan}"
+                                    "<strong>Diajukan:</strong> {$diajukan}<br />".
+                                    "<strong>Bukti LoA:</strong> {$loaLinks}"
                                 ));
                         }
 
