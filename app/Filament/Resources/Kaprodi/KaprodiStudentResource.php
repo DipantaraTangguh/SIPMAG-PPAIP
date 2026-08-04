@@ -31,6 +31,10 @@ class KaprodiStudentResource extends Resource
 
     protected static ?string $navigationGroup = 'Akademik';
 
+    protected static ?string $modelLabel = 'Mahasiswa';
+
+    protected static ?string $pluralModelLabel = 'Mahasiswa';
+
     protected static ?int $navigationSort = 1;
 
     protected static ?string $slug = 'kaprodi/students';

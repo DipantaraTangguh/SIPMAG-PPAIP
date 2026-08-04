@@ -16,6 +16,10 @@ class PpaipInternshipResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-briefcase';
     protected static ?string $navigationLabel = 'Lowongan Magang';
     protected static ?string $navigationGroup = 'Data';
+
+    protected static ?string $modelLabel = 'Lowongan Magang';
+
+    protected static ?string $pluralModelLabel = 'Lowongan Magang';
     protected static ?int $navigationSort = 2;
     protected static ?string $slug = 'ppaip/internships';
 

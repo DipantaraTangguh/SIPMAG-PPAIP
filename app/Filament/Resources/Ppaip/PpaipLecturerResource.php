@@ -16,6 +16,10 @@ class PpaipLecturerResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-user-group';
     protected static ?string $navigationLabel = 'Dosen';
     protected static ?string $navigationGroup = 'Data';
+
+    protected static ?string $modelLabel = 'Dosen';
+
+    protected static ?string $pluralModelLabel = 'Dosen';
     protected static ?int $navigationSort = 3;
     protected static ?string $slug = 'ppaip/lecturers';
 

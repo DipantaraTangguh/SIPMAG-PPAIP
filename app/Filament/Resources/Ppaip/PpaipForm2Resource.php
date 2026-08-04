@@ -27,6 +27,10 @@ class PpaipForm2Resource extends Resource
 
     protected static ?string $navigationGroup = 'Review';
 
+    protected static ?string $modelLabel = 'Pengajuan Form 2';
+
+    protected static ?string $pluralModelLabel = 'Pengajuan Form 2';
+
     protected static ?int $navigationSort = 1;
 
     protected static ?string $slug = 'ppaip/form2';
@@ -50,6 +54,55 @@ class PpaipForm2Resource extends Resource
     {
         return parent::getEloquentQuery()
             ->with('student.dpm');
+    }
+
+    public static function infolist(Infolist $infolist): Infolist
+    {
+        return $infolist
+            ->schema([
+                Section::make('Data Mahasiswa')
+                    ->schema([
+                        TextEntry::make('student.nim')->label('NIM'),
+                        TextEntry::make('student.name')->label('Nama'),
+                        TextEntry::make('student.study_program')->label('Program Studi'),
+                        TextEntry::make('student.dpm.lecturer_name')
+                            ->label('Dosen Pembimbing')
+                            ->placeholder('-'),
+                    ])
+                    ->columns(2),
+
+                Section::make('Data Form 2')
+                    ->schema([
+                        TextEntry::make('company_name')->label('Perusahaan'),
+                        TextEntry::make('nama_pimpinan')->label('Nama Pimpinan')->placeholder('-'),
+                        TextEntry::make('jabatan_pimpinan')->label('Jabatan Pimpinan')->placeholder('-'),
+                        TextEntry::make('alamat_perusahaan')
+                            ->label('Alamat Perusahaan')
+                            ->columnSpanFull(),
+                        TextEntry::make('lingkup_magang')
+                            ->label('Lingkup Magang')
+                            ->columnSpanFull(),
+                        TextEntry::make('tanggal_mulai')->label('Bulan Mulai')->date('F Y'),
+                        TextEntry::make('tanggal_selesai')->label('Bulan Selesai')->date('F Y'),
+                        TextEntry::make('status')
+                            ->label('Status')
+                            ->badge()
+                            ->color(fn (string $state): string => match ($state) {
+                                'PendingReview' => 'warning',
+                                'ApprovedForm2' => 'success',
+                                'RejectedForm2' => 'danger',
+                                default => 'gray',
+                            }),
+                        TextEntry::make('rejection_reason')
+                            ->label('Alasan Penolakan')
+                            ->placeholder('-')
+                            ->columnSpanFull(),
+                        TextEntry::make('submitted_at')
+                            ->label('Diajukan Pada')
+                            ->dateTime('d M Y H:i'),
+                    ])
+                    ->columns(2),
+            ]);
     }
 
     public static function table(Table $table): Table
@@ -118,6 +171,7 @@ class PpaipForm2Resource extends Resource
     {
         return [
             'index' => ListForm2::route('/'),
+            'view' => ViewForm2Submission::route('/{record}'),
         ];
     }
 }

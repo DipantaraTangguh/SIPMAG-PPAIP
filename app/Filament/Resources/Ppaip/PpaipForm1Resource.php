@@ -25,6 +25,10 @@ class PpaipForm1Resource extends Resource
 
     protected static ?string $navigationGroup = 'Review';
 
+    protected static ?string $modelLabel = 'Pengajuan Form 1';
+
+    protected static ?string $pluralModelLabel = 'Pengajuan Form 1';
+
     protected static ?int $navigationSort = 0;
 
     protected static ?string $slug = 'ppaip/form1';
