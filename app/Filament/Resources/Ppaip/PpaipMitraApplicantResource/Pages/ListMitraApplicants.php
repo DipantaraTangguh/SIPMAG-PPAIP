@@ -14,7 +14,7 @@ class ListMitraApplicants extends ListRecords
     {
         return [
             Actions\Action::make('exportExcel')
-                ->label('Export Excel')
+                ->label('Ekspor Excel')
                 ->icon('heroicon-o-arrow-down-tray')
                 ->color('success')
                 ->url(route('mitra-applications.export')),

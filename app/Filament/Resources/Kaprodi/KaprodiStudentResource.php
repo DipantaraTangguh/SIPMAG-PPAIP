@@ -173,7 +173,7 @@ class KaprodiStudentResource extends Resource
                                     '<a href="'.$downloadUrl.'" '.
                                        'class="inline-flex items-center gap-2 rounded-lg bg-primary-600 px-4 py-2 text-sm font-medium text-white shadow hover:bg-primary-700 transition">'.
                                         '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>'.
-                                        'Download Transkrip'.
+                                        'Unduh Transkrip'.
                                     '</a>'.
                                 '</div>'.
                             '</div>'
@@ -185,7 +185,7 @@ class KaprodiStudentResource extends Resource
 
                 // Action approve Form 1.
                 Tables\Actions\Action::make('approveForm1')
-                    ->label('Approve Form 1')
+                    ->label('Setujui Form 1')
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
                     ->visible(fn (Student $record) => $record->access_status === 'PendingReview')
@@ -201,7 +201,7 @@ class KaprodiStudentResource extends Resource
 
                 // Action reject Form 1.
                 Tables\Actions\Action::make('rejectForm1')
-                    ->label('Reject Form 1')
+                    ->label('Tolak Form 1')
                     ->icon('heroicon-o-x-circle')
                     ->color('danger')
                     ->visible(fn (Student $record) => $record->access_status === 'PendingReview')
@@ -218,7 +218,7 @@ class KaprodiStudentResource extends Resource
                 // Tombol ini muncul cuma kalau mahasiswa sudah submit pengajuan.
                 // Dan belum punya DPM supaya assign-nya nggak dobel.
                 Tables\Actions\Action::make('assignDpm')
-                    ->label('Assign DPM')
+                    ->label('Tunjuk DPM')
                     ->icon('heroicon-o-user-plus')
                     ->color('primary')
                     ->visible(fn (Student $record) => ! $record->dpm_id &&
