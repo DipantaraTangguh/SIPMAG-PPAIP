@@ -4,6 +4,7 @@ use App\Exports\MitraApplicantsExport;
 use App\Models\Application as InternshipApplication;
 use App\Models\DefenseSubmission;
 use App\Models\Student;
+use App\Models\SupervisorApplication;
 use App\Support\DefenseDocument;
 use App\Support\StoredFilePath;
 use Illuminate\Http\Request;
@@ -91,6 +92,25 @@ Route::middleware(['web', 'auth'])->prefix('admin/dpm/loa')->group(function () {
 
         return serveStoredFile($student->supervisorApplication?->loa_path, 'LoA tidak tersedia.', "loa_{$student->nim}");
     })->name('dpm.loa.download');
+});
+
+// Kaprodi perlu memverifikasi keaslian LoA sebelum menunjuk DPM.
+Route::middleware(['web', 'auth'])->prefix('admin/kaprodi/loa')->group(function () {
+    Route::get('/{student}/preview', function (Student $student) {
+        /** @var SupervisorApplication $application */
+        $application = $student->supervisorApplication()->firstOrFail();
+        Gate::authorize('view', $application);
+
+        return serveStoredFile($application->loa_path, 'LoA tidak tersedia.');
+    })->name('kaprodi.loa.preview');
+
+    Route::get('/{student}/download', function (Student $student) {
+        /** @var SupervisorApplication $application */
+        $application = $student->supervisorApplication()->firstOrFail();
+        Gate::authorize('view', $application);
+
+        return serveStoredFile($application->loa_path, 'LoA tidak tersedia.', "loa_{$student->nim}");
+    })->name('kaprodi.loa.download');
 });
 
 // Sisanya lempar ke React router.
