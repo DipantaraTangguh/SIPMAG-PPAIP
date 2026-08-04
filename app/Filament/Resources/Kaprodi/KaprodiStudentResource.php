@@ -318,7 +318,8 @@ class KaprodiStudentResource extends Resource
                             ->required()
                             ->minDate(now()->addDay()),
                         Forms\Components\TimePicker::make('scheduled_time')
-                            ->label('Waktu Sidang'),
+                            ->label('Waktu Sidang')
+                            ->seconds(false),
                         Forms\Components\TextInput::make('room')
                             ->label('Ruangan / Link')
                             ->maxLength(100),
