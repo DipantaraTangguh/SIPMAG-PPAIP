@@ -187,7 +187,7 @@ class PpaipMitraApplicantResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\Action::make('downloadCv')
-                    ->label('Download CV')
+                    ->label('Unduh CV')
                     ->icon('heroicon-o-arrow-down-tray')
                     ->visible(fn (Application $record): bool => ! empty($record->cv_file_path))
                     ->url(fn (Application $record): string => route('mitra-applications.cv.download', $record)),

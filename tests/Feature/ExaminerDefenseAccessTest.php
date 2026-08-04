@@ -80,12 +80,12 @@ class ExaminerDefenseAccessTest extends TestCase
 
         $this->get('/admin/penguji/defenses')
             ->assertOk()
-            ->assertSee('Examined Sessions');
+            ->assertSee('Sidang Diuji');
 
         $this->get("/admin/penguji/defenses/{$submission->id}")
             ->assertOk()
-            ->assertSee('Student Details')
-            ->assertSee('Exam Documents');
+            ->assertSee('Detail Mahasiswa')
+            ->assertSee('Dokumen Sidang');
     }
 
     public function test_examiner_document_download_requires_assigned_session(): void
