@@ -55,7 +55,7 @@ class KaprodiStudentResource extends Resource
 
         return parent::getEloquentQuery()
             ->where('study_program', $prodi)
-            ->with(['dpm', 'sidangSubmission', 'supervisorApplication:id,student_id,loa_path'])
+            ->with(['dpm', 'sidangSubmission', 'supervisorApplication'])
             ->withCount(['logbooks as approved_logbook_count' => fn ($query) => $query->where('status', 'Approved')]);
     }
 
