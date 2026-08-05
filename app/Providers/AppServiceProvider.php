@@ -3,7 +3,9 @@
 namespace App\Providers;
 
 use App\Models\Application;
+use App\Models\DefenseAssessment;
 use App\Observers\ApplicationObserver;
+use App\Observers\DefenseAssessmentObserver;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -26,6 +28,7 @@ class AppServiceProvider extends ServiceProvider
         }
 
         Application::observe(ApplicationObserver::class);
+        DefenseAssessment::observe(DefenseAssessmentObserver::class);
 
         RateLimiter::for('login', function (Request $request): array {
             $identifier = Str::lower(trim((string) $request->input('login')));

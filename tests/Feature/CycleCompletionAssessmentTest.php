@@ -15,9 +15,8 @@ class CycleCompletionAssessmentTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_cycle_cannot_be_completed_until_all_three_assessors_have_scored(): void
+    public function test_cycle_is_not_completed_until_all_three_assessors_have_scored(): void
     {
-        [$kaprodiUser] = $this->lecturerUser('kaprodi', 'Kaprodi');
         [$dpmUser, $dpm] = $this->lecturerUser('dpm', 'Dosen Pembimbing');
         [$examinerOneUser, $examinerOne] = $this->lecturerUser('dosen_penguji', 'Penguji Satu');
         [, $examinerTwo] = $this->lecturerUser('dosen_penguji', 'Penguji Dua');
@@ -28,18 +27,12 @@ class CycleCompletionAssessmentTest extends TestCase
         $assessmentService->save($examinerOneUser, $submission, $this->scores(82));
 
         $this->assertFalse(app(InternshipCycleCompletionService::class)->canComplete($student));
-
-        $this->actingAs($kaprodiUser)
-            ->postJson("/api/kaprodi/defense/{$student->id}/complete")
-            ->assertUnprocessable()
-            ->assertJsonValidationErrors('assessments');
-
         $this->assertSame('MenungguSidang', $student->fresh()->access_status);
+        $this->assertSame(0, $student->internshipCycles()->count());
     }
 
-    public function test_cycle_can_be_completed_after_all_three_assessments_are_available(): void
+    public function test_cycle_completes_automatically_once_the_last_assessor_scores(): void
     {
-        [$kaprodiUser] = $this->lecturerUser('kaprodi', 'Kaprodi');
         [$dpmUser, $dpm] = $this->lecturerUser('dpm', 'Dosen Pembimbing');
         [$examinerOneUser, $examinerOne] = $this->lecturerUser('dosen_penguji', 'Penguji Satu');
         [$examinerTwoUser, $examinerTwo] = $this->lecturerUser('dosen_penguji', 'Penguji Dua');
@@ -60,15 +53,12 @@ class CycleCompletionAssessmentTest extends TestCase
 
         $assessmentService->save($dpmUser, $submission, $this->scores(80));
         $assessmentService->save($examinerOneUser, $submission, $this->scores(82));
+
+        // Belum lengkap: siklus masih berjalan.
+        $this->assertSame('MenungguSidang', $student->fresh()->access_status);
+
+        // Penilai terakhir masuk -> siklus tertutup otomatis, nilai terbit.
         $assessmentService->save($examinerTwoUser, $submission, $this->scores(84));
-
-        $this->assertTrue(app(InternshipCycleCompletionService::class)->canComplete($student));
-
-        $this->actingAs($kaprodiUser)
-            ->postJson("/api/kaprodi/defense/{$student->id}/complete")
-            ->assertOk()
-            ->assertJsonPath('access_status', 'SiklusSelesai')
-            ->assertJsonPath('final_score', 82);
 
         $student->refresh();
 
@@ -108,7 +98,7 @@ class CycleCompletionAssessmentTest extends TestCase
             ->assertSee('Penilaian Sidang')
             ->assertSee('3/3')
             ->assertSee('82.00 (A-)')
-            ->assertSee('Selesaikan Siklus');
+            ->assertDontSee('Selesaikan Siklus');
     }
 
     /**

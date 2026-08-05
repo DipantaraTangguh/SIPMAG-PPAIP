@@ -5,8 +5,6 @@ namespace App\Filament\Resources\Ppaip;
 use App\Filament\Resources\Ppaip\PpaipStudentResource\Pages\ListStudents;
 use App\Models\Student;
 use App\Services\DefenseAssessmentService;
-use App\Services\InternshipCycleCompletionService;
-use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -132,27 +130,6 @@ class PpaipStudentResource extends Resource
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
-
-                // ACTION: Selesaikan Siklus Magang.
-                // PRD §5.4 - hanya PPAIP yang boleh trigger cycle reset.
-                // Muncul setelah sidang sudah dijadwalkan (status Scheduled).
-                Tables\Actions\Action::make('completeCycle')
-                    ->label('Selesaikan Siklus')
-                    ->icon('heroicon-o-arrow-path')
-                    ->color('warning')
-                    ->visible(fn (Student $record): bool => app(InternshipCycleCompletionService::class)->canComplete($record))
-                    ->requiresConfirmation()
-                    ->modalHeading('Selesaikan Siklus Magang')
-                    ->modalDescription('Seluruh penilaian telah lengkap. Siklus magang akan diselesaikan dan riwayat tetap tersimpan.')
-                    ->action(function (Student $record): void {
-                        $finalScore = app(InternshipCycleCompletionService::class)->complete($record);
-
-                        Notification::make()
-                            ->title('Siklus magang diselesaikan')
-                            ->body("Siklus magang {$record->name} selesai dengan nilai akhir ".number_format($finalScore, 2).'.')
-                            ->success()
-                            ->send();
-                    }),
             ])
             ->bulkActions([]);
     }

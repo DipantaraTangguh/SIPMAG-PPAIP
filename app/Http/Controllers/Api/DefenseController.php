@@ -9,7 +9,6 @@ use App\Http\Resources\DefenseSubmissionResource;
 use App\Http\Resources\StudentResource;
 use App\Models\DefenseSubmission;
 use App\Models\Student;
-use App\Services\InternshipCycleCompletionService;
 use App\Services\StudentStateMachine;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -145,29 +144,4 @@ class DefenseController extends Controller
         ]);
     }
 
-    public function completeCycle(Request $request, int $studentId)
-    {
-        $lecturer = $request->user()->lecturer;
-
-        $student = Student::where('id', $studentId)
-            ->where('access_status', 'MenungguSidang')
-            ->firstOrFail();
-
-        Gate::authorize('manageDefense', $student);
-
-        $submission = $student->sidangSubmission;
-        if (! $submission || $submission->status !== 'Scheduled') {
-            return response()->json(['message' => 'Sidang belum dijadwalkan.'], 422);
-        }
-
-        Gate::authorize('complete', $submission);
-
-        $finalScore = app(InternshipCycleCompletionService::class)->complete($student);
-
-        return response()->json([
-            'message' => 'Siklus magang berhasil diselesaikan.',
-            'access_status' => 'SiklusSelesai',
-            'final_score' => $finalScore,
-        ]);
-    }
 }
