@@ -45,15 +45,6 @@ class DefenseSubmissionPolicy
             && $submission->student?->access_status === 'MenungguSidang';
     }
 
-    public function complete(User $user, DefenseSubmission $submission): bool
-    {
-        return $user->isKaprodi()
-            && $user->lecturer?->study_program !== null
-            && $user->lecturer->study_program === $submission->student?->study_program
-            && $submission->status === 'Scheduled'
-            && $submission->student?->access_status === 'MenungguSidang';
-    }
-
     public function assess(User $user, DefenseSubmission $submission): bool
     {
         return $submission->status === 'Scheduled'

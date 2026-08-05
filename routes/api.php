@@ -72,10 +72,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/supervisor-applications/{studentId}/loa', [SupervisorController::class, 'downloadLoaForKaprodi']);
         Route::post('/assign-dpm', [SupervisorController::class, 'assignDpm']);
 
-        // Jadwal sidang dan closing cycle magang.
+        // Jadwal sidang. Siklus ditutup otomatis begitu penilaian lengkap.
         Route::get('/defense', [DefenseController::class, 'indexForKaprodi']);
         Route::post('/defense/{studentId}/schedule', [DefenseController::class, 'scheduleSidang']);
-        Route::post('/defense/{studentId}/complete', [DefenseController::class, 'completeCycle']);
 
         // Data mahasiswa buat dashboard Kaprodi.
         Route::get('/students', [StudentController::class, 'indexForKaprodi']);
