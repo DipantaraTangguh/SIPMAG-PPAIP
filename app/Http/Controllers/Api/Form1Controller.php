@@ -66,6 +66,7 @@ class Form1Controller extends Controller
             'skemaMagang'  => $validated['skemaMagang'],
             'topikMagang'  => $validated['topikMagang'],
             'outputTarget' => $validated['outputTarget'],
+            'catatanKhusus' => $validated['catatanKhusus'] ?? null,
         ];
 
         $student->fill([

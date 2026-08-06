@@ -49,6 +49,64 @@ class Form1SubmissionTest extends TestCase
         $this->assertSame('PendingReview', $student->access_status);
     }
 
+    public function test_form_1_stores_optional_catatan_khusus(): void
+    {
+        [$user, $student] = $this->readyStudent('1101214240', 'catatan@student.bakrie.ac.id');
+
+        $this->actingAs($user)
+            ->post('/api/form1', [
+                'jenisMagang' => 'wajib',
+                'skemaMagang' => 'Magang Perusahaan',
+                'topikMagang' => 'PT Contoh Indonesia',
+                'outputTarget' => 'Laporan',
+                'catatanKhusus' => 'Saya sedang mengambil skripsi paralel.',
+            ])
+            ->assertCreated();
+
+        $this->assertSame(
+            'Saya sedang mengambil skripsi paralel.',
+            $student->fresh()->form1_data['catatanKhusus'],
+        );
+    }
+
+    public function test_form_1_is_accepted_without_catatan_khusus(): void
+    {
+        [$user, $student] = $this->readyStudent('1101214241', 'tanpa-catatan@student.bakrie.ac.id');
+
+        $this->actingAs($user)
+            ->post('/api/form1', [
+                'jenisMagang' => 'wajib',
+                'skemaMagang' => 'Magang Perusahaan',
+                'topikMagang' => 'PT Contoh Indonesia',
+                'outputTarget' => 'Laporan',
+            ])
+            ->assertCreated();
+
+        $this->assertNull($student->fresh()->form1_data['catatanKhusus']);
+    }
+
+    /**
+     * @return array{User, Student}
+     */
+    private function readyStudent(string $nim, string $email): array
+    {
+        $user = User::factory()->create(['role' => 'mahasiswa']);
+        $student = Student::create([
+            'user_id' => $user->id,
+            'nim' => $nim,
+            'name' => 'Mahasiswa Catatan',
+            'study_program' => 'Sistem Informasi',
+            'email' => $email,
+            'semester' => 6,
+            'tahun_akademik' => '2025/2026',
+            'jumlah_sks' => 120,
+            'ipk' => 3.75,
+            'access_status' => 'Unverified',
+        ]);
+
+        return [$user, $student];
+    }
+
     public function test_form_1_rejects_old_internship_scheme_values(): void
     {
         $user = User::factory()->create(['role' => 'mahasiswa']);

@@ -28,6 +28,7 @@ export default function useForm1() {
         rencanaSkema: prefill?.rencanaSkema ?? '',
         topikTempat: prefill?.topikTempat ?? '',
         output: prefill?.output ?? '',
+        catatanKhusus: prefill?.catatanKhusus ?? '',
         declarationChecked: false,
     });
 
@@ -95,6 +96,10 @@ export default function useForm1() {
                 fd.append('skemaMagang',  formData.rencanaSkema);
                 fd.append('topikMagang',  formData.topikTempat);
                 fd.append('outputTarget', formData.output);
+                // Opsional: hanya dikirim kalau mahasiswa mengisinya.
+                if (formData.catatanKhusus.trim()) {
+                    fd.append('catatanKhusus', formData.catatanKhusus.trim());
+                }
 
                 await submitForm1(fd);
                 navigate('/form1/status', { replace: true });

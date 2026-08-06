@@ -108,6 +108,11 @@ class PpaipForm1Resource extends Resource
                         TextEntry::make('output_target')
                             ->label('Output')
                             ->state(fn (Student $record): string => $record->form1_data['outputTarget'] ?? '-'),
+                        TextEntry::make('catatan_khusus')
+                            ->label('Catatan Khusus')
+                            ->state(fn (Student $record): ?string => $record->form1_data['catatanKhusus'] ?? null)
+                            ->placeholder('Tidak ada catatan')
+                            ->columnSpanFull(),
                         TextEntry::make('form1Approver.lecturer_name')
                             ->label('Disetujui Oleh')
                             ->placeholder('-'),
@@ -141,6 +146,13 @@ class PpaipForm1Resource extends Resource
                 Tables\Columns\TextColumn::make('output_target')
                     ->label('Output')
                     ->getStateUsing(fn (Student $record): string => $record->form1_data['outputTarget'] ?? '-'),
+                Tables\Columns\TextColumn::make('catatan_khusus')
+                    ->label('Catatan Khusus')
+                    ->getStateUsing(fn (Student $record): ?string => $record->form1_data['catatanKhusus'] ?? null)
+                    ->placeholder('-')
+                    ->limit(32)
+                    ->tooltip(fn (Student $record): ?string => $record->form1_data['catatanKhusus'] ?? null)
+                    ->toggleable(),
                 Tables\Columns\TextColumn::make('access_status')
                     ->label('Status')
                     ->badge()

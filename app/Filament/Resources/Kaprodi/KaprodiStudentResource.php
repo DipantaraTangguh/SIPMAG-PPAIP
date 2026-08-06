@@ -84,6 +84,11 @@ class KaprodiStudentResource extends Resource
             ])->columns(2),
 
             Forms\Components\Section::make('Form 1 Data')->schema([
+                // Catatan opsional dari mahasiswa; ditarik keluar dari KeyValue
+                // supaya terbaca utuh saat Kaprodi meninjau pengajuan.
+                Forms\Components\Placeholder::make('catatan_khusus')
+                    ->label('Catatan Khusus')
+                    ->content(fn (?Student $record): string => $record?->form1_data['catatanKhusus'] ?? 'Tidak ada catatan'),
                 Forms\Components\KeyValue::make('form1_data')->label('Data Form 1')->disabled(),
                 Forms\Components\Textarea::make('form1_rejection_reason')
                     ->label('Alasan Penolakan')
@@ -128,6 +133,13 @@ class KaprodiStudentResource extends Resource
                         'HasDPM' => 'primary',
                         default => 'gray',
                     }),
+                Tables\Columns\TextColumn::make('catatan_khusus')
+                    ->label('Catatan Khusus')
+                    ->getStateUsing(fn (Student $record): ?string => $record->form1_data['catatanKhusus'] ?? null)
+                    ->placeholder('-')
+                    ->limit(30)
+                    ->tooltip(fn (Student $record): ?string => $record->form1_data['catatanKhusus'] ?? null)
+                    ->toggleable(),
                 Tables\Columns\TextColumn::make('dpm.lecturer_name')->label('DPM')->placeholder('-'),
                 Tables\Columns\TextColumn::make('approved_logbook_count')->label('Logbook')->sortable(),
                 Tables\Columns\IconColumn::make('supervisorApplication.loa_path')
