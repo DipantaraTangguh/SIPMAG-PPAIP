@@ -16,6 +16,9 @@ class DatabaseSeeder extends Seeder
             LecturerSeeder::class,
             StudentSeeder::class,
             InternshipSeeder::class,
+            // Didaftarkan di sini supaya 100 mahasiswa demo ikut terbentuk
+            // ulang setiap `migrate:fresh --seed`, bukan hilang begitu saja.
+            DemoStudentsSeeder::class,
         ]);
     }
 }
