@@ -84,6 +84,13 @@ class ApplicationController extends Controller
                     ]);
                 }
 
+                if (! $internship->acceptsStudyProgram($student->study_program)) {
+                    throw ValidationException::withMessages([
+                        'internship_id' => 'Lowongan ini hanya dibuka untuk program studi: '
+                            .implode(', ', $internship->study_programs).'.',
+                    ]);
+                }
+
                 $alreadyApplied = Application::where('student_id', $student->id)
                     ->where('internship_id', $internship->id)
                     ->exists();

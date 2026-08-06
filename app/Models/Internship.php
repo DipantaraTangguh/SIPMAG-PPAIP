@@ -13,7 +13,7 @@ class Internship extends Model
         'description',
         'capacity',
         'duration',
-        'bidang',
+        'study_programs',
         'start_date',
         'job_description',
         'skills',
@@ -31,10 +31,26 @@ class Internship extends Model
             'job_description' => 'array',
             'skills' => 'array',
             'requirements' => 'array',
+            'study_programs' => 'array',
             'start_date' => 'date',
             'deadline' => 'date',
             'is_active' => 'boolean',
         ];
+    }
+
+    /**
+     * Lowongan tanpa daftar prodi dianggap terbuka untuk semua prodi --
+     * termasuk lowongan lama yang bidang-nya belum dipetakan PPAIP.
+     */
+    public function acceptsStudyProgram(?string $studyProgram): bool
+    {
+        $allowed = $this->study_programs;
+
+        if (empty($allowed)) {
+            return true;
+        }
+
+        return $studyProgram !== null && in_array($studyProgram, $allowed, true);
     }
 
     public function scopeOpenForApplications(Builder $query): Builder

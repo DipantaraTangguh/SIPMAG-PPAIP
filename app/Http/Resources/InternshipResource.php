@@ -16,7 +16,7 @@ class InternshipResource extends JsonResource
             'description' => $this->description,
             'capacity' => $this->capacity,
             'duration' => $this->duration,
-            'bidang' => $this->bidang,
+            'study_programs' => $this->study_programs ?? [],
             'start_date' => $this->start_date?->toDateString(),
             'job_description' => $this->job_description,
             'skills' => $this->skills,
