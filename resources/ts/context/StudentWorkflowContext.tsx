@@ -168,8 +168,11 @@ export function StudentWorkflowProvider({ children }) {
         const res = await api.upload('/student/cycle/confirm', formData);
         await refreshProfile();
         updateStudentLocally({ accessStatus: res.access_status });
+        // Panel status baca form1Submission.status, bukan cuma accessStatus --
+        // tanpa fetch ulang, panel konfirmasi masih tampil sampai user refresh.
+        await fetchAllStudentData();
         return res;
-    }, [refreshProfile, updateStudentLocally]);
+    }, [refreshProfile, updateStudentLocally, fetchAllStudentData]);
 
     // Reset siklus mandiri: hanya tersedia saat SiklusSelesai / SelesaiNonWajib.
     // Riwayat magang tetap tersimpan di server (internship_cycles).
