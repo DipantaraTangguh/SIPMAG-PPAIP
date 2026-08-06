@@ -33,9 +33,12 @@ function mapInternship(i) {
         id: i.id,
         companyName: company,
         position: i.position,
-        location: i.location,
+        location: i.location || '',
+        bidang: i.bidang || '',
+        sistemKerja: i.sistem_kerja || '',
         deadline,
         deadlineDate,
+        createdAt: i.created_at || '',
         logoColor: pickLogoColor(company),
         logoInitial: (company.trim()[0] || '?').toUpperCase(),
         isActive: !!i.is_active,
@@ -74,6 +77,7 @@ export default function InternshipPortalPage() {
     const [searchQuery, setSearchQuery] = useState('');
     const [sortBy, setSortBy] = useState('terbaru');
     const [vacancies, setVacancies] = useState([]);
+    const [filters, setFilters] = useState({ bidang: '', sistemKerja: '', location: '' });
 
     // State navigasi dibersihin supaya refresh nggak maksa tab lama.
     useEffect(() => {
@@ -102,20 +106,51 @@ export default function InternshipPortalPage() {
                 (v) =>
                     v.companyName.toLowerCase().includes(q) ||
                     v.position.toLowerCase().includes(q) ||
-                    v.location.toLowerCase().includes(q),
+                    (v.location || '').toLowerCase().includes(q),
             );
         }
 
-        if (sortBy === 'deadline') {
-            result.sort(
-                (a, b) =>
-                    new Date(a.deadlineDate).getTime() -
-                    new Date(b.deadlineDate).getTime(),
+        if (filters.bidang) {
+            result = result.filter((v) => v.bidang === filters.bidang);
+        }
+
+        if (filters.sistemKerja) {
+            result = result.filter((v) => v.sistemKerja === filters.sistemKerja);
+        }
+
+        if (filters.location) {
+            result = result.filter((v) => v.location === filters.location);
+        }
+
+        if (sortBy === 'terbaru') {
+            result.sort((a, b) =>
+                new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
             );
+        } else if (sortBy === 'deadline') {
+            result.sort((a, b) => {
+                // Entry tanpa deadline didorong ke paling bawah.
+                if (!a.deadlineDate && !b.deadlineDate) return 0;
+                if (!a.deadlineDate) return 1;
+                if (!b.deadlineDate) return -1;
+                return new Date(a.deadlineDate).getTime() - new Date(b.deadlineDate).getTime();
+            });
         }
 
         return result;
-    }, [vacancies, searchQuery, sortBy]);
+    }, [vacancies, searchQuery, sortBy, filters]);
+
+    // Opsi unik untuk dropdown filter — dipopulate dari data aktual.
+    const filterOptions = useMemo(() => ({
+        bidang: [...new Set(vacancies.map((v) => v.bidang).filter(Boolean))].sort(),
+        sistemKerja: [...new Set(vacancies.map((v) => v.sistemKerja).filter(Boolean))].sort(),
+        location: [...new Set(vacancies.map((v) => v.location).filter(Boolean))].sort(),
+    }), [vacancies]);
+
+    const handleFilterChange = (key: string, value: string) => {
+        setFilters((prev) => ({ ...prev, [key]: value }));
+    };
+
+    const activeFilterCount = Object.values(filters).filter(Boolean).length;
 
     const handleCardClick = (id) => {
         navigate(`/portal/vacancy/${id}`);
@@ -169,6 +204,10 @@ export default function InternshipPortalPage() {
                             onSearchChange={setSearchQuery}
                             sortBy={sortBy}
                             onSortChange={setSortBy}
+                            filters={filters}
+                            onFilterChange={handleFilterChange}
+                            filterOptions={filterOptions}
+                            activeFilterCount={activeFilterCount}
                         />
                         <div className="grid grid-cols-1 items-start gap-6 xl:grid-cols-[1fr_300px]">
                             <VacancyGrid
