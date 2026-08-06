@@ -34,7 +34,8 @@ class StudentCycleController extends Controller
     }
 
     /**
-     * Konfirmasi hasil magang non-wajib jalur Form 2 (state MenungguKonfirmasi):
+     * Konfirmasi hasil magang non-wajib (state MenungguKonfirmasi, atau
+     * HasApplication untuk jalur mitra yang lapor sendiri):
      * - diterima : wajib bukti LoA + tempat & periode aktual → SelesaiNonWajib + riwayat.
      * - ditolak  : mundur ke ApprovedForm1 agar bisa mengajukan Form 2 lagi.
      */
@@ -47,11 +48,23 @@ class StudentCycleController extends Controller
 
         Gate::authorize('view', $student);
 
+        $validated = $request->validated();
+
+        // Jalur mitra: mahasiswa non-wajib yang lamarannya diterima langsung
+        // oleh perusahaan boleh melapor sendiri, tanpa menunggu PPAIP/mitra
+        // mengubah status lamaran lebih dulu. Penolakan tidak perlu dilaporkan
+        // dari sini -- mereka tinggal melamar lowongan lain lewat portal.
+        if (
+            $student->access_status === 'HasApplication'
+            && $validated['hasil'] === 'diterima'
+            && ($student->form1_data['jenisMagang'] ?? 'wajib') === 'non_wajib'
+        ) {
+            $stateMachine->transition($student, 'MenungguKonfirmasi');
+        }
+
         if ($student->access_status !== 'MenungguKonfirmasi') {
             return response()->json(['message' => 'Tidak ada konfirmasi magang yang menunggu.'], 403);
         }
-
-        $validated = $request->validated();
 
         if ($validated['hasil'] === 'ditolak') {
             $stateMachine->transition($student, 'ApprovedForm1');

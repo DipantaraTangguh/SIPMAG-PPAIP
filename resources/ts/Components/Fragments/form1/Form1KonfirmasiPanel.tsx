@@ -4,12 +4,15 @@ import { BadgeCheck, Upload, Loader2, XCircle } from "lucide-react";
 import { useForm1Workflow } from "../../../context/StudentWorkflowContext";
 
 /**
- * Panel state MenungguKonfirmasi (magang non-wajib jalur Form 2).
- * Surat pengantar sudah disetujui - sekarang mahasiswa wajib melaporkan
+ * Panel state MenungguKonfirmasi (magang non-wajib jalur Form 2), dipakai juga
+ * di HasApplication buat jalur mitra yang lapor sendiri. Mahasiswa melaporkan
  * hasilnya: diterima (upload LoA + tempat & periode aktual) atau ditolak
  * (kembali bisa mengajukan Form 2 ke perusahaan lain).
+ *
+ * allowDecline=false dipakai di jalur mitra: kalau lamarannya belum tembus,
+ * mahasiswa tinggal melamar lowongan lain lewat portal, tanpa lapor apa pun.
  */
-export default function Form1KonfirmasiPanel() {
+export default function Form1KonfirmasiPanel({ allowDecline = true }) {
     const { confirmCycle } = useForm1Workflow();
     const navigate = useNavigate();
 
@@ -62,10 +65,9 @@ export default function Form1KonfirmasiPanel() {
                         Konfirmasi Hasil Magang Non-Wajib
                     </h3>
                     <p className="mt-1 text-sm leading-relaxed text-gray-600">
-                        Surat pengantar Anda disetujui atau lamaran mitra Anda
-                        diterima. Laporkan hasilnya: bila diterima, unggah bukti
-                        penerimaan (LoA) beserta tempat dan periode magang yang
-                        sebenarnya.
+                        {allowDecline
+                            ? 'Surat pengantar Anda disetujui atau lamaran mitra Anda diterima. Laporkan hasilnya: bila diterima, unggah bukti penerimaan (LoA) beserta tempat dan periode magang yang sebenarnya.'
+                            : 'Sudah diterima di tempat magang? Laporkan di sini dengan mengunggah bukti penerimaan (LoA) beserta tempat dan periode magang yang sebenarnya. Kalau belum, Anda masih bisa melamar lowongan lain lewat portal.'}
                     </p>
                 </div>
             </div>
@@ -198,6 +200,7 @@ export default function Form1KonfirmasiPanel() {
                 </button>
             </div>
 
+            {allowDecline && (
             <div className="mt-5 border-t border-gray-100 pt-4">
                 {!decliningConfirm ? (
                     <button
@@ -236,6 +239,7 @@ export default function Form1KonfirmasiPanel() {
                     </div>
                 )}
             </div>
+            )}
         </div>
     );
 }
