@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use App\Exceptions\InvalidStateTransitionException;
 use App\Models\Lecturer;
 use App\Models\Student;
 use App\Services\StudentStateMachine;
