@@ -318,4 +318,63 @@ class NonWajibFlowTest extends TestCase
         $this->assertSame('HasApplication', $student->access_status);
         $this->assertSame(0, $student->internshipCycles()->count());
     }
+
+    public function test_non_wajib_can_self_report_acceptance_while_still_has_application(): void
+    {
+        // Perusahaan menerima mahasiswa di luar sistem, jadi status lamaran
+        // belum diubah PPAIP/mitra -- mahasiswa harus tetap bisa lapor sendiri.
+        $studentUser = User::factory()->create(['role' => 'mahasiswa']);
+        $student = Student::create([
+            'user_id' => $studentUser->id,
+            'nim' => '1101214270',
+            'name' => 'Mahasiswa Lapor Sendiri',
+            'study_program' => 'Sistem Informasi',
+            'email' => 'lapor-sendiri@example.test',
+            'form1_data' => ['jenisMagang' => 'non_wajib'],
+        ]);
+        $student->forceFill(['access_status' => 'HasApplication'])->save();
+
+        Storage::fake('local');
+        $this->actingAs($studentUser)->post('/api/student/cycle/confirm', [
+            'hasil' => 'diterima',
+            'company_name' => 'PT Terima Langsung',
+            'tanggal_mulai' => '2026-09',
+            'tanggal_selesai' => '2026-11',
+            'loa_file' => UploadedFile::fake()->create('loa.pdf', 100, 'application/pdf'),
+        ])->assertOk()->assertJsonPath('access_status', 'SelesaiNonWajib');
+
+        $student->refresh();
+        $this->assertSame('SelesaiNonWajib', $student->access_status);
+
+        $cycle = $student->internshipCycles()->first();
+        $this->assertNotNull($cycle);
+        $this->assertSame('non_wajib', $cycle->jenis_magang);
+        $this->assertSame('PT Terima Langsung', $cycle->company_name);
+        $this->assertNotNull($cycle->loa_path);
+    }
+
+    public function test_wajib_student_cannot_self_report_acceptance_from_has_application(): void
+    {
+        $studentUser = User::factory()->create(['role' => 'mahasiswa']);
+        $student = Student::create([
+            'user_id' => $studentUser->id,
+            'nim' => '1101214271',
+            'name' => 'Mahasiswa Wajib',
+            'study_program' => 'Sistem Informasi',
+            'email' => 'wajib-lapor@example.test',
+            'form1_data' => ['jenisMagang' => 'wajib'],
+        ]);
+        $student->forceFill(['access_status' => 'HasApplication'])->save();
+
+        Storage::fake('local');
+        $this->actingAs($studentUser)->post('/api/student/cycle/confirm', [
+            'hasil' => 'diterima',
+            'company_name' => 'PT Bukan Haknya',
+            'tanggal_mulai' => '2026-09',
+            'tanggal_selesai' => '2026-11',
+            'loa_file' => UploadedFile::fake()->create('loa.pdf', 100, 'application/pdf'),
+        ])->assertForbidden();
+
+        $this->assertSame('HasApplication', $student->fresh()->access_status);
+    }
 }

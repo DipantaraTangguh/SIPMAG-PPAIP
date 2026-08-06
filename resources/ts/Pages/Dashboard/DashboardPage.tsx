@@ -89,6 +89,10 @@ export default function DashboardPage() {
                 navigate('/portal');
                 break;
             case 'HasApplication':
+                // Non-wajib nggak punya Bimbingan/Logbook -- arahkan ke panel
+                // konfirmasi magang di Profil, bukan ke menu yang terkunci.
+                navigate(isNonWajib ? '/form1/status' : '/guidance');
+                break;
             case 'HasDPM':
                 navigate('/guidance');
                 break;
@@ -122,7 +126,13 @@ export default function DashboardPage() {
                         <QuickActionButton
                             accessStatus={accessStatus}
                             onClick={handleQuickAction}
-                            label={accessStatus === 'MenungguSidang' && sidangSchedule ? 'Lihat Jadwal Sidang' : undefined}
+                            label={
+                                accessStatus === 'MenungguSidang' && sidangSchedule
+                                    ? 'Lihat Jadwal Sidang'
+                                    : accessStatus === 'HasApplication' && isNonWajib
+                                        ? 'Konfirmasi Magang'
+                                        : undefined
+                            }
                             disabled={accessStatus === 'MenungguSidang' && sidangSchedule ? false : undefined}
                             style={accessStatus === 'MenungguSidang' && sidangSchedule ? 'primary' : undefined}
                         />

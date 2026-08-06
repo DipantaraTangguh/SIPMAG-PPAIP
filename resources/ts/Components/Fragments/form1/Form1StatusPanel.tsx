@@ -18,7 +18,12 @@ export default function Form1StatusPanel({
     const isApproved = form1_status === 'ApprovedForm1';
     const isCompleted = form1_status === 'SiklusSelesai';
     const isNonWajibDone = form1_status === 'SelesaiNonWajib';
-    const isAwaitingConfirmation = form1_status === 'MenungguKonfirmasi';
+    // Jalur mitra non-wajib belum sempat masuk MenungguKonfirmasi kalau status
+    // lamarannya belum diubah PPAIP/mitra -- beri jalan lapor sendiri dari sini.
+    const isNonWajib = formData?.jenisMagang === 'non_wajib';
+    const isSelfReporting = isNonWajib && form1_status === 'HasApplication';
+    const isAwaitingConfirmation =
+        form1_status === 'MenungguKonfirmasi' || isSelfReporting;
 
     return (
         <div className="flex flex-col gap-4">
@@ -45,7 +50,9 @@ export default function Form1StatusPanel({
             )}
             {isCompleted && <Form1CompletedPanel />}
             {isNonWajibDone && <Form1NonWajibDonePanel />}
-            {isAwaitingConfirmation && <Form1KonfirmasiPanel />}
+            {isAwaitingConfirmation && (
+                <Form1KonfirmasiPanel allowDecline={!isSelfReporting} />
+            )}
             {!isApproved && !isCompleted && !isNonWajibDone && !isAwaitingConfirmation && <Form1BackButton />}
             <Form1HelpCard />
         </div>
