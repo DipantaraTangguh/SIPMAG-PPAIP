@@ -47,7 +47,7 @@ function mapInternshipDetail(i) {
         kapasitas: i.capacity || '-',
         sistemKerja: i.sistem_kerja || '-',
         durasi: i.duration || '-',
-        bidang: i.bidang || '-',
+        studyPrograms: i.study_programs || [],
         mulaiMagang: formatIdDate(i.start_date, { withDay: true }),
         deadline: formatIdDate(i.deadline),
         deadlineDaysLeft: daysUntil(i.deadline),

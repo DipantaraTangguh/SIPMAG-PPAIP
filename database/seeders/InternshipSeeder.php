@@ -19,7 +19,7 @@ class InternshipSeeder extends Seeder
                 'description' => 'Bergabung dengan tim engineering Gojek untuk mengembangkan fitur-fitur baru pada platform menggunakan arsitektur microservices.',
                 'capacity' => '3 Posisi',
                 'duration' => '3 Bulan',
-                'bidang' => 'Software Engineering',
+                'study_programs' => ['Informatika', 'Sistem Informasi'],
                 'start_date' => $december2026StartDate,
                 'job_description' => [
                     'Mengembangkan fitur baru pada platform Gojek menggunakan microservices architecture.',
@@ -44,7 +44,7 @@ class InternshipSeeder extends Seeder
                 'description' => 'Bergabung dengan tim Marketing Telkomsel untuk menyusun strategi konten dan kampanye digital.',
                 'capacity' => '2 Posisi',
                 'duration' => '3 Bulan',
-                'bidang' => 'Marketing & Communications',
+                'study_programs' => ['Ilmu Komunikasi', 'Manajemen'],
                 'start_date' => $december2026StartDate,
                 'job_description' => [
                     'Menyusun strategi konten media sosial untuk brand Telkomsel.',
@@ -69,7 +69,7 @@ class InternshipSeeder extends Seeder
                 'description' => 'Bekerja dengan tim Product Design Traveloka untuk merancang antarmuka pengguna yang intuitif.',
                 'capacity' => '2 Posisi',
                 'duration' => '3 Bulan',
-                'bidang' => 'Product Design',
+                'study_programs' => ['Informatika', 'Sistem Informasi'],
                 'start_date' => $december2026StartDate,
                 'job_description' => [
                     'Bekerja sama dengan tim Product Design dalam merancang antarmuka pengguna (UI) yang intuitif dan menarik untuk platform Traveloka.',
@@ -94,7 +94,7 @@ class InternshipSeeder extends Seeder
                 'description' => 'Bergabung dengan tim Data Analytics Microsoft Indonesia untuk menganalisis dataset dan membuat dashboard.',
                 'capacity' => '2 Posisi',
                 'duration' => '6 Bulan',
-                'bidang' => 'Data Analytics',
+                'study_programs' => ['Sistem Informasi', 'Informatika'],
                 'start_date' => $december2026StartDate,
                 'job_description' => [
                     'Menganalisis dataset besar untuk menghasilkan insight bisnis yang actionable.',
@@ -119,7 +119,7 @@ class InternshipSeeder extends Seeder
                 'description' => 'Mengembangkan pipeline data dan dashboard monitoring KPI untuk tim regional Google Indonesia.',
                 'capacity' => '1 Posisi',
                 'duration' => '3 Bulan',
-                'bidang' => 'Data Analytics',
+                'study_programs' => ['Sistem Informasi', 'Informatika'],
                 'start_date' => $december2026StartDate,
                 'job_description' => [
                     'Mengembangkan pipeline data untuk analisis performa produk Google di Indonesia.',
@@ -143,7 +143,7 @@ class InternshipSeeder extends Seeder
                 'description' => 'Bergabung dengan tim analytics BCA untuk menganalisis data transaksi nasabah dan mendukung risk management.',
                 'capacity' => '2 Posisi',
                 'duration' => '6 Bulan',
-                'bidang' => 'Banking & Finance Analytics',
+                'study_programs' => ['Akuntansi', 'Manajemen'],
                 'start_date' => $december2026StartDate,
                 'job_description' => [
                     'Melakukan analisis data transaksi nasabah untuk identifikasi pola dan tren.',
@@ -168,7 +168,7 @@ class InternshipSeeder extends Seeder
                 'description' => 'Bergabung dengan tim Business Intelligence Indofood untuk menganalisis data penjualan dan distribusi produk.',
                 'capacity' => '1 Posisi',
                 'duration' => '3 Bulan',
-                'bidang' => 'Business Intelligence',
+                'study_programs' => ['Sistem Informasi', 'Teknik Industri'],
                 'start_date' => $december2026StartDate,
                 'job_description' => [
                     'Menganalisis data penjualan dan distribusi produk Indofood secara nasional.',
@@ -193,7 +193,7 @@ class InternshipSeeder extends Seeder
                 'description' => 'Posisi kedua di kantor Traveloka Tangerang untuk tim Product Design.',
                 'capacity' => '2 Posisi',
                 'duration' => '3 Bulan',
-                'bidang' => 'Product Design',
+                'study_programs' => ['Informatika', 'Sistem Informasi'],
                 'start_date' => $december2026StartDate,
                 'job_description' => [
                     'Bekerja sama dengan tim Product Design dalam merancang antarmuka pengguna (UI) yang intuitif dan menarik untuk platform Traveloka.',
@@ -216,9 +216,12 @@ class InternshipSeeder extends Seeder
 
         $now = now();
         $payload = array_map(function ($r) use ($now) {
+            // DB::table()->insert() melewati cast Eloquent, jadi kolom JSON
+            // harus di-encode manual di sini.
             $r['job_description'] = json_encode($r['job_description']);
             $r['skills'] = json_encode($r['skills']);
             $r['requirements'] = json_encode($r['requirements']);
+            $r['study_programs'] = json_encode($r['study_programs']);
             $r['is_active'] = true;
             $r['created_at'] = $now;
             $r['updated_at'] = $now;

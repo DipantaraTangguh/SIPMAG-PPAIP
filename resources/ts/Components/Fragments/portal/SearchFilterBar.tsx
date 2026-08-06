@@ -53,7 +53,7 @@ export default function SearchFilterBar({
     const hasActiveFilters = activeFilterCount > 0;
 
     const clearAllFilters = () => {
-        onFilterChange('bidang', '');
+        onFilterChange('studyProgram', '');
         onFilterChange('sistemKerja', '');
         onFilterChange('location', '');
     };
@@ -116,10 +116,10 @@ export default function SearchFilterBar({
                             </div>
                             <div className="flex flex-col gap-3">
                                 <FilterDropdown
-                                    label="Bidang"
-                                    value={filters.bidang}
-                                    options={filterOptions.bidang}
-                                    onChange={(v) => onFilterChange('bidang', v)}
+                                    label="Program Studi"
+                                    value={filters.studyProgram}
+                                    options={filterOptions.studyProgram}
+                                    onChange={(v) => onFilterChange('studyProgram', v)}
                                 />
                                 <FilterDropdown
                                     label="Sistem Kerja"
@@ -162,13 +162,13 @@ export default function SearchFilterBar({
             {/* Active filter chips */}
             {hasActiveFilters && (
                 <div className="flex flex-wrap gap-2">
-                    {filters.bidang && (
+                    {filters.studyProgram && (
                         <span className="flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary-pale px-3 py-1 text-[12px] font-medium text-primary">
-                            Bidang: {filters.bidang}
+                            Prodi: {filters.studyProgram}
                             <button
                                 type="button"
-                                onClick={() => onFilterChange('bidang', '')}
-                                aria-label="Hapus filter bidang"
+                                onClick={() => onFilterChange('studyProgram', '')}
+                                aria-label="Hapus filter program studi"
                                 className="cursor-pointer"
                             >
                                 <X className="h-3 w-3" />

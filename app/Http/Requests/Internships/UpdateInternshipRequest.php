@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests\Internships;
 
+use App\Support\StudyProgram;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateInternshipRequest extends FormRequest
 {
@@ -19,7 +21,8 @@ class UpdateInternshipRequest extends FormRequest
             'description' => 'sometimes|string',
             'capacity' => 'nullable|string|max:255',
             'duration' => 'nullable|string|max:255',
-            'bidang' => 'nullable|string|max:255',
+            'study_programs' => 'nullable|array',
+            'study_programs.*' => ['string', Rule::in(StudyProgram::ALL)],
             'start_date' => 'nullable|date',
             'job_description' => 'nullable|array',
             'skills' => 'nullable|array',

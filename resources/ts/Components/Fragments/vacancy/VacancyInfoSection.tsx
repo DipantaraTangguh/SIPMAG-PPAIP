@@ -29,7 +29,14 @@ export default function VacancyInfoSection({ vacancy }) {
                 <InfoItem label="Kapasitas" value={vacancy.kapasitas} />
                 <InfoItem label="Sistem Kerja" value={vacancy.sistemKerja} />
                 <InfoItem label="Durasi" value={vacancy.durasi} />
-                <InfoItem label="Bidang" value={vacancy.bidang} />
+                <InfoItem
+                    label="Program Studi"
+                    value={
+                        vacancy.studyPrograms?.length
+                            ? vacancy.studyPrograms.join(', ')
+                            : 'Semua program studi'
+                    }
+                />
             </div>
             <div className="mt-4 flex items-center gap-1.5 text-[13px] text-gray-500">
                 <span>Mulai Magang:</span>

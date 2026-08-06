@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Ppaip;
 
 use App\Models\Internship;
+use App\Support\StudyProgram;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -76,10 +77,13 @@ class PpaipInternshipResource extends Resource
                         ->label('Durasi')
                         ->placeholder('Contoh: 3 Bulan')
                         ->maxLength(255),
-                    Forms\Components\TextInput::make('bidang')
-                        ->label('Bidang')
-                        ->placeholder('Contoh: Software Engineering')
-                        ->maxLength(255),
+                    Forms\Components\Select::make('study_programs')
+                        ->label('Program Studi yang Boleh Melamar')
+                        ->helperText('Kosongkan bila lowongan terbuka untuk semua program studi.')
+                        ->multiple()
+                        ->options(StudyProgram::options())
+                        ->searchable()
+                        ->columnSpanFull(),
                     Forms\Components\DatePicker::make('start_date')
                         ->label('Mulai Magang')
                         ->native(false)
@@ -168,6 +172,13 @@ class PpaipInternshipResource extends Resource
                 Tables\Columns\TextColumn::make('location')
                     ->label('Lokasi')
                     ->icon('heroicon-m-map-pin'),
+                Tables\Columns\TextColumn::make('study_programs')
+                    ->label('Prodi')
+                    ->badge()
+                    ->placeholder('Semua prodi')
+                    ->listWithLineBreaks()
+                    ->limitList(2)
+                    ->expandableLimitedList(),
                 Tables\Columns\TextColumn::make('sistem_kerja')
                     ->label('Sistem Kerja')
                     ->badge()
