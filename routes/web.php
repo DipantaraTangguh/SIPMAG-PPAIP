@@ -1,8 +1,10 @@
 <?php
 
+use App\Exports\InternshipCyclesExport;
 use App\Exports\MitraApplicantsExport;
 use App\Models\Application as InternshipApplication;
 use App\Models\DefenseSubmission;
+use App\Models\InternshipCycle;
 use App\Models\Student;
 use App\Models\SupervisorApplication;
 use App\Support\DefenseDocument;
@@ -111,6 +113,32 @@ Route::middleware(['web', 'auth'])->prefix('admin/kaprodi/loa')->group(function 
 
         return serveStoredFile($application->loa_path, 'LoA tidak tersedia.', "loa_{$student->nim}");
     })->name('kaprodi.loa.download');
+});
+
+// Rekap riwayat magang (internship_cycles): ekspor + berkas LoA arsip.
+// Otorisasi lewat InternshipCyclePolicy -- PPAIP semua prodi, Kaprodi prodinya.
+// Prefix sengaja lebih dalam dari slug Filament 'rekap-magang': rute view-nya
+// pakai '/{record}' satu segmen, jadi '/export' akan tertelan kalau sejajar.
+Route::middleware(['web', 'auth'])->prefix('admin/rekap-magang/berkas')->group(function () {
+    Route::get('/export', function (Request $request) {
+        Gate::authorize('viewAny', InternshipCycle::class);
+
+        $filename = 'rekap_magang_'.now()->format('Ymd_His').'.xlsx';
+
+        return Excel::download(new InternshipCyclesExport($request->user()), $filename, ExcelWriter::XLSX);
+    })->name('rekap-magang.export');
+
+    Route::get('/{cycle}/loa/preview', function (InternshipCycle $cycle) {
+        Gate::authorize('view', $cycle);
+
+        return serveStoredFile($cycle->loa_path, 'LoA tidak tersedia.');
+    })->name('rekap-magang.loa.preview');
+
+    Route::get('/{cycle}/loa/download', function (InternshipCycle $cycle) {
+        Gate::authorize('view', $cycle);
+
+        return serveStoredFile($cycle->loa_path, 'LoA tidak tersedia.', "loa_{$cycle->nim}_siklus{$cycle->cycle_number}");
+    })->name('rekap-magang.loa.download');
 });
 
 // Sisanya lempar ke React router.
