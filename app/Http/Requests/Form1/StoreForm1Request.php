@@ -18,6 +18,8 @@ class StoreForm1Request extends FormRequest
             'skemaMagang'  => 'required|string|in:Magang Perusahaan,Magang Kewirausahaan',
             'topikMagang'  => 'required|string|max:2000',
             'outputTarget' => 'required|string|in:Produk,Prototype,Laporan',
+            // Opsional: catatan bebas mahasiswa, dibaca PPAIP & Kaprodi.
+            'catatanKhusus' => 'nullable|string|max:2000',
         ];
     }
 }

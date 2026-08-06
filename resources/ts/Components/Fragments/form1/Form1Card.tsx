@@ -330,6 +330,45 @@ export default function Form1Card({
                     </div>
                     <FieldError id="output-error" message={errors.output} />
                 </div>
+
+                <div>
+                    <FieldLabel htmlFor="catatanKhusus">
+                        Catatan Khusus{" "}
+                        <span className="font-normal text-gray-400">
+                            (opsional)
+                        </span>
+                    </FieldLabel>
+                    <textarea
+                        id="catatanKhusus"
+                        rows={3}
+                        placeholder="Informasi tambahan yang perlu diketahui PPAIP atau Kaprodi..."
+                        value={formData.catatanKhusus}
+                        onChange={(e) =>
+                            updateField("catatanKhusus", e.target.value)
+                        }
+                        aria-invalid={!!errors.catatanKhusus}
+                        aria-describedby={
+                            errors.catatanKhusus
+                                ? "catatanKhusus-error"
+                                : undefined
+                        }
+                        className={`${
+                            errors.catatanKhusus ? inputError : inputNormal
+                        } resize-none`}
+                        disabled={isSubmitting}
+                    />
+                    {!errors.catatanKhusus && (
+                        <HelperText>
+                            Boleh dikosongkan. Catatan ini hanya dibaca PPAIP dan
+                            Kaprodi saat meninjau pengajuan Anda.
+                        </HelperText>
+                    )}
+                    <FieldError
+                        id="catatanKhusus-error"
+                        message={errors.catatanKhusus}
+                    />
+                </div>
+
                 <label className="flex cursor-pointer items-start gap-3">
                     <input
                         type="checkbox"

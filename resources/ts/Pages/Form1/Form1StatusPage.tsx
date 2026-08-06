@@ -50,6 +50,7 @@ export default function Form1StatusPage() {
         rencanaSkema: f.rencanaSkema ?? f.skemaMagang,
         topikTempat: f.topikTempat ?? f.topikMagang,
         output: f.output ?? f.outputTarget,
+        catatanKhusus: f.catatanKhusus,
         submittedAt: f.submittedAt,
         // Field approval cuma muncul kalau Kaprodi sudah proses.
         approverName: f.approver?.name,

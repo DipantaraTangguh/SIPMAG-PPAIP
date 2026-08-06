@@ -61,6 +61,12 @@ export default function Form1SubmittedData({ formData }) {
                     value={formData.topikTempat}
                 />
                 <DataField label="Target Output" value={formData.output} />
+                {formData.catatanKhusus && (
+                    <DataField
+                        label="Catatan Khusus"
+                        value={formData.catatanKhusus}
+                    />
+                )}
             </div>
             <div className="mt-6 border-t border-gray-100 pt-4">
                 <div className="flex items-center gap-1.5 text-[13px] italic text-gray-500">
