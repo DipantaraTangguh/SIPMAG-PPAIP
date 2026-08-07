@@ -307,7 +307,7 @@ class ExaminedSessionResource extends Resource
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
                         'DPM' => 'success',
-                        'Examiner 1' => 'info',
+                        'Penguji 1' => 'info',
                         default => 'primary',
                     }),
                 Tables\Columns\TextColumn::make('assessment_status')
