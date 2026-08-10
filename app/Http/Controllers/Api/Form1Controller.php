@@ -15,6 +15,13 @@ use Illuminate\Support\Facades\Gate;
 
 class Form1Controller extends Controller
 {
+    /**
+     * Syarat SKS minimal untuk mengajukan Form 1. Berlaku sama untuk semua
+     * program studi. Dipakai guard di store() sekaligus dikirim ke frontend
+     * lewat Form1Resource supaya tombolnya bisa dikunci sebelum submit.
+     */
+    public const MIN_SKS = 85;
+
     public function show(Request $request)
     {
         $student = $request->user()->student;
@@ -44,6 +51,15 @@ class Form1Controller extends Controller
         if ($student->semester === null || $student->jumlah_sks === null || $student->ipk === null) {
             return response()->json([
                 'message' => 'Data akademik mahasiswa belum lengkap. Hubungi admin akademik sebelum mengajukan Form 1.',
+            ], 422);
+        }
+
+        // Syarat akademik: SKS lulus minimal MIN_SKS. Hard block -- mahasiswa
+        // yang belum memenuhi tidak bisa mengajukan sama sekali.
+        if ($student->jumlah_sks < self::MIN_SKS) {
+            return response()->json([
+                'message' => 'SKS Anda belum memenuhi syarat minimal '.self::MIN_SKS
+                    .' SKS untuk mengajukan Form 1. SKS Anda saat ini: '.$student->jumlah_sks.'.',
             ], 422);
         }
 

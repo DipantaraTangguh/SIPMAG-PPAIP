@@ -37,13 +37,25 @@ export default function useForm1() {
 
     // Kalau mahasiswa sudah pernah menyelesaikan magang wajib, opsi wajib dikunci.
     const [hasCompletedWajib, setHasCompletedWajib] = useState(false);
+    // Syarat SKS minimal; angkanya ikut server supaya tidak ada dua sumber.
+    const [sksRequirement, setSksRequirement] = useState({
+        minSks: null,
+        jumlahSks: null,
+        meets: true,
+    });
     useEffect(() => {
         let active = true;
         api.get('/form1')
             .then((res) => {
-                if (active) setHasCompletedWajib(Boolean(res.has_completed_wajib));
+                if (!active) return;
+                setHasCompletedWajib(Boolean(res.has_completed_wajib));
+                setSksRequirement({
+                    minSks: res.min_sks ?? null,
+                    jumlahSks: res.jumlah_sks ?? null,
+                    meets: res.meets_sks_requirement !== false,
+                });
             })
-            .catch(() => { /* biarkan false, backend tetap menolak */ });
+            .catch(() => { /* biarkan default, backend tetap menolak */ });
         return () => { active = false; };
     }, []);
 
@@ -67,10 +79,13 @@ export default function useForm1() {
         if (!formData.topikTempat.trim()) e.topikTempat = 'Topik/tempat magang wajib diisi';
         if (!formData.output) e.output = 'Pilih output yang ditargetkan';
         if (!formData.declarationChecked) e.declarationChecked = true;
+        if (!sksRequirement.meets) {
+            e.submit = `SKS Anda belum memenuhi syarat minimal ${sksRequirement.minSks} SKS untuk mengajukan Form 1.`;
+        }
 
         setErrors(e);
         return Object.keys(e).length === 0;
-    }, [formData, hasCompletedWajib]);
+    }, [formData, hasCompletedWajib, sksRequirement]);
 
     const isFormValid = useMemo(
         () =>
@@ -79,8 +94,9 @@ export default function useForm1() {
             formData.rencanaSkema !== '' &&
             formData.topikTempat.trim() !== '' &&
             formData.output !== '' &&
-            formData.declarationChecked,
-        [formData, hasCompletedWajib],
+            formData.declarationChecked &&
+            sksRequirement.meets,
+        [formData, hasCompletedWajib, sksRequirement],
     );
 
     const handleSubmit = useCallback(
@@ -124,6 +140,7 @@ export default function useForm1() {
         isSubmitting,
         isFormValid,
         hasCompletedWajib,
+        sksRequirement,
         updateField,
         handleSubmit,
         handleCancel,

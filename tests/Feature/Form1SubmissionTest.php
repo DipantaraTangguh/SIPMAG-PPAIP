@@ -135,6 +135,59 @@ class Form1SubmissionTest extends TestCase
             ->assertJsonValidationErrors('skemaMagang');
     }
 
+    public function test_form_1_is_blocked_below_the_minimum_sks(): void
+    {
+        [$user, $student] = $this->readyStudent('1101214250', 'sks-kurang@student.bakrie.ac.id');
+        $student->forceFill(['jumlah_sks' => 84])->save();
+
+        $this->actingAs($user)
+            ->postJson('/api/form1', [
+                'jenisMagang' => 'wajib',
+                'skemaMagang' => 'Magang Perusahaan',
+                'topikMagang' => 'PT Contoh Indonesia',
+                'outputTarget' => 'Laporan',
+            ])
+            ->assertUnprocessable()
+            ->assertJsonPath(
+                'message',
+                'SKS Anda belum memenuhi syarat minimal 85 SKS untuk mengajukan Form 1. SKS Anda saat ini: 84.',
+            );
+
+        // Status tidak boleh maju kalau pengajuannya ditolak.
+        $this->assertSame('Unverified', $student->fresh()->access_status);
+        $this->assertNull($student->fresh()->form1_data);
+    }
+
+    public function test_form_1_is_accepted_exactly_at_the_minimum_sks(): void
+    {
+        [$user, $student] = $this->readyStudent('1101214251', 'sks-pas@student.bakrie.ac.id');
+        $student->forceFill(['jumlah_sks' => 85])->save();
+
+        $this->actingAs($user)
+            ->postJson('/api/form1', [
+                'jenisMagang' => 'wajib',
+                'skemaMagang' => 'Magang Perusahaan',
+                'topikMagang' => 'PT Contoh Indonesia',
+                'outputTarget' => 'Laporan',
+            ])
+            ->assertCreated();
+
+        $this->assertSame('PendingReview', $student->fresh()->access_status);
+    }
+
+    public function test_form_1_endpoint_reports_the_sks_requirement(): void
+    {
+        [$user, $student] = $this->readyStudent('1101214252', 'sks-info@student.bakrie.ac.id');
+        $student->forceFill(['jumlah_sks' => 60])->save();
+
+        $this->actingAs($user)
+            ->getJson('/api/form1')
+            ->assertOk()
+            ->assertJsonPath('min_sks', 85)
+            ->assertJsonPath('jumlah_sks', 60)
+            ->assertJsonPath('meets_sks_requirement', false);
+    }
+
     public function test_form_1_rejects_submission_when_academic_profile_is_incomplete(): void
     {
         $user = User::factory()->create(['role' => 'mahasiswa']);
