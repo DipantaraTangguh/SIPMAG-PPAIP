@@ -9,6 +9,7 @@ export default function SupervisorRequestForm({ onSubmit }) {
 
     const [formData, setFormData] = useState({
         namaPerusahaan: '',
+        lingkupMagang: '',
         namaPraktisi: '',
         jabatanPraktisi: '',
         noTelepon: '',
@@ -24,6 +25,7 @@ export default function SupervisorRequestForm({ onSubmit }) {
 
     const isFormValid =
         formData.namaPerusahaan.trim() !== '' &&
+        formData.lingkupMagang.trim() !== '' &&
         formData.namaPraktisi.trim() !== '' &&
         formData.jabatanPraktisi.trim() !== '' &&
         formData.noTelepon.trim() !== '' &&
@@ -135,6 +137,21 @@ export default function SupervisorRequestForm({ onSubmit }) {
                                 aria-required="true"
                                 placeholder="contoh: PT Gojek Tokopedia TBK"
                                 className="h-11 w-full rounded-lg border border-gray-200 px-3 outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/10"
+                            />
+                        </div>
+                        <div>
+                            <label htmlFor="lingkupMagang" className="mb-1.5 block text-[11px] font-medium uppercase tracking-wider text-gray-400">
+                                DESKRIPSI LINGKUP MAGANG
+                            </label>
+                            <textarea
+                                id="lingkupMagang"
+                                name="lingkupMagang"
+                                rows={3}
+                                value={formData.lingkupMagang}
+                                onChange={handleChange}
+                                aria-required="true"
+                                placeholder="Deskripsikan secara singkat rencana divisi dan tugas Anda..."
+                                className="w-full resize-none rounded-lg border border-gray-200 px-3 py-2.5 outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/10"
                             />
                         </div>
                         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">

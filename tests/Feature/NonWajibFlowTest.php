@@ -268,6 +268,7 @@ class NonWajibFlowTest extends TestCase
         return [
             'company_name' => 'PT Contoh',
             'company_contact' => 'Budi - 08123456789',
+            'lingkup_magang' => 'Membantu tim operasional harian.',
             'nama_praktisi' => 'Budi Praktisi',
             'jabatan_praktisi' => 'Manager',
             'no_telepon' => '081234567890',

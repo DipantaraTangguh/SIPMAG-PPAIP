@@ -12,6 +12,7 @@ class SupervisorApplication extends Model
         'student_id',
         'company_name',
         'company_contact',
+        'lingkup_magang',
         'nama_praktisi',
         'jabatan_praktisi',
         'no_telepon',

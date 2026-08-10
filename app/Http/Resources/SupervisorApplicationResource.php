@@ -14,6 +14,7 @@ class SupervisorApplicationResource extends JsonResource
             'student_id' => $this->student_id,
             'company_name' => $this->company_name,
             'company_contact' => $this->company_contact,
+            'lingkup_magang' => $this->lingkup_magang,
             'nama_praktisi' => $this->nama_praktisi,
             'jabatan_praktisi' => $this->jabatan_praktisi,
             'no_telepon' => $this->no_telepon,

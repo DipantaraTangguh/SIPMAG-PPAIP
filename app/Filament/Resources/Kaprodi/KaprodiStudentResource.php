@@ -281,6 +281,7 @@ class KaprodiStudentResource extends Resource
                                 ->label(new HtmlString('<strong>Pengajuan Pembimbing</strong>'))
                                 ->content(new HtmlString(
                                     "<strong>Perusahaan:</strong> {$supApp->company_name}<br />".
+                                    '<strong>Lingkup Magang:</strong> '.($supApp->lingkup_magang ?? '-').'<br />'.
                                     '<strong>Nama Praktisi:</strong> '.($supApp->nama_praktisi ?? $supApp->company_contact).'<br />'.
                                     '<strong>Jabatan:</strong> '.($supApp->jabatan_praktisi ?? '-').'<br />'.
                                     '<strong>No. Telepon:</strong> '.($supApp->no_telepon ?? '-').'<br />'.

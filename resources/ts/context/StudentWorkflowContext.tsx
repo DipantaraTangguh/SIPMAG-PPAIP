@@ -122,6 +122,7 @@ export function StudentWorkflowProvider({ children }) {
                 pengajuanPembimbing: supervisorRes.status === 'fulfilled' && supervisorRes.value.application
                     ? {
                         namaPerusahaan: supervisorRes.value.application.company_name,
+                        lingkupMagang: supervisorRes.value.application.lingkup_magang || '',
                         namaPraktisi: supervisorRes.value.application.nama_praktisi || (supervisorRes.value.application.company_contact ? supervisorRes.value.application.company_contact.split(' - ')[0] : ''),
                         jabatanPraktisi: supervisorRes.value.application.jabatan_praktisi || '',
                         noTelepon: supervisorRes.value.application.no_telepon || (supervisorRes.value.application.company_contact ? supervisorRes.value.application.company_contact.split(' - ')[1] : ''),
@@ -250,6 +251,7 @@ export function StudentWorkflowProvider({ children }) {
         const fd = new FormData();
         fd.append('company_name', formData.namaPerusahaan);
         fd.append('company_contact', `${formData.namaPraktisi} - ${formData.noTelepon}`);
+        fd.append('lingkup_magang', formData.lingkupMagang);
         fd.append('nama_praktisi', formData.namaPraktisi);
         fd.append('jabatan_praktisi', formData.jabatanPraktisi);
         fd.append('no_telepon', formData.noTelepon);
@@ -266,6 +268,7 @@ export function StudentWorkflowProvider({ children }) {
             ...s,
             pengajuanPembimbing: {
                 namaPerusahaan: formData.namaPerusahaan,
+                lingkupMagang: formData.lingkupMagang,
                 namaPraktisi: formData.namaPraktisi,
                 jabatanPraktisi: formData.jabatanPraktisi,
                 noTelepon: formData.noTelepon,
