@@ -172,7 +172,7 @@ export default function Form2NewPage() {
             </button>
             <div className="mb-6">
                 <h1 className="text-2xl font-bold leading-tight text-[#1A1A1A] sm:text-[28px]">
-                    Ajukan Form 2 - Surat Pengantar Magang
+                    Form Surat Pengantar Magang
                 </h1>
                 <p className="mt-1 text-[14px] leading-relaxed text-gray-500">
                     Isi data perusahaan yang akan Anda tuju untuk permohonan
@@ -344,7 +344,7 @@ export default function Form2NewPage() {
                                 rows={4}
                                 value={formData.lingkupMagang}
                                 onChange={handleChange}
-                                placeholder="Deskripsikan secara singkat rencana divisi dan tugas Anda..."
+                                placeholder="Lingkup Kerja dan Tugas Divisi Anda..."
                                 className={`w-full resize-none rounded-lg border p-3.5 outline-none transition-all focus:ring-2 focus:ring-primary/10 ${
                                     errors.lingkupMagang
                                         ? "border-red-400 focus:border-red-400"
