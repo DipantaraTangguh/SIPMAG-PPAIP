@@ -23,7 +23,7 @@ export default function Form1Page() {
 
     return (
         <DashboardLayout
-            pageTitle="Form Magang-01: Surat Keterangan Memenuhi Syarat Akademik"
+            pageTitle="Form Surat Keterangan Memenuhi Syarat Akademik"
         >
             <Form1Card {...form1} />
         </DashboardLayout>
