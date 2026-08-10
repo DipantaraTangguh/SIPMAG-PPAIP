@@ -52,10 +52,12 @@ export default function Form1Card({
     isSubmitting,
     isFormValid,
     hasCompletedWajib,
+    sksRequirement,
     updateField,
     handleSubmit,
     handleCancel,
 }) {
+    const sksBlocked = sksRequirement && sksRequirement.meets === false;
     const inputBase =
         "w-full rounded-lg border px-4 py-3 text-sm text-gray-800 outline-none transition-colors duration-150 placeholder:text-gray-400";
     const inputNormal = `${inputBase} border-gray-200 bg-white focus:border-primary focus:ring-2 focus:ring-primary/20`;
@@ -67,14 +69,30 @@ export default function Form1Card({
             className="rounded-xl border border-gray-200 bg-white p-5 sm:p-8"
         >
             <div className="mb-8">
-                <h3 className="text-xl font-bold text-gray-900">
-                    Isi Form Magang-01
-                </h3>
+                <h3 className="text-xl font-bold text-gray-900">Isi Form</h3>
                 <p className="mt-1 text-sm text-gray-500">
                     Lengkapi data di bawah ini untuk mengajukan surat keterangan
                     akademik.
                 </p>
             </div>
+            {sksBlocked && (
+                <div
+                    className="mb-6 flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3"
+                    role="alert"
+                >
+                    <Lock className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
+                    <div className="text-sm text-amber-800">
+                        <p className="font-bold">Belum memenuhi syarat SKS</p>
+                        <p className="mt-0.5 leading-relaxed">
+                            Pengajuan Form 1 membutuhkan minimal{" "}
+                            {sksRequirement.minSks} SKS. SKS Anda saat ini{" "}
+                            {sksRequirement.jumlahSks ?? "belum tercatat"}.
+                            Hubungi admin akademik bila data SKS Anda belum
+                            sesuai.
+                        </p>
+                    </div>
+                </div>
+            )}
             {errors.submit && (
                 <div
                     className="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600"
@@ -359,8 +377,8 @@ export default function Form1Card({
                     />
                     {!errors.catatanKhusus && (
                         <HelperText>
-                            Boleh dikosongkan. Catatan ini hanya dibaca PPAIP dan
-                            Kaprodi saat meninjau pengajuan Anda.
+                            Boleh dikosongkan. Catatan ini hanya dibaca PPAIP
+                            dan Kaprodi saat meninjau pengajuan Anda.
                         </HelperText>
                     )}
                     <FieldError
