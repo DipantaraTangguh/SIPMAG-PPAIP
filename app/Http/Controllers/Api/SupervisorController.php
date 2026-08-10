@@ -74,6 +74,7 @@ class SupervisorController extends Controller
                 'student_id' => $student->id,
                 'company_name' => $validated['company_name'],
                 'company_contact' => $validated['company_contact'],
+                'lingkup_magang' => $validated['lingkup_magang'],
                 'nama_praktisi' => $validated['nama_praktisi'],
                 'jabatan_praktisi' => $validated['jabatan_praktisi'],
                 'no_telepon' => $validated['no_telepon'],

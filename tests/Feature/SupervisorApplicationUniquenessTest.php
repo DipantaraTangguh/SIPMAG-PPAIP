@@ -45,6 +45,7 @@ class SupervisorApplicationUniquenessTest extends TestCase
         return [
             'company_name' => 'PT Contoh Indonesia',
             'company_contact' => 'Budi - 08123456789',
+            'lingkup_magang' => 'Membantu tim engineering mengembangkan fitur baru.',
             'nama_praktisi' => 'Budi Santoso',
             'jabatan_praktisi' => 'Engineering Manager',
             'no_telepon' => '08123456789',

@@ -16,6 +16,7 @@ class StoreSupervisorApplicationRequest extends FormRequest
         return [
             'company_name' => 'required|string|max:255',
             'company_contact' => 'required|string|max:255',
+            'lingkup_magang' => 'required|string|max:2000',
             'nama_praktisi' => 'required|string|max:255',
             'jabatan_praktisi' => 'required|string|max:255',
             'no_telepon' => ['required', 'string', 'max:20', 'regex:/^\+?[0-9][0-9\s().-]{7,19}$/'],

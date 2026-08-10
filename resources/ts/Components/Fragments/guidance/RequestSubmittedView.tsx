@@ -45,6 +45,16 @@ export default function RequestSubmittedView({ data, studentName, studentNim }) 
                     </div>
 
                     <div className="my-5 border-b border-gray-100"></div>
+                    <div>
+                        <p className="mb-1 text-[11px] font-medium uppercase tracking-wider text-gray-400">
+                            DESKRIPSI LINGKUP MAGANG
+                        </p>
+                        <p className="text-[15px] font-semibold text-gray-900">
+                            {data.lingkupMagang}
+                        </p>
+                    </div>
+
+                    <div className="my-5 border-b border-gray-100"></div>
                     <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                         <div>
                             <p className="mb-1 text-[11px] font-medium uppercase tracking-wider text-gray-400">
