@@ -50,6 +50,7 @@ function mapInternship(i) {
         deadline,
         deadlineDate,
         createdAt: i.created_at || "",
+        logoUrl: i.logo_url || null,
         logoColor: pickLogoColor(company),
         logoInitial: (company.trim()[0] || "?").toUpperCase(),
         isActive: !!i.is_active,
