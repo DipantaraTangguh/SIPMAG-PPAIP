@@ -58,6 +58,17 @@ class PpaipInternshipResource extends Resource
                             'WFH (Remote)'  => 'WFH (Remote)',
                         ])
                         ->required(),
+                    Forms\Components\FileUpload::make('logo_path')
+                        ->label('Logo Perusahaan')
+                        ->helperText('Opsional. JPG, PNG, WEBP, atau SVG. Maksimal 2MB. Bila kosong, portal menampilkan inisial nama perusahaan.')
+                        ->image()
+                        ->disk('public')
+                        ->directory('logo-perusahaan')
+                        ->visibility('public')
+                        ->maxSize(2048)
+                        ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp', 'image/svg+xml'])
+                        ->imageEditor()
+                        ->columnSpanFull(),
                 ])->columns(2),
 
             Forms\Components\Section::make('Detail Lowongan')
@@ -160,6 +171,11 @@ class PpaipInternshipResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\ImageColumn::make('logo_path')
+                    ->label('Logo')
+                    ->disk('public')
+                    ->height(32)
+                    ->defaultImageUrl(null),
                 Tables\Columns\TextColumn::make('company_name')
                     ->label('Perusahaan')
                     ->searchable()

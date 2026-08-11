@@ -42,6 +42,7 @@ function mapInternshipDetail(i) {
         companyName: company,
         position: i.position,
         location: i.location || '-',
+        logoUrl: i.logo_url || null,
         logoColor: pickLogoColor(company),
         logoInitial: (company.trim()[0] || '?').toUpperCase(),
         kapasitas: i.capacity || '-',
@@ -64,6 +65,7 @@ function mapSimilar(i) {
         companyName: company,
         position: i.position,
         location: i.location || '-',
+        logoUrl: i.logo_url || null,
         logoColor: pickLogoColor(company),
         logoInitial: (company.trim()[0] || '?').toUpperCase(),
     };

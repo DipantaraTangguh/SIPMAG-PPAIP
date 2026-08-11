@@ -261,14 +261,22 @@ export default function VacancyApplySidebar({
                                 }
                                 className="flex items-start gap-3 rounded-lg p-2 text-left transition-colors hover:bg-gray-50"
                             >
-                                <div
-                                    className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg text-sm font-bold text-white"
-                                    style={{
-                                        backgroundColor: sv.logoColor,
-                                    }}
-                                >
-                                    {sv.logoInitial}
-                                </div>
+                                {sv.logoUrl ? (
+                                    <img
+                                        src={sv.logoUrl}
+                                        alt={`Logo ${sv.companyName}`}
+                                        className="h-8 w-8 flex-shrink-0 rounded-lg border border-gray-100 bg-white object-contain"
+                                    />
+                                ) : (
+                                    <div
+                                        className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg text-sm font-bold text-white"
+                                        style={{
+                                            backgroundColor: sv.logoColor,
+                                        }}
+                                    >
+                                        {sv.logoInitial}
+                                    </div>
+                                )}
                                 <div className="min-w-0 flex-1">
                                     <p className="text-[13px] font-bold text-gray-900 truncate">
                                         {sv.position}

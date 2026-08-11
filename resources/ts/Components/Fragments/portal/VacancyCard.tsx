@@ -8,12 +8,20 @@ export default function VacancyCard({ vacancy, onCardClick }) {
             className="cursor-pointer rounded-xl border border-gray-200 border-l-4 border-l-primary bg-white p-5 transition-all duration-200 hover:-translate-y-1 hover:border-primary hover:bg-red-50 hover:shadow-md"
         >
             <div className="flex items-start justify-between">
-                <div
-                    className="flex h-10 w-10 items-center justify-center rounded-lg text-base font-bold text-white"
-                    style={{ backgroundColor: vacancy.logoColor }}
-                >
-                    {vacancy.logoInitial}
-                </div>
+                {vacancy.logoUrl ? (
+                    <img
+                        src={vacancy.logoUrl}
+                        alt={`Logo ${vacancy.companyName}`}
+                        className="h-10 w-10 rounded-lg border border-gray-100 bg-white object-contain"
+                    />
+                ) : (
+                    <div
+                        className="flex h-10 w-10 items-center justify-center rounded-lg text-base font-bold text-white"
+                        style={{ backgroundColor: vacancy.logoColor }}
+                    >
+                        {vacancy.logoInitial}
+                    </div>
+                )}
                 <span className="rounded-full bg-primary-pale px-2.5 py-1 text-xs font-bold uppercase text-primary">
                     {vacancy.deadline}
                 </span>

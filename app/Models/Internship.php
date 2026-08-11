@@ -4,11 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class Internship extends Model
 {
     protected $fillable = [
         'company_name',
+        'logo_path',
         'position',
         'description',
         'capacity',
@@ -36,6 +38,17 @@ class Internship extends Model
             'deadline' => 'date',
             'is_active' => 'boolean',
         ];
+    }
+
+    /**
+     * URL logo siap pakai untuk frontend, atau null kalau belum diunggah
+     * (frontend jatuh ke fallback inisial nama perusahaan).
+     */
+    public function getLogoUrlAttribute(): ?string
+    {
+        return $this->logo_path
+            ? Storage::disk('public')->url($this->logo_path)
+            : null;
     }
 
     /**

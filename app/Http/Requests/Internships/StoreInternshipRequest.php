@@ -21,6 +21,7 @@ class StoreInternshipRequest extends FormRequest
             'description' => 'required|string',
             'capacity' => 'nullable|string|max:255',
             'duration' => 'nullable|string|max:255',
+            'logo_path' => 'nullable|string|max:2048',
             'study_programs' => 'nullable|array',
             'study_programs.*' => ['string', Rule::in(StudyProgram::ALL)],
             'start_date' => 'nullable|date',
