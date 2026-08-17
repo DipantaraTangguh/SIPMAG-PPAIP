@@ -30,15 +30,15 @@ function deriveStep(status) {
         case 'ApprovedForm1':
             return 2;
         case 'HasApplication':
-        case 'MenungguKonfirmasi':
+        case 'AwaitingConfirmation':
             return 3;
         case 'HasDPM':
             return 4;
         case 'LogbookComplete':
-        case 'MenungguSidang':
+        case 'AwaitingDefense':
             return 5;
-        case 'SiklusSelesai':
-        case 'SelesaiNonWajib':
+        case 'CycleCompleted':
+        case 'ElectiveCompleted':
             return 6; // All 5 steps completed
         default:
             return 1;
@@ -55,9 +55,9 @@ function deriveNonWajibStep(status) {
         case 'ApprovedForm1':
         case 'HasApplication':
             return 2;
-        case 'MenungguKonfirmasi':
+        case 'AwaitingConfirmation':
             return 3;
-        case 'SelesaiNonWajib':
+        case 'ElectiveCompleted':
             return 4; // 3 langkah selesai
         default:
             return 1;
@@ -97,14 +97,14 @@ export default function DashboardPage() {
                 navigate('/guidance');
                 break;
             case 'LogbookComplete':
-            case 'MenungguSidang':
+            case 'AwaitingDefense':
                 navigate('/defense');
                 break;
-            case 'SiklusSelesai':
+            case 'CycleCompleted':
                 navigate('/defense');
                 break;
-            case 'SelesaiNonWajib':
-            case 'MenungguKonfirmasi':
+            case 'ElectiveCompleted':
+            case 'AwaitingConfirmation':
                 navigate('/form1/status');
                 break;
             default:
@@ -127,14 +127,14 @@ export default function DashboardPage() {
                             accessStatus={accessStatus}
                             onClick={handleQuickAction}
                             label={
-                                accessStatus === 'MenungguSidang' && sidangSchedule
+                                accessStatus === 'AwaitingDefense' && sidangSchedule
                                     ? 'Lihat Jadwal Sidang'
                                     : accessStatus === 'HasApplication' && isNonWajib
                                         ? 'Konfirmasi Magang'
                                         : undefined
                             }
-                            disabled={accessStatus === 'MenungguSidang' && sidangSchedule ? false : undefined}
-                            style={accessStatus === 'MenungguSidang' && sidangSchedule ? 'primary' : undefined}
+                            disabled={accessStatus === 'AwaitingDefense' && sidangSchedule ? false : undefined}
+                            style={accessStatus === 'AwaitingDefense' && sidangSchedule ? 'primary' : undefined}
                         />
                         <LogbookProgressCard approvedCount={logbookCount} />
                         <TipsMagangCard tips={mockTips} />

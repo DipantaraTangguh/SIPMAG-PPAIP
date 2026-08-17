@@ -27,7 +27,7 @@ class CycleCompletionAssessmentTest extends TestCase
         $assessmentService->save($examinerOneUser, $submission, $this->scores(82));
 
         $this->assertFalse(app(InternshipCycleCompletionService::class)->canComplete($student));
-        $this->assertSame('MenungguSidang', $student->fresh()->access_status);
+        $this->assertSame('AwaitingDefense', $student->fresh()->access_status);
         $this->assertSame(0, $student->internshipCycles()->count());
     }
 
@@ -55,14 +55,14 @@ class CycleCompletionAssessmentTest extends TestCase
         $assessmentService->save($examinerOneUser, $submission, $this->scores(82));
 
         // Belum lengkap: siklus masih berjalan.
-        $this->assertSame('MenungguSidang', $student->fresh()->access_status);
+        $this->assertSame('AwaitingDefense', $student->fresh()->access_status);
 
         // Penilai terakhir masuk -> siklus tertutup otomatis, nilai terbit.
         $assessmentService->save($examinerTwoUser, $submission, $this->scores(84));
 
         $student->refresh();
 
-        $this->assertSame('SiklusSelesai', $student->access_status);
+        $this->assertSame('CycleCompleted', $student->access_status);
         $this->assertNull($student->dpm_id);
         $this->assertSame($form1Data, $student->form1_data);
         $this->assertSame('transkrip/form1.pdf', $student->form1_pdf_path);
@@ -73,7 +73,7 @@ class CycleCompletionAssessmentTest extends TestCase
         $this->assertNotNull($cycle);
         $this->assertSame(1, $cycle->cycle_number);
         $this->assertSame('wajib', $cycle->jenis_magang);
-        $this->assertSame('SiklusSelesai', $cycle->outcome_status);
+        $this->assertSame('CycleCompleted', $cycle->outcome_status);
         $this->assertSame($student->nim, $cycle->nim);
         $this->assertSame(82.0, $cycle->final_score);
         $this->assertSame('A-', $cycle->letter_grade);
@@ -139,7 +139,7 @@ class CycleCompletionAssessmentTest extends TestCase
             'study_program' => 'Sistem Informasi',
             'email' => fake()->unique()->safeEmail(),
         ]);
-        $student->forceFill(['access_status' => 'MenungguSidang'])->save();
+        $student->forceFill(['access_status' => 'AwaitingDefense'])->save();
 
         $submission = DefenseSubmission::create([
             'student_id' => $student->id,

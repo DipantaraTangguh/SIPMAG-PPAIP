@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-     * Menambah nilai enum 'SelesaiNonWajib' ke students.access_status.
+     * Menambah nilai enum 'ElectiveCompleted' ke students.access_status.
      *
      * Hanya relevan untuk MySQL yang sudah terlanjur migrate dengan enum lama.
      * Pada SQLite (test) enum = kolom teks, dan daftar nilai sudah disertakan
@@ -28,16 +28,16 @@ return new class extends Migration
             return;
         }
 
-        DB::statement("ALTER TABLE students MODIFY access_status ENUM(".$this->valuesWithout('SelesaiNonWajib').") NOT NULL DEFAULT 'Unverified'");
+        DB::statement("ALTER TABLE students MODIFY access_status ENUM(".$this->valuesWithout('ElectiveCompleted').") NOT NULL DEFAULT 'Unverified'");
     }
 
     private function values(): string
     {
-        return "'Unverified','PendingReview','RejectedForm1','ApprovedForm1','HasApplication','HasDPM','LogbookComplete','MenungguSidang','SiklusSelesai','SelesaiNonWajib'";
+        return "'Unverified','PendingReview','RejectedForm1','ApprovedForm1','HasApplication','HasDPM','LogbookComplete','AwaitingDefense','CycleCompleted','ElectiveCompleted'";
     }
 
     private function valuesWithout(string $value): string
     {
-        return "'Unverified','PendingReview','RejectedForm1','ApprovedForm1','HasApplication','HasDPM','LogbookComplete','MenungguSidang','SiklusSelesai'";
+        return "'Unverified','PendingReview','RejectedForm1','ApprovedForm1','HasApplication','HasDPM','LogbookComplete','AwaitingDefense','CycleCompleted'";
     }
 };

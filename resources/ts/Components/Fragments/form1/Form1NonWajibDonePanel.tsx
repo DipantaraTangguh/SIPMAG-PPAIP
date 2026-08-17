@@ -3,7 +3,7 @@ import { CheckCircle, FileText } from "lucide-react";
 import CycleResetButton from "./CycleResetButton";
 
 /**
- * Panel status untuk magang non-wajib yang sudah selesai (SelesaiNonWajib).
+ * Panel status untuk magang non-wajib yang sudah selesai (ElectiveCompleted).
  * Alur non-wajib berhenti setelah surat pengantar (Form 2) disetujui PPAIP.
  */
 export default function Form1NonWajibDonePanel() {

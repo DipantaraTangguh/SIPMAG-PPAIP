@@ -58,6 +58,6 @@ class ApplicationObserver
             return;
         }
 
-        app(StudentStateMachine::class)->transition($student, 'MenungguKonfirmasi');
+        app(StudentStateMachine::class)->transition($student, 'AwaitingConfirmation');
     }
 }

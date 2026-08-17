@@ -126,7 +126,7 @@ class InternshipCycleRecapTest extends TestCase
             'student_id' => $student->id,
             'cycle_number' => 1,
             'jenis_magang' => 'wajib',
-            'outcome_status' => 'SiklusSelesai',
+            'outcome_status' => 'CycleCompleted',
             'nim' => $nim,
             'nama' => $nama,
             'study_program' => $prodi,

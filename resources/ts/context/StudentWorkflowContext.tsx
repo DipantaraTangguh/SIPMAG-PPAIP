@@ -163,7 +163,7 @@ export function StudentWorkflowProvider({ children }) {
         await fetchAllStudentData();
     }, [refreshProfile, fetchAllStudentData]);
 
-    // Konfirmasi hasil magang non-wajib (state MenungguKonfirmasi).
+    // Konfirmasi hasil magang non-wajib (state AwaitingConfirmation).
     // formData: hasil=diterima (+ company/periode/LoA) atau hasil=ditolak.
     const confirmCycle = useCallback(async (formData) => {
         const res = await api.upload('/student/cycle/confirm', formData);
@@ -175,7 +175,7 @@ export function StudentWorkflowProvider({ children }) {
         return res;
     }, [refreshProfile, updateStudentLocally, fetchAllStudentData]);
 
-    // Reset siklus mandiri: hanya tersedia saat SiklusSelesai / SelesaiNonWajib.
+    // Reset siklus mandiri: hanya tersedia saat CycleCompleted / ElectiveCompleted.
     // Riwayat magang tetap tersimpan di server (internship_cycles).
     const resetCycle = useCallback(async () => {
         await api.post('/student/cycle/reset');
@@ -335,7 +335,7 @@ export function StudentWorkflowProvider({ children }) {
 
         await api.upload('/defense', fd);
         await refreshProfile();
-        updateStudentLocally({ accessStatus: 'MenungguSidang' });
+        updateStudentLocally({ accessStatus: 'AwaitingDefense' });
 
         setState((s) => ({
             ...s,
@@ -458,7 +458,7 @@ export function StudentWorkflowProvider({ children }) {
             }
         }
 
-        if (student?.accessStatus === 'SiklusSelesai') {
+        if (student?.accessStatus === 'CycleCompleted') {
             list.push({
                 message: 'Selamat! Siklus magang Anda telah selesai. Terima kasih atas dedikasi Anda.',
                 time: 'Baru saja',

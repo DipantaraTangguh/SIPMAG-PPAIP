@@ -114,7 +114,7 @@ class ApprovedInternshipLockTest extends TestCase
 
     public function test_menunggu_konfirmasi_allows_new_form2_submissions(): void
     {
-        [$user, $student] = $this->studentUser('MenungguKonfirmasi');
+        [$user, $student] = $this->studentUser('AwaitingConfirmation');
         $this->actingAs($user);
 
         // Mahasiswa non-wajib yang sudah punya Form 2 approved tetap boleh submit lagi.

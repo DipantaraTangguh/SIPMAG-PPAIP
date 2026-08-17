@@ -13,7 +13,7 @@ use Illuminate\Validation\ValidationException;
  */
 class InternshipCycleResetService
 {
-    private const RESETTABLE_STATUSES = ['SiklusSelesai', 'SelesaiNonWajib'];
+    private const RESETTABLE_STATUSES = ['CycleCompleted', 'ElectiveCompleted'];
 
     public function __construct(private readonly StudentStateMachine $stateMachine) {}
 

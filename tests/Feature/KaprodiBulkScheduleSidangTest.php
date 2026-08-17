@@ -50,7 +50,7 @@ class KaprodiBulkScheduleSidangTest extends TestCase
                 'study_program' => 'Sistem Informasi',
                 'email' => 'bulk'.$i.'@example.test',
             ]);
-            $student->forceFill(['access_status' => 'MenungguSidang'])->save();
+            $student->forceFill(['access_status' => 'AwaitingDefense'])->save();
             DefenseSubmission::create([
                 'student_id' => $student->id,
                 'status' => 'Pending',

@@ -58,7 +58,7 @@ class PpaipStudentResource extends Resource
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
                         'Unverified' => 'gray',
-                        'PendingReview', 'MenungguSidang' => 'warning',
+                        'PendingReview', 'AwaitingDefense' => 'warning',
                         'RejectedForm1' => 'danger',
                         'ApprovedForm1', 'LogbookComplete' => 'success',
                         'HasApplication' => 'info',
@@ -118,8 +118,8 @@ class PpaipStudentResource extends Resource
                         'HasApplication' => 'HasApplication',
                         'HasDPM' => 'HasDPM',
                         'LogbookComplete' => 'LogbookComplete',
-                        'MenungguSidang' => 'MenungguSidang',
-                        'SiklusSelesai' => 'SiklusSelesai',
+                        'AwaitingDefense' => 'AwaitingDefense',
+                        'CycleCompleted' => 'CycleCompleted',
                     ]),
                 Tables\Filters\SelectFilter::make('study_program')
                     ->label('Prodi')

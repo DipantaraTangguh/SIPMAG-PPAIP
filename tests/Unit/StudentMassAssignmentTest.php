@@ -19,7 +19,7 @@ class StudentMassAssignmentTest extends TestCase
             'name' => 'Mass Assignment Test',
             'study_program' => 'Sistem Informasi',
             'email' => 'mass-assignment@example.test',
-            'access_status' => 'SiklusSelesai',
+            'access_status' => 'CycleCompleted',
             'form1_approved_by' => 999,
             'form1_approved_at' => now(),
         ]);

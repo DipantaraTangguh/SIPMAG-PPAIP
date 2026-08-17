@@ -25,7 +25,7 @@ class StudentPolicy
     public function resetCycle(User $user, Student $student): bool
     {
         return $user->student?->is($student) === true
-            && in_array($student->access_status, ['SiklusSelesai', 'SelesaiNonWajib'], true);
+            && in_array($student->access_status, ['CycleCompleted', 'ElectiveCompleted'], true);
     }
 
     public function reviewForm1(User $user, Student $student): bool
@@ -42,7 +42,7 @@ class StudentPolicy
     public function manageDefense(User $user, Student $student): bool
     {
         return $this->sameStudyProgramKaprodi($user, $student)
-            && $student->access_status === 'MenungguSidang';
+            && $student->access_status === 'AwaitingDefense';
     }
 
     private function sameStudyProgramKaprodi(User $user, Student $student): bool

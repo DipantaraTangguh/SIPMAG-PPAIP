@@ -65,7 +65,7 @@ class DefenseSubmissionTest extends TestCase
             $this->assertTrue(Storage::disk('local')->exists($path));
         }
 
-        $this->assertSame('MenungguSidang', $student->fresh()->access_status);
+        $this->assertSame('AwaitingDefense', $student->fresh()->access_status);
 
         $this->getJson('/api/defense')
             ->assertOk()
@@ -76,7 +76,7 @@ class DefenseSubmissionTest extends TestCase
     public function test_kaprodi_schedules_defense_with_lecturer_examiner_references(): void
     {
         [$studentUser, $student] = $this->createEligibleStudent();
-        $student->forceFill(['access_status' => 'MenungguSidang'])->save();
+        $student->forceFill(['access_status' => 'AwaitingDefense'])->save();
 
         $submission = DefenseSubmission::create([
             'student_id' => $student->id,
@@ -136,7 +136,7 @@ class DefenseSubmissionTest extends TestCase
     public function test_kaprodi_cannot_assign_student_dpm_as_an_examiner(): void
     {
         [, $student] = $this->createEligibleStudent();
-        $student->forceFill(['access_status' => 'MenungguSidang'])->save();
+        $student->forceFill(['access_status' => 'AwaitingDefense'])->save();
 
         DefenseSubmission::create([
             'student_id' => $student->id,

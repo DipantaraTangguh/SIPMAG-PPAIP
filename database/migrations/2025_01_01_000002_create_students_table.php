@@ -28,10 +28,10 @@ return new class extends Migration
                 'HasApplication',
                 'HasDPM',
                 'LogbookComplete',
-                'MenungguSidang',
-                'SiklusSelesai',
-                'SelesaiNonWajib',
-                'MenungguKonfirmasi',
+                'AwaitingDefense',
+                'CycleCompleted',
+                'ElectiveCompleted',
+                'AwaitingConfirmation',
             ])->default('Unverified');
             $table->boolean('is_independent')->default(false); // Mandiri track marker
             $table->json('form1_data')->nullable();            // stored Form 1 field values

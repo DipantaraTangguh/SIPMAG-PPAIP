@@ -9,14 +9,14 @@ return new class extends Migration
 {
     /**
      * Konfirmasi penerimaan magang non-wajib:
-     * 1. Nilai enum baru 'MenungguKonfirmasi' pada students.access_status
+     * 1. Nilai enum baru 'AwaitingConfirmation' pada students.access_status
      *    (MySQL-only; SQLite test membangun ulang dari migration create).
      * 2. Kolom loa_path di internship_cycles untuk bukti diterima (LoA).
      */
     public function up(): void
     {
         if (DB::getDriverName() === 'mysql') {
-            DB::statement("ALTER TABLE students MODIFY access_status ENUM('Unverified','PendingReview','RejectedForm1','ApprovedForm1','HasApplication','HasDPM','LogbookComplete','MenungguSidang','SiklusSelesai','SelesaiNonWajib','MenungguKonfirmasi') NOT NULL DEFAULT 'Unverified'");
+            DB::statement("ALTER TABLE students MODIFY access_status ENUM('Unverified','PendingReview','RejectedForm1','ApprovedForm1','HasApplication','HasDPM','LogbookComplete','AwaitingDefense','CycleCompleted','ElectiveCompleted','AwaitingConfirmation') NOT NULL DEFAULT 'Unverified'");
         }
 
         Schema::table('internship_cycles', function (Blueprint $table) {
@@ -31,7 +31,7 @@ return new class extends Migration
         });
 
         if (DB::getDriverName() === 'mysql') {
-            DB::statement("ALTER TABLE students MODIFY access_status ENUM('Unverified','PendingReview','RejectedForm1','ApprovedForm1','HasApplication','HasDPM','LogbookComplete','MenungguSidang','SiklusSelesai','SelesaiNonWajib') NOT NULL DEFAULT 'Unverified'");
+            DB::statement("ALTER TABLE students MODIFY access_status ENUM('Unverified','PendingReview','RejectedForm1','ApprovedForm1','HasApplication','HasDPM','LogbookComplete','AwaitingDefense','CycleCompleted','ElectiveCompleted') NOT NULL DEFAULT 'Unverified'");
         }
     }
 };

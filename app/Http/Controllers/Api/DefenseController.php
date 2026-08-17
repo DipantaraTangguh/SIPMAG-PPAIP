@@ -75,7 +75,7 @@ class DefenseController extends Controller
                     'status' => 'Pending',
                 ]);
 
-                app(StudentStateMachine::class)->transition($lockedStudent, 'MenungguSidang');
+                app(StudentStateMachine::class)->transition($lockedStudent, 'AwaitingDefense');
             });
         } catch (Throwable $exception) {
             Storage::disk('local')->delete(array_values($storedPaths));
@@ -85,7 +85,7 @@ class DefenseController extends Controller
 
         return response()->json([
             'message' => 'Dokumen sidang berhasil dikirim.',
-            'access_status' => 'MenungguSidang',
+            'access_status' => 'AwaitingDefense',
         ], 201);
     }
 
@@ -99,7 +99,7 @@ class DefenseController extends Controller
         }
 
         $students = Student::where('study_program', $lecturer->study_program)
-            ->where('access_status', 'MenungguSidang')
+            ->where('access_status', 'AwaitingDefense')
             ->with(['sidangSubmission.examinerOne', 'sidangSubmission.examinerTwo', 'dpm:id,lecturer_name'])
             ->select(['id', 'nim', 'name', 'study_program', 'dpm_id', 'access_status'])
             ->paginate($this->perPage($request));
@@ -114,7 +114,7 @@ class DefenseController extends Controller
         $lecturer = $request->user()->lecturer;
 
         $student = Student::where('id', $studentId)
-            ->where('access_status', 'MenungguSidang')
+            ->where('access_status', 'AwaitingDefense')
             ->firstOrFail();
 
         Gate::authorize('manageDefense', $student);
