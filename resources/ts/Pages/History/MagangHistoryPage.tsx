@@ -154,7 +154,7 @@ function CycleDetail({ cycle }) {
                 <DetailField
                     label="Status Akhir"
                     value={
-                        cycle.outcome_status === "SiklusSelesai"
+                        cycle.outcome_status === "CycleCompleted"
                             ? "Siklus Selesai (Sidang & Penilaian)"
                             : "Selesai Non-Wajib (Surat Pengantar)"
                     }

@@ -79,10 +79,10 @@ class NonWajibFlowTest extends TestCase
         $student->refresh();
 
         // Surat pengantar bukan bukti diterima: masuk tahap konfirmasi dulu.
-        $this->assertSame('MenungguKonfirmasi', $student->access_status);
+        $this->assertSame('AwaitingConfirmation', $student->access_status);
         $this->assertSame(0, $student->internshipCycles()->count());
 
-        // Mahasiswa boleh submit Form 2 baru meskipun sudah MenungguKonfirmasi.
+        // Mahasiswa boleh submit Form 2 baru meskipun sudah AwaitingConfirmation.
         $studentUser->refresh();
         $this->actingAs($studentUser)->postJson('/api/form2', [
             'company_name'      => 'PT Lain',
@@ -102,12 +102,12 @@ class NonWajibFlowTest extends TestCase
             'tanggal_mulai'     => '2026-09',
             'tanggal_selesai'   => '2026-11',
             'loa_file'          => UploadedFile::fake()->create('loa.pdf', 100, 'application/pdf'),
-        ])->assertOk()->assertJsonPath('access_status', 'SelesaiNonWajib');
+        ])->assertOk()->assertJsonPath('access_status', 'ElectiveCompleted');
 
         $student->refresh();
 
         // Selesai tanpa masuk jalur DPM.
-        $this->assertSame('SelesaiNonWajib', $student->access_status);
+        $this->assertSame('ElectiveCompleted', $student->access_status);
         $this->assertNull($student->dpm_id);
         $this->assertSame(0, $student->logbooks()->count());
 
@@ -116,7 +116,7 @@ class NonWajibFlowTest extends TestCase
         $this->assertNotNull($cycle);
         $this->assertSame(1, $cycle->cycle_number);
         $this->assertSame('non_wajib', $cycle->jenis_magang);
-        $this->assertSame('SelesaiNonWajib', $cycle->outcome_status);
+        $this->assertSame('ElectiveCompleted', $cycle->outcome_status);
         $this->assertSame('PT Aktual Diterima', $cycle->company_name);
         $this->assertSame('2026-09-01', $cycle->tanggal_mulai->toDateString());
         $this->assertSame('2026-11-01', $cycle->tanggal_selesai->toDateString());
@@ -139,7 +139,7 @@ class NonWajibFlowTest extends TestCase
             'ipk'            => 3.40,
         ]);
         $student->forceFill([
-            'access_status' => 'MenungguKonfirmasi',
+            'access_status' => 'AwaitingConfirmation',
             'form1_data' => ['jenisMagang' => 'non_wajib', 'skemaMagang' => 'Magang Perusahaan'],
         ])->save();
 
@@ -204,7 +204,7 @@ class NonWajibFlowTest extends TestCase
 
         $student->refresh();
 
-        $this->assertSame('MenungguKonfirmasi', $student->access_status);
+        $this->assertSame('AwaitingConfirmation', $student->access_status);
         $this->assertSame(0, $student->internshipCycles()->count());
 
         // Tahap DPM tertutup untuk magang non-wajib.
@@ -222,10 +222,10 @@ class NonWajibFlowTest extends TestCase
             'tanggal_mulai'   => '2026-09',
             'tanggal_selesai' => '2026-12',
             'loa_file'        => UploadedFile::fake()->create('loa.pdf', 100, 'application/pdf'),
-        ])->assertOk()->assertJsonPath('access_status', 'SelesaiNonWajib');
+        ])->assertOk()->assertJsonPath('access_status', 'ElectiveCompleted');
 
         $student->refresh();
-        $this->assertSame('SelesaiNonWajib', $student->access_status);
+        $this->assertSame('ElectiveCompleted', $student->access_status);
 
         $cycle = $student->internshipCycles()->first();
         $this->assertNotNull($cycle);
@@ -342,10 +342,10 @@ class NonWajibFlowTest extends TestCase
             'tanggal_mulai' => '2026-09',
             'tanggal_selesai' => '2026-11',
             'loa_file' => UploadedFile::fake()->create('loa.pdf', 100, 'application/pdf'),
-        ])->assertOk()->assertJsonPath('access_status', 'SelesaiNonWajib');
+        ])->assertOk()->assertJsonPath('access_status', 'ElectiveCompleted');
 
         $student->refresh();
-        $this->assertSame('SelesaiNonWajib', $student->access_status);
+        $this->assertSame('ElectiveCompleted', $student->access_status);
 
         $cycle = $student->internshipCycles()->first();
         $this->assertNotNull($cycle);

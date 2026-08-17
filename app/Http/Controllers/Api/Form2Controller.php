@@ -20,9 +20,9 @@ class Form2Controller extends Controller
     private const SECURED_INTERNSHIP_STATUSES = [
         'HasDPM',
         'LogbookComplete',
-        'MenungguSidang',
-        'SiklusSelesai',
-        'SelesaiNonWajib',
+        'AwaitingDefense',
+        'CycleCompleted',
+        'ElectiveCompleted',
     ];
 
     private const SECURED_INTERNSHIP_MESSAGE = 'DPM Anda sudah ditunjuk atau pengajuan DPM sudah disetujui, sehingga Form 2 tidak dapat diajukan lagi.';
@@ -54,7 +54,7 @@ class Form2Controller extends Controller
             ]);
         }
 
-        if (! in_array($student->access_status, ['ApprovedForm1', 'HasApplication', 'MenungguKonfirmasi'])) {
+        if (! in_array($student->access_status, ['ApprovedForm1', 'HasApplication', 'AwaitingConfirmation'])) {
             return response()->json(['message' => 'Form 1 harus disetujui terlebih dahulu.'], 403);
         }
 

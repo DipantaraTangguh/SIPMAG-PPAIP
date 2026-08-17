@@ -16,7 +16,7 @@ export default function InternshipDefensePage() {
 
     // View sidang cukup ngikut context biar state nggak dobel.
     const sidangView = (() => {
-        if (accessStatus === 'SiklusSelesai') return 'completed';
+        if (accessStatus === 'CycleCompleted') return 'completed';
         if (sidangSubmission?.status === 'Scheduled') return 'scheduled';
         if (sidangSubmission) return 'success'; // Pending - waiting for Kaprodi to schedule
         return 'form';

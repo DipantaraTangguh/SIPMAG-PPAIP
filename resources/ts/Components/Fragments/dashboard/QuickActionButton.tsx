@@ -9,12 +9,12 @@ const statusConfig = {
     HasApplication: { label: 'Ajukan Pembimbing Magang', disabled: false, style: 'primary' },
     HasDPM: { label: 'Isi Logbook Bimbingan', disabled: false, style: 'primary' },
     LogbookComplete: { label: 'Daftar Sidang Magang', disabled: false, style: 'primary' },
-    MenungguSidang: { label: 'Menunggu Jadwal Sidang', disabled: true, style: 'disabled' },
-    SiklusSelesai: { label: 'Siklus Magang Selesai', disabled: false, style: 'success' },
+    AwaitingDefense: { label: 'Menunggu Jadwal Sidang', disabled: true, style: 'disabled' },
+    CycleCompleted: { label: 'Siklus Magang Selesai', disabled: false, style: 'success' },
     // Tanpa dua entri non-wajib ini, tombol jatuh ke fallback Unverified
     // dan salah menyuruh mahasiswa mengisi Form 1 lagi.
-    MenungguKonfirmasi: { label: 'Konfirmasi Magang', disabled: false, style: 'primary' },
-    SelesaiNonWajib: { label: 'Magang Non-Wajib Selesai', disabled: false, style: 'success' },
+    AwaitingConfirmation: { label: 'Konfirmasi Magang', disabled: false, style: 'primary' },
+    ElectiveCompleted: { label: 'Magang Non-Wajib Selesai', disabled: false, style: 'success' },
 };
 
 const buttonStyles = {

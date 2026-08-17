@@ -4,7 +4,7 @@ import { BadgeCheck, Upload, Loader2, XCircle } from "lucide-react";
 import { useForm1Workflow } from "../../../context/StudentWorkflowContext";
 
 /**
- * Panel state MenungguKonfirmasi (magang non-wajib jalur Form 2), dipakai juga
+ * Panel state AwaitingConfirmation (magang non-wajib jalur Form 2), dipakai juga
  * di HasApplication buat jalur mitra yang lapor sendiri. Mahasiswa melaporkan
  * hasilnya: diterima (upload LoA + tempat & periode aktual) atau ditolak
  * (kembali bisa mengajukan Form 2 ke perusahaan lain).

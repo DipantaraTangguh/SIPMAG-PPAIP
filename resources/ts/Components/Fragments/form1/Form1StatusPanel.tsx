@@ -16,14 +16,14 @@ export default function Form1StatusPanel({
     formData,
 }) {
     const isApproved = form1_status === 'ApprovedForm1';
-    const isCompleted = form1_status === 'SiklusSelesai';
-    const isNonWajibDone = form1_status === 'SelesaiNonWajib';
-    // Jalur mitra non-wajib belum sempat masuk MenungguKonfirmasi kalau status
+    const isCompleted = form1_status === 'CycleCompleted';
+    const isNonWajibDone = form1_status === 'ElectiveCompleted';
+    // Jalur mitra non-wajib belum sempat masuk AwaitingConfirmation kalau status
     // lamarannya belum diubah PPAIP/mitra -- beri jalan lapor sendiri dari sini.
     const isNonWajib = formData?.jenisMagang === 'non_wajib';
     const isSelfReporting = isNonWajib && form1_status === 'HasApplication';
     const isAwaitingConfirmation =
-        form1_status === 'MenungguKonfirmasi' || isSelfReporting;
+        form1_status === 'AwaitingConfirmation' || isSelfReporting;
 
     return (
         <div className="flex flex-col gap-4">

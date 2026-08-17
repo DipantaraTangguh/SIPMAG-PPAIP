@@ -3,10 +3,10 @@ const PORTAL_ACCESS_STATUSES = [
     'HasApplication',
     'HasDPM',
     'LogbookComplete',
-    'MenungguSidang',
-    'SiklusSelesai',
-    'SelesaiNonWajib',
-    'MenungguKonfirmasi',
+    'AwaitingDefense',
+    'CycleCompleted',
+    'ElectiveCompleted',
+    'AwaitingConfirmation',
 ];
 export const canAccessPortal = (accessStatus) =>
     PORTAL_ACCESS_STATUSES.includes(accessStatus);
@@ -14,9 +14,9 @@ export const canAccessPortal = (accessStatus) =>
 const SECURED_INTERNSHIP_STATUSES = [
     'HasDPM',
     'LogbookComplete',
-    'MenungguSidang',
-    'SiklusSelesai',
-    'SelesaiNonWajib',
+    'AwaitingDefense',
+    'CycleCompleted',
+    'ElectiveCompleted',
 ];
 
 export const SECURED_INTERNSHIP_MESSAGE =
@@ -30,8 +30,8 @@ export const hasSecuredInternship = (accessStatus) =>
 
 const SIDANG_ACCESS_STATUSES = [
     'LogbookComplete',
-    'MenungguSidang',
-    'SiklusSelesai',
+    'AwaitingDefense',
+    'CycleCompleted',
 ];
 export const canAccessSidang = (accessStatus) =>
     SIDANG_ACCESS_STATUSES.includes(accessStatus);

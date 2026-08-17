@@ -19,16 +19,16 @@ export default function GuidanceFullPage() {
     const canAccessLogbook = 
         student?.accessStatus === 'HasDPM' || 
         student?.accessStatus === 'LogbookComplete' || 
-        student?.accessStatus === 'MenungguSidang' || 
-        student?.accessStatus === 'SiklusSelesai';
+        student?.accessStatus === 'AwaitingDefense' || 
+        student?.accessStatus === 'CycleCompleted';
 
     // State context nentuin layar bimbingan yang tampil.
     const pengajuanView = (() => {
         if (student?.dpm && (
             student?.accessStatus === 'HasDPM' || 
             student?.accessStatus === 'LogbookComplete' || 
-            student?.accessStatus === 'MenungguSidang' || 
-            student?.accessStatus === 'SiklusSelesai'
+            student?.accessStatus === 'AwaitingDefense' || 
+            student?.accessStatus === 'CycleCompleted'
         )) {
             return 'dpm_assigned';
         }

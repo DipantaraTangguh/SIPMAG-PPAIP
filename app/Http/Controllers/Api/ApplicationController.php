@@ -22,10 +22,10 @@ class ApplicationController extends Controller
     private const SECURED_INTERNSHIP_STATUSES = [
         'HasDPM',
         'LogbookComplete',
-        'MenungguSidang',
-        'SiklusSelesai',
-        'SelesaiNonWajib',
-        'MenungguKonfirmasi',
+        'AwaitingDefense',
+        'CycleCompleted',
+        'ElectiveCompleted',
+        'AwaitingConfirmation',
     ];
 
     private const SECURED_INTERNSHIP_MESSAGE = 'DPM Anda sudah ditunjuk atau pengajuan DPM sudah disetujui, sehingga Anda tidak dapat melamar lowongan mitra lagi.';

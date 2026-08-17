@@ -134,7 +134,7 @@ class InternshipCycleResource extends Resource
                     TextEntry::make('outcome_status')
                         ->label('Status Akhir')
                         ->badge()
-                        ->formatStateUsing(fn (string $state): string => $state === 'SiklusSelesai'
+                        ->formatStateUsing(fn (string $state): string => $state === 'CycleCompleted'
                             ? 'Selesai (Sidang & Penilaian)'
                             : 'Selesai (Non-Wajib)')
                         ->color('success'),
@@ -205,8 +205,8 @@ class InternshipCycleResource extends Resource
                 Tables\Filters\SelectFilter::make('outcome_status')
                     ->label('Status Akhir')
                     ->options([
-                        'SiklusSelesai' => 'Selesai (Sidang & Penilaian)',
-                        'SelesaiNonWajib' => 'Selesai (Non-Wajib)',
+                        'CycleCompleted' => 'Selesai (Sidang & Penilaian)',
+                        'ElectiveCompleted' => 'Selesai (Non-Wajib)',
                     ]),
                 Tables\Filters\Filter::make('periode_selesai')
                     ->label('Periode Selesai')

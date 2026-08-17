@@ -156,7 +156,7 @@ Nilai utama aplikasi:
 11. Mahasiswa mengunggah dokumen sidang.
 12. Kaprodi menjadwalkan sidang.
 13. Dosen Penguji melihat jadwal dan dokumen sidang yang ditugaskan kepadanya secara read-only.
-14. Siklus magang diselesaikan menjadi `SiklusSelesai`.
+14. Siklus magang diselesaikan menjadi `CycleCompleted`.
 
 ### 5.3 Alur CRUD Data
 
@@ -184,8 +184,8 @@ Status utama mahasiswa disimpan pada `students.access_status`.
 | `ApprovedForm1` | `HasApplication` | Mahasiswa melamar lowongan atau Form 2 disetujui PPAIP. |
 | `HasApplication` | `HasDPM` | Kaprodi assign DPM setelah pengajuan pembimbing. |
 | `HasDPM` | `LogbookComplete` | Minimal 6 logbook disetujui DPM. |
-| `LogbookComplete` | `MenungguSidang` | Mahasiswa submit dokumen sidang. |
-| `MenungguSidang` | `SiklusSelesai` | Siklus diselesaikan setelah sidang terjadwal dan tiga penilaian lengkap. |
+| `LogbookComplete` | `AwaitingDefense` | Mahasiswa submit dokumen sidang. |
+| `AwaitingDefense` | `CycleCompleted` | Siklus diselesaikan setelah sidang terjadwal dan tiga penilaian lengkap. |
 
 Status lainnya:
 
@@ -348,7 +348,7 @@ Status lainnya:
 | Lokasi halaman/route | `/defense`, API `/api/defense` |
 | Aktor | Mahasiswa, Kaprodi |
 | Input | Laporan akhir PDF, poster PDF, foto kegiatan 1, foto kegiatan 2, KRS PDF, dua checkbox deklarasi |
-| Output | Submission sidang status `Pending`, status mahasiswa `MenungguSidang` |
+| Output | Submission sidang status `Pending`, status mahasiswa `AwaitingDefense` |
 | Validasi/aturan bisnis | Mahasiswa harus `LogbookComplete`; satu mahasiswa hanya boleh satu submission sidang; laporan maksimal 10 MB; poster dan KRS maksimal 5 MB; backend menerima foto kegiatan JPG/JPEG/PNG/PDF maksimal 5 MB, namun UI saat ini hanya menerima PDF untuk semua upload sidang. |
 | Acceptance criteria | Mahasiswa dengan 6 logbook approved dapat submit dokumen; submission tampil sebagai menunggu jadwal; mahasiswa tidak dapat submit ulang. |
 
@@ -361,7 +361,7 @@ Status lainnya:
 | Lokasi halaman/route | Filament `/admin/kaprodi/students`, API `/api/kaprodi/defense/*` |
 | Aktor | Kaprodi; PPAIP juga memiliki aksi selesai siklus pada resource mahasiswa semua prodi |
 | Input | Tanggal sidang, waktu, ruangan/link, dosen penguji 1 dan 2 |
-| Output | Status sidang `Scheduled`, jadwal tampil ke mahasiswa, status akhir `SiklusSelesai` saat complete |
+| Output | Status sidang `Scheduled`, jadwal tampil ke mahasiswa, status akhir `CycleCompleted` saat complete |
 | Validasi/aturan bisnis | Tanggal sidang API harus setelah hari ini; dosen penguji 1 dan 2 wajib berbeda; Kaprodi hanya prodi terkait; complete memerlukan status sidang `Scheduled` dan tiga penilaian lengkap. |
 | Acceptance criteria | Mahasiswa melihat jadwal sidang setelah dijadwalkan; PPAIP melihat progres dan nilai akhir; siklus hanya dapat ditutup setelah DPM serta kedua penguji selesai menilai. |
 
@@ -745,8 +745,8 @@ Panel admin Filament:
 - Sidang hanya dapat diajukan jika status mahasiswa `LogbookComplete`.
 - Mahasiswa hanya boleh memiliki satu submission sidang.
 - Submission baru berstatus `Pending`.
-- Setelah submit sidang, status mahasiswa menjadi `MenungguSidang`.
-- Kaprodi hanya dapat menjadwalkan mahasiswa prodi terkait yang statusnya `MenungguSidang`.
+- Setelah submit sidang, status mahasiswa menjadi `AwaitingDefense`.
+- Kaprodi hanya dapat menjadwalkan mahasiswa prodi terkait yang statusnya `AwaitingDefense`.
 - Jadwal sidang API harus setelah hari ini.
 - Dosen penguji 1 dan 2 harus berbeda serta tidak boleh sama dengan DPM mahasiswa.
 - Dosen Penguji hanya dapat melihat sidang jika `lecturers.id` miliknya sama dengan `dosen_penguji_1_id` atau `dosen_penguji_2_id`.
@@ -793,7 +793,7 @@ Panel admin Filament:
 | Foto kegiatan sidang | Backend menerima image atau PDF, tetapi UI upload sidang hanya menerima `.pdf`. |
 | Tindak lanjut sidang | Penilaian sudah tersedia, tetapi berita acara, catatan revisi, approval hasil sidang, dan publikasi nilai mahasiswa belum tersedia. |
 | Penyelesaian siklus | API `completeCycle` berada pada prefix Kaprodi, sementara Filament PPAIP juga memiliki action "Selesaikan Siklus". Perlu konfirmasi role final yang berwenang. |
-| Status setelah `SiklusSelesai` | State machine menjadikan `SiklusSelesai` terminal. Tidak terlihat alur reset ke siklus baru selain pembersihan beberapa field saat complete. |
+| Status setelah `CycleCompleted` | State machine menjadikan `CycleCompleted` terminal. Tidak terlihat alur reset ke siklus baru selain pembersihan beberapa field saat complete. |
 | Manajemen user | Tidak terlihat resource khusus untuk CRUD user/role. |
 | Notifikasi | Notifikasi mahasiswa dibangun dari state frontend, bukan sistem notifikasi persisten/realtime. |
 | WhatsApp group | Tombol "Join Grup Whatsapp" menggunakan `dpm.whatsappGroupLink`, tetapi mapping data DPM tidak mengisi field tersebut. |
@@ -807,7 +807,7 @@ Panel admin Filament:
 - Apakah syarat 100 hari kerja perlu divalidasi backend berdasarkan tanggal/periode magang?
 - Bagaimana format berita acara, revisi, dan mekanisme publikasi nilai sidang kepada mahasiswa?
 - Apakah mahasiswa boleh memiliki lebih dari satu pengajuan Form 2 aktif?
-- Apakah siklus magang dapat dimulai ulang setelah `SiklusSelesai`?
+- Apakah siklus magang dapat dimulai ulang setelah `CycleCompleted`?
 - Apakah data user/mahasiswa/dosen akan dikelola PPAIP melalui aplikasi atau impor dari sistem akademik lain?
 
 ## 14. Future Improvement

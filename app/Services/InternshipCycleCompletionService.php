@@ -19,7 +19,7 @@ class InternshipCycleCompletionService
         $student->loadMissing('sidangSubmission.assessments');
         $submission = $student->sidangSubmission;
 
-        return $student->access_status === 'MenungguSidang'
+        return $student->access_status === 'AwaitingDefense'
             && $submission?->status === 'Scheduled'
             && $this->assessmentService->finalScore($submission) !== null;
     }
@@ -34,7 +34,7 @@ class InternshipCycleCompletionService
             $submission = $lockedStudent->sidangSubmission;
 
             if (
-                $lockedStudent->access_status !== 'MenungguSidang'
+                $lockedStudent->access_status !== 'AwaitingDefense'
                 || $submission?->status !== 'Scheduled'
             ) {
                 throw ValidationException::withMessages([
@@ -57,7 +57,7 @@ class InternshipCycleCompletionService
                 'dpm_id' => null,
                 'is_independent' => false,
             ]);
-            $this->stateMachine->transition($lockedStudent, 'SiklusSelesai');
+            $this->stateMachine->transition($lockedStudent, 'CycleCompleted');
 
             return $finalScore;
         });

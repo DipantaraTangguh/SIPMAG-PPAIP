@@ -77,8 +77,8 @@ class KaprodiStudentResource extends Resource
                         'HasApplication' => 'HasApplication',
                         'HasDPM' => 'HasDPM',
                         'LogbookComplete' => 'LogbookComplete',
-                        'MenungguSidang' => 'MenungguSidang',
-                        'SiklusSelesai' => 'SiklusSelesai',
+                        'AwaitingDefense' => 'AwaitingDefense',
+                        'CycleCompleted' => 'CycleCompleted',
                     ])
                     ->disabled(),
             ])->columns(2),
@@ -126,7 +126,7 @@ class KaprodiStudentResource extends Resource
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
                         'Unverified' => 'gray',
-                        'PendingReview', 'MenungguSidang' => 'warning',
+                        'PendingReview', 'AwaitingDefense' => 'warning',
                         'RejectedForm1' => 'danger',
                         'ApprovedForm1', 'LogbookComplete' => 'success',
                         'HasApplication' => 'info',
@@ -157,7 +157,7 @@ class KaprodiStudentResource extends Resource
                         'HasApplication' => 'HasApplication',
                         'HasDPM' => 'HasDPM',
                         'LogbookComplete' => 'LogbookComplete',
-                        'MenungguSidang' => 'MenungguSidang',
+                        'AwaitingDefense' => 'AwaitingDefense',
                     ]),
             ])
             ->actions([
@@ -319,7 +319,7 @@ class KaprodiStudentResource extends Resource
                     ->label('Jadwalkan Sidang')
                     ->icon('heroicon-o-calendar-days')
                     ->color('info')
-                    ->visible(fn (Student $record) => $record->access_status === 'MenungguSidang' &&
+                    ->visible(fn (Student $record) => $record->access_status === 'AwaitingDefense' &&
                         $record->sidangSubmission &&
                         $record->sidangSubmission->status === 'Pending'
                     )
@@ -436,7 +436,7 @@ class KaprodiStudentResource extends Resource
                     ->action(function (Collection $records, array $data) {
                         $lecturerId = static::currentUser()?->lecturer?->id;
 
-                        $eligible = $records->filter(fn (Student $s) => $s->access_status === 'MenungguSidang' &&
+                        $eligible = $records->filter(fn (Student $s) => $s->access_status === 'AwaitingDefense' &&
                             $s->sidangSubmission &&
                             $s->sidangSubmission->status === 'Pending'
                         );

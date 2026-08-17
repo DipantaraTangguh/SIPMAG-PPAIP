@@ -34,9 +34,9 @@ class StudentCycleController extends Controller
     }
 
     /**
-     * Konfirmasi hasil magang non-wajib (state MenungguKonfirmasi, atau
+     * Konfirmasi hasil magang non-wajib (state AwaitingConfirmation, atau
      * HasApplication untuk jalur mitra yang lapor sendiri):
-     * - diterima : wajib bukti LoA + tempat & periode aktual → SelesaiNonWajib + riwayat.
+     * - diterima : wajib bukti LoA + tempat & periode aktual → ElectiveCompleted + riwayat.
      * - ditolak  : mundur ke ApprovedForm1 agar bisa mengajukan Form 2 lagi.
      */
     public function confirm(ConfirmNonWajibRequest $request, StudentStateMachine $stateMachine, InternshipCycleSnapshotService $snapshotService)
@@ -59,10 +59,10 @@ class StudentCycleController extends Controller
             && $validated['hasil'] === 'diterima'
             && ($student->form1_data['jenisMagang'] ?? 'wajib') === 'non_wajib'
         ) {
-            $stateMachine->transition($student, 'MenungguKonfirmasi');
+            $stateMachine->transition($student, 'AwaitingConfirmation');
         }
 
-        if ($student->access_status !== 'MenungguKonfirmasi') {
+        if ($student->access_status !== 'AwaitingConfirmation') {
             return response()->json(['message' => 'Tidak ada konfirmasi magang yang menunggu.'], 403);
         }
 
@@ -80,7 +80,7 @@ class StudentCycleController extends Controller
         DB::transaction(function () use ($student, $stateMachine, $snapshotService, $validated, $loaPath): void {
             $locked = Student::query()->lockForUpdate()->findOrFail($student->id);
 
-            $stateMachine->transition($locked, 'SelesaiNonWajib');
+            $stateMachine->transition($locked, 'ElectiveCompleted');
             $snapshotService->record($locked->refresh(), [
                 'company_name' => $validated['company_name'],
                 'alamat_perusahaan' => $validated['alamat_perusahaan'] ?? null,
@@ -92,7 +92,7 @@ class StudentCycleController extends Controller
 
         return response()->json([
             'message' => 'Konfirmasi diterima. Magang non-wajib Anda tercatat di riwayat.',
-            'access_status' => 'SelesaiNonWajib',
+            'access_status' => 'ElectiveCompleted',
         ]);
     }
 

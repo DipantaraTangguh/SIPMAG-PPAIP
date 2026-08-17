@@ -15,8 +15,8 @@ export default function GuidancePage() {
         accessStatus === 'HasApplication' ||
         accessStatus === 'HasDPM' ||
         accessStatus === 'LogbookComplete' ||
-        accessStatus === 'MenungguSidang' ||
-        accessStatus === 'SiklusSelesai';
+        accessStatus === 'AwaitingDefense' ||
+        accessStatus === 'CycleCompleted';
 
     // Magang non-wajib berhenti di Form 2 / lamaran mitra: tidak ada tahap
     // DPM, logbook, maupun sidang.

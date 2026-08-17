@@ -4,8 +4,8 @@ import { RotateCcw, Loader2 } from "lucide-react";
 import { useForm1Workflow } from "../../../context/StudentWorkflowContext";
 
 /**
- * Tombol reset siklus mandiri. Muncul di panel SiklusSelesai dan
- * SelesaiNonWajib. Riwayat magang tetap tersimpan setelah reset.
+ * Tombol reset siklus mandiri. Muncul di panel CycleCompleted dan
+ * ElectiveCompleted. Riwayat magang tetap tersimpan setelah reset.
  */
 export default function CycleResetButton() {
     const { resetCycle } = useForm1Workflow();

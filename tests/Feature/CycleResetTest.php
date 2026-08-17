@@ -14,7 +14,7 @@ class CycleResetTest extends TestCase
 
     public function test_student_can_reset_cycle_after_non_wajib_completion(): void
     {
-        [$user, $student] = $this->completedStudent('SelesaiNonWajib', 'non_wajib');
+        [$user, $student] = $this->completedStudent('ElectiveCompleted', 'non_wajib');
 
         $form2 = Form2Submission::create([
             'student_id' => $student->id,
@@ -58,7 +58,7 @@ class CycleResetTest extends TestCase
 
     public function test_student_can_reset_cycle_after_wajib_completion(): void
     {
-        [$user, $student] = $this->completedStudent('SiklusSelesai', 'wajib');
+        [$user, $student] = $this->completedStudent('CycleCompleted', 'wajib');
 
         $this->actingAs($user)
             ->postJson('/api/student/cycle/reset')
@@ -90,7 +90,7 @@ class CycleResetTest extends TestCase
 
     public function test_history_endpoint_lists_completed_cycles(): void
     {
-        [$user, $student] = $this->completedStudent('SelesaiNonWajib', 'non_wajib');
+        [$user, $student] = $this->completedStudent('ElectiveCompleted', 'non_wajib');
 
         $this->actingAs($user)
             ->getJson('/api/student/cycle/history')
@@ -128,7 +128,7 @@ class CycleResetTest extends TestCase
             $student->internshipCycles()->create([
                 'cycle_number'   => 1,
                 'jenis_magang'   => $jenis,
-                'outcome_status' => $jenis === 'wajib' ? 'SiklusSelesai' : 'SelesaiNonWajib',
+                'outcome_status' => $jenis === 'wajib' ? 'CycleCompleted' : 'ElectiveCompleted',
                 'nim'            => $student->nim,
                 'nama'           => $student->name,
                 'study_program'  => $student->study_program,

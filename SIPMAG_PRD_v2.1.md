@@ -156,9 +156,9 @@ To develop a web-based platform that centralizes the entire internship administr
 
 | **ID** | **Requirement**                                                           | **Acceptance Criteria**                                                                                                                                                                                                                                                                                                                                           |
 |--------|---------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| FR-16  | Student submits Sidang form after 6 approved logbook entries.             | Form uploads: Laporan Magang Akhir (PDF, max 2MB), Poster Presentasi (PDF, max 2MB), KRS proof of internship course (PDF, max 2MB). No approval or rejection — files stored immediately. Status set to MenungguSidang.                                                                                                                                            |
-| FR-17  | Student data remains fully visible during MenungguSidang.                 | All data (DPM, logbook, company, LoA, files) remains accessible on student dashboard and admin panel while status = MenungguSidang. No data cleared automatically.                                                                                                                                                                                                |
-| FR-18  | PPAIP manually resets internship cycle per student after offline sidang.  | PPAIP sees list of students with status = MenungguSidang. 'Selesaikan Siklus' button is per individual student — not bulk. Confirmation modal: 'Apakah Anda yakin? Semua data siklus mahasiswa ini akan direset.' On confirm: access_status = Unverified, dpm_id = null, is_independent = false, logbook count = 0. Application/logbook history retained in DB for audit. |
+| FR-16  | Student submits Sidang form after 6 approved logbook entries.             | Form uploads: Laporan Magang Akhir (PDF, max 2MB), Poster Presentasi (PDF, max 2MB), KRS proof of internship course (PDF, max 2MB). No approval or rejection — files stored immediately. Status set to AwaitingDefense.                                                                                                                                            |
+| FR-17  | Student data remains fully visible during AwaitingDefense.                 | All data (DPM, logbook, company, LoA, files) remains accessible on student dashboard and admin panel while status = AwaitingDefense. No data cleared automatically.                                                                                                                                                                                                |
+| FR-18  | PPAIP manually resets internship cycle per student after offline sidang.  | PPAIP sees list of students with status = AwaitingDefense. 'Selesaikan Siklus' button is per individual student — not bulk. Confirmation modal: 'Apakah Anda yakin? Semua data siklus mahasiswa ini akan direset.' On confirm: access_status = Unverified, dpm_id = null, is_independent = false, logbook count = 0. Application/logbook history retained in DB for audit. |
 
 ---
 
@@ -252,7 +252,7 @@ To develop a web-based platform that centralizes the entire internship administr
 | nim                     | String     | Unique                                                                   | Digits only, from campus DB      |
 | name                    | String     |                                                                          |                                  |
 | study_program           | String     |                                                                          | Used for Kaprodi scoping         |
-| access_status           | Enum       | Unverified, PendingReview, ApprovedForm1, RejectedForm1, MenungguSidang  | Lifecycle gatekeeper             |
+| access_status           | Enum       | Unverified, PendingReview, ApprovedForm1, RejectedForm1, AwaitingDefense  | Lifecycle gatekeeper             |
 | is_independent          | Boolean    | Default: false                                                           | Mandiri track marker             |
 | form1_data              | JSON       | Nullable                                                                 | Stored Form 1 field values       |
 | form1_pdf_path          | String     | Nullable                                                                 | Generated Form 1 PDF path        |
@@ -375,7 +375,7 @@ To develop a web-based platform that centralizes the entire internship administr
 | 7        | Kaprodi              | Assign DPM to student via admin panel                                               | dpm_id set on student. DPM name appears on student dashboard.                                                |
 | 8        | Mahasiswa            | Submit logbook entries (6 required)                                                 | Each entry reviewed by DPM. Counter increments on each approval.                                             |
 | 9        | DPM                  | Approve or reject each logbook entry                                                | Approved: counter +1. Rejected: note added, student revises.                                                 |
-| 10       | Mahasiswa            | Submit Sidang form (Laporan, Poster, KRS) after 6 approved entries                  | Status = MenungguSidang. All data remains visible.                                                           |
+| 10       | Mahasiswa            | Submit Sidang form (Laporan, Poster, KRS) after 6 approved entries                  | Status = AwaitingDefense. All data remains visible.                                                           |
 | 11       | PPAIP                | Click 'Selesaikan Siklus' after confirming offline sidang                           | Confirmation modal → cycle reset to Unverified. History retained.                                            |
 
 ---
@@ -387,7 +387,7 @@ To develop a web-based platform that centralizes the entire internship administr
 | Verification Efficiency  | Reduction in admin time to process Form 1 vs manual  | Compare avg processing time before and after deployment                     |
 | Form 2 Data Coverage     | 100% of Mandiri students have Form 2 records         | students WHERE is_independent = true WITH form2_submissions count > 0       |
 | No Double Booking        | 0% students with duplicate Accepted status           | Auto-Cancel logic enforced — verifiable via DB query                        |
-| Cycle Completion Rate    | % students reaching MenungguSidang                   | students WHERE status = MenungguSidang / total registered                   |
+| Cycle Completion Rate    | % students reaching AwaitingDefense                   | students WHERE status = AwaitingDefense / total registered                   |
 | Logbook Compliance       | % students completing 6 approved logbook entries     | students WHERE approved_logbook_count = 6 / active students                 |
 | DPM Assignment Rate      | % students with LoA who have been assigned a DPM     | students WHERE dpm_id IS NOT NULL / students with supervisor form            |
 

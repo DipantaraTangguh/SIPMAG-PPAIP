@@ -81,7 +81,7 @@ class InternshipCyclesExport implements FromQuery, ShouldAutoSize, WithColumnFor
             $row->ipk !== null ? (float) $row->ipk : null,
             $row->cycle_number,
             $row->jenis_magang === 'wajib' ? 'Wajib' : 'Non-Wajib',
-            $row->outcome_status === 'SiklusSelesai' ? 'Selesai (Sidang & Penilaian)' : 'Selesai (Non-Wajib)',
+            $row->outcome_status === 'CycleCompleted' ? 'Selesai (Sidang & Penilaian)' : 'Selesai (Non-Wajib)',
             $row->skema_magang ?? '-',
             $row->topik_magang ?? '-',
             $row->output_target ?? '-',

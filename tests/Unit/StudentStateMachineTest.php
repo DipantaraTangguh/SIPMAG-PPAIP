@@ -33,15 +33,15 @@ class StudentStateMachineTest extends TestCase
             'ApprovedForm1 → HasApplication'  => ['ApprovedForm1', 'HasApplication'],
             'HasApplication → HasDPM'         => ['HasApplication', 'HasDPM'],
             'HasDPM → LogbookComplete'        => ['HasDPM', 'LogbookComplete'],
-            'LogbookComplete → MenungguSidang'=> ['LogbookComplete', 'MenungguSidang'],
-            'MenungguSidang → SiklusSelesai'  => ['MenungguSidang', 'SiklusSelesai'],
+            'LogbookComplete → AwaitingDefense'=> ['LogbookComplete', 'AwaitingDefense'],
+            'AwaitingDefense → CycleCompleted'  => ['AwaitingDefense', 'CycleCompleted'],
             // Cabang non-wajib + konfirmasi + reset siklus mandiri.
-            'ApprovedForm1 → MenungguKonfirmasi'  => ['ApprovedForm1', 'MenungguKonfirmasi'],
-            'HasApplication → MenungguKonfirmasi' => ['HasApplication', 'MenungguKonfirmasi'],
-            'MenungguKonfirmasi → SelesaiNonWajib'=> ['MenungguKonfirmasi', 'SelesaiNonWajib'],
-            'MenungguKonfirmasi → ApprovedForm1'  => ['MenungguKonfirmasi', 'ApprovedForm1'],
-            'SiklusSelesai → Unverified'      => ['SiklusSelesai', 'Unverified'],
-            'SelesaiNonWajib → Unverified'    => ['SelesaiNonWajib', 'Unverified'],
+            'ApprovedForm1 → AwaitingConfirmation'  => ['ApprovedForm1', 'AwaitingConfirmation'],
+            'HasApplication → AwaitingConfirmation' => ['HasApplication', 'AwaitingConfirmation'],
+            'AwaitingConfirmation → ElectiveCompleted'=> ['AwaitingConfirmation', 'ElectiveCompleted'],
+            'AwaitingConfirmation → ApprovedForm1'  => ['AwaitingConfirmation', 'ApprovedForm1'],
+            'CycleCompleted → Unverified'      => ['CycleCompleted', 'Unverified'],
+            'ElectiveCompleted → Unverified'    => ['ElectiveCompleted', 'Unverified'],
         ];
     }
 
@@ -63,17 +63,17 @@ class StudentStateMachineTest extends TestCase
     {
         return [
             'Unverified → LogbookComplete'    => ['Unverified', 'LogbookComplete'],
-            'Unverified → SiklusSelesai'      => ['Unverified', 'SiklusSelesai'],
+            'Unverified → CycleCompleted'      => ['Unverified', 'CycleCompleted'],
             'Unverified → HasDPM'             => ['Unverified', 'HasDPM'],
             'ApprovedForm1 → PendingReview'   => ['ApprovedForm1', 'PendingReview'],
-            'HasDPM → MenungguSidang'         => ['HasDPM', 'MenungguSidang'],
-            'LogbookComplete → SiklusSelesai' => ['LogbookComplete', 'SiklusSelesai'],
-            'SiklusSelesai → HasDPM'          => ['SiklusSelesai', 'HasDPM'],
-            'SelesaiNonWajib → PendingReview' => ['SelesaiNonWajib', 'PendingReview'],
-            'MenungguKonfirmasi → HasDPM'     => ['MenungguKonfirmasi', 'HasDPM'],
-            'MenungguKonfirmasi → Unverified' => ['MenungguKonfirmasi', 'Unverified'],
-            'HasApplication → SelesaiNonWajib'=> ['HasApplication', 'SelesaiNonWajib'],
-            'MenungguSidang → HasDPM'         => ['MenungguSidang', 'HasDPM'],
+            'HasDPM → AwaitingDefense'         => ['HasDPM', 'AwaitingDefense'],
+            'LogbookComplete → CycleCompleted' => ['LogbookComplete', 'CycleCompleted'],
+            'CycleCompleted → HasDPM'          => ['CycleCompleted', 'HasDPM'],
+            'ElectiveCompleted → PendingReview' => ['ElectiveCompleted', 'PendingReview'],
+            'AwaitingConfirmation → HasDPM'     => ['AwaitingConfirmation', 'HasDPM'],
+            'AwaitingConfirmation → Unverified' => ['AwaitingConfirmation', 'Unverified'],
+            'HasApplication → ElectiveCompleted'=> ['HasApplication', 'ElectiveCompleted'],
+            'AwaitingDefense → HasDPM'         => ['AwaitingDefense', 'HasDPM'],
         ];
     }
 
@@ -144,11 +144,11 @@ class StudentStateMachineTest extends TestCase
         $student->access_status = 'Unverified';
 
         try {
-            $this->stateMachine->transition($student, 'SiklusSelesai');
+            $this->stateMachine->transition($student, 'CycleCompleted');
             $this->fail('Expected InvalidStateTransitionException was not thrown.');
         } catch (InvalidStateTransitionException $e) {
             $this->assertSame('Unverified', $e->from);
-            $this->assertSame('SiklusSelesai', $e->to);
+            $this->assertSame('CycleCompleted', $e->to);
         }
     }
 }

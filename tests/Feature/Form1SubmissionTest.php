@@ -237,7 +237,7 @@ class Form1SubmissionTest extends TestCase
         $student->internshipCycles()->create([
             'cycle_number'   => 1,
             'jenis_magang'   => 'wajib',
-            'outcome_status' => 'SiklusSelesai',
+            'outcome_status' => 'CycleCompleted',
             'nim'            => $student->nim,
             'nama'           => $student->name,
             'study_program'  => $student->study_program,
@@ -280,7 +280,7 @@ class Form1SubmissionTest extends TestCase
             'ipk'          => 3.80,
         ]);
         $student->forceFill([
-            'access_status' => 'SiklusSelesai',
+            'access_status' => 'CycleCompleted',
             'form1_data'    => null,
             'form1_pdf_path' => null,
         ])->save();
@@ -288,7 +288,7 @@ class Form1SubmissionTest extends TestCase
         $this->actingAs($user)
             ->getJson('/api/form1')
             ->assertOk()
-            ->assertJsonPath('access_status', 'SiklusSelesai')
+            ->assertJsonPath('access_status', 'CycleCompleted')
             ->assertJsonPath('form1', null);
     }
 }

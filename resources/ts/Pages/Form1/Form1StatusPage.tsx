@@ -21,7 +21,7 @@ export default function Form1StatusPage() {
 
     // Siklus selesai diarsipkan: form1_data sengaja tidak lagi dihapus, tapi cycle
     // lama bisa punya data null. Tetap render arsipnya dari profil mahasiswa.
-    const isCompleted = status === 'SiklusSelesai' || status === 'SelesaiNonWajib';
+    const isCompleted = status === 'CycleCompleted' || status === 'ElectiveCompleted';
 
     // Kalau status sudah maju tapi data belum nyampe, tahan dulu pakai loader.
     if (!form1Submission && !isCompleted) {

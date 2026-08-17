@@ -18,7 +18,7 @@ return new class extends Migration
             $table->foreignId('student_id')->constrained('students')->restrictOnDelete();
             $table->unsignedInteger('cycle_number');
             $table->enum('jenis_magang', ['wajib', 'non_wajib']);
-            $table->enum('outcome_status', ['SiklusSelesai', 'SelesaiNonWajib']);
+            $table->enum('outcome_status', ['CycleCompleted', 'ElectiveCompleted']);
 
             // Snapshot identitas mahasiswa saat siklus selesai.
             $table->string('nim');

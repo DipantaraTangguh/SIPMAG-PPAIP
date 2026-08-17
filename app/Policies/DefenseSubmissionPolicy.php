@@ -42,7 +42,7 @@ class DefenseSubmissionPolicy
             && $user->lecturer?->study_program !== null
             && $user->lecturer->study_program === $submission->student?->study_program
             && $submission->status === 'Pending'
-            && $submission->student?->access_status === 'MenungguSidang';
+            && $submission->student?->access_status === 'AwaitingDefense';
     }
 
     public function assess(User $user, DefenseSubmission $submission): bool

@@ -170,7 +170,7 @@ class DefenseAssessmentTest extends TestCase
             'study_program' => 'Sistem Informasi',
             'email' => fake()->unique()->safeEmail(),
         ]);
-        $student->forceFill(['access_status' => 'MenungguSidang'])->save();
+        $student->forceFill(['access_status' => 'AwaitingDefense'])->save();
 
         return DefenseSubmission::create([
             'student_id' => $student->id,

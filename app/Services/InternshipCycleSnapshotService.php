@@ -9,7 +9,7 @@ use App\Models\Student;
  * Merekam snapshot satu siklus magang yang selesai ke tabel riwayat
  * (internship_cycles). Dipanggil tepat sekali per penyelesaian siklus:
  * - magang wajib  : dari InternshipCycleCompletionService::complete()
- * - magang non-wajib: dari Form2Controller::approve() saat masuk SelesaiNonWajib
+ * - magang non-wajib: dari Form2Controller::approve() saat masuk ElectiveCompleted
  */
 class InternshipCycleSnapshotService
 {
@@ -35,7 +35,7 @@ class InternshipCycleSnapshotService
         return $student->internshipCycles()->create(array_merge([
             'cycle_number'     => $cycleNumber,
             'jenis_magang'     => $jenis,
-            'outcome_status'   => $jenis === 'wajib' ? 'SiklusSelesai' : 'SelesaiNonWajib',
+            'outcome_status'   => $jenis === 'wajib' ? 'CycleCompleted' : 'ElectiveCompleted',
             'nim'              => $student->nim,
             'nama'             => $student->name,
             'study_program'    => $student->study_program,
