@@ -8,6 +8,7 @@ use App\Models\DefenseAssessment;
 use App\Models\DefenseSubmission;
 use App\Models\User;
 use App\Services\DefenseAssessmentService;
+use App\Support\AccessStatus;
 use App\Support\DefenseDocument;
 use Filament\Forms\Form;
 use Filament\Infolists\Components\Section;
@@ -118,7 +119,9 @@ class ExaminedSessionResource extends Resource
                             ->label('Email'),
                         TextEntry::make('student.access_status')
                             ->label('Status Alur')
-                            ->badge(),
+                            ->badge()
+                            ->formatStateUsing(fn (?string $state): string => AccessStatus::label($state))
+                            ->color(fn (?string $state): string => AccessStatus::color($state)),
                     ])
                     ->columns(2),
 

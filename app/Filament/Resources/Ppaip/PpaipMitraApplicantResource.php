@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Ppaip;
 use App\Filament\Resources\Ppaip\PpaipMitraApplicantResource\Pages\ListMitraApplicants;
 use App\Filament\Resources\Ppaip\PpaipMitraApplicantResource\Pages\ViewMitraApplicant;
 use App\Models\Application;
+use App\Support\AccessStatus;
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Infolist;
@@ -86,7 +87,11 @@ class PpaipMitraApplicantResource extends Resource
                         TextEntry::make('student.semester')->label('Semester')->placeholder('-'),
                         TextEntry::make('student.jumlah_sks')->label('Jumlah SKS')->placeholder('-'),
                         TextEntry::make('student.ipk')->label('IPK')->placeholder('-'),
-                        TextEntry::make('student.access_status')->label('Status Mahasiswa')->badge(),
+                        TextEntry::make('student.access_status')
+                            ->label('Status Mahasiswa')
+                            ->badge()
+                            ->formatStateUsing(fn (?string $state): string => AccessStatus::label($state))
+                            ->color(fn (?string $state): string => AccessStatus::color($state)),
                     ])
                     ->columns(2),
 
