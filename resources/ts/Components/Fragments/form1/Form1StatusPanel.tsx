@@ -53,9 +53,7 @@ export default function Form1StatusPanel({
             )}
             {isCompleted && <Form1CompletedPanel />}
             {isNonWajibDone && <Form1NonWajibDonePanel />}
-            {isAwaitingConfirmation && (
-                <Form1KonfirmasiPanel allowDecline={!isSelfReporting} />
-            )}
+            {isAwaitingConfirmation && <Form1KonfirmasiPanel />}
             {!isApproved && !isCompleted && !isNonWajibDone && !isAwaitingConfirmation && <Form1BackButton />}
             <Form1HelpCard />
         </div>

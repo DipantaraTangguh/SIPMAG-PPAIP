@@ -17,9 +17,15 @@ import QuickActionButton from '../../Components/Fragments/dashboard/QuickActionB
 import LogbookProgressCard from '../../Components/Fragments/dashboard/LogbookProgressCard';
 import TipsMagangCard from '../../Components/Fragments/dashboard/TipsMagangCard';
 
-const mockTips = [
+const WAJIB_TIPS = [
     'Jangan lupa isi logbook sebagai syarat untuk bisa melakukan sidang magang.',
     'Gunakan foto profil profesional untuk meningkatkan kepercayaan mitra magang.',
+];
+
+// Non-wajib tidak punya logbook maupun sidang, jadi tipsnya beda.
+const NON_WAJIB_TIPS = [
+    'Setelah diterima, unggah bukti penerimaan (LoA) di menu Profil agar magang Anda tercatat.',
+    'Simpan LoA dalam bentuk PDF atau gambar yang jelas terbaca, maksimal 5MB.',
 ];
 function deriveStep(status) {
     switch (status) {
@@ -45,7 +51,7 @@ function deriveStep(status) {
     }
 }
 
-// Non-wajib berhenti di konfirmasi LoA — tanpa DPM/logbook/sidang.
+// Non-wajib cuma dua langkah: Form 1 lalu konfirmasi penerimaan (unggah LoA).
 function deriveNonWajibStep(status) {
     switch (status) {
         case 'Unverified':
@@ -54,11 +60,10 @@ function deriveNonWajibStep(status) {
             return 1;
         case 'ApprovedForm1':
         case 'HasApplication':
-            return 2;
         case 'AwaitingConfirmation':
-            return 3;
+            return 2;
         case 'ElectiveCompleted':
-            return 4; // 3 langkah selesai
+            return 3; // 2 langkah selesai
         default:
             return 1;
     }
@@ -136,8 +141,12 @@ export default function DashboardPage() {
                             disabled={accessStatus === 'AwaitingDefense' && sidangSchedule ? false : undefined}
                             style={accessStatus === 'AwaitingDefense' && sidangSchedule ? 'primary' : undefined}
                         />
-                        <LogbookProgressCard approvedCount={logbookCount} />
-                        <TipsMagangCard tips={mockTips} />
+                        {!isNonWajib && (
+                            <LogbookProgressCard approvedCount={logbookCount} />
+                        )}
+                        <TipsMagangCard
+                            tips={isNonWajib ? NON_WAJIB_TIPS : WAJIB_TIPS}
+                        />
                     </div>
                 </div>
             </div>

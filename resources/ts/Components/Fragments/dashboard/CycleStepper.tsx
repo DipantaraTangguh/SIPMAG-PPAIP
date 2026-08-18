@@ -22,10 +22,11 @@ const WAJIB_STEPS = [
 ];
 
 // Magang non-wajib berhenti setelah konfirmasi LoA — tanpa DPM/logbook/sidang.
+// Non-wajib cuma dua langkah: Form 1 lalu form penerimaan (unggah LoA).
+// Tidak ada Form 2/surat pengantar, DPM, logbook, maupun sidang.
 const NON_WAJIB_STEPS = [
     { key: "syarat_akademik", label: "Syarat Akademik", icon: ClipboardCheck },
-    { key: "pengantar_lamaran", label: "Pengantar / Lamaran", icon: FileText },
-    { key: "konfirmasi", label: "Konfirmasi Magang", icon: BadgeCheck },
+    { key: "konfirmasi", label: "Konfirmasi Penerimaan", icon: BadgeCheck },
 ];
 
 export default function CycleStepper({ currentStep = 1, variant = "wajib" }) {

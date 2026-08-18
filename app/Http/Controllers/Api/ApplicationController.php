@@ -19,13 +19,21 @@ use Throwable;
 
 class ApplicationController extends Controller
 {
+    /**
+     * Status yang berarti tempat magang sudah benar-benar didapat, sehingga
+     * mahasiswa tidak boleh melamar lowongan mitra lagi.
+     *
+     * AwaitingConfirmation sengaja TIDAK masuk: non-wajib berada di state itu
+     * sejak Form 1 disetujui, justru saat belum mengonfirmasi diterima di mana
+     * pun. Daftar ini harus sama dengan SECURED_INTERNSHIP_STATUSES di
+     * accessUtils.js -- sebelumnya beda dan bikin portal menolak diam-diam.
+     */
     private const SECURED_INTERNSHIP_STATUSES = [
         'HasDPM',
         'LogbookComplete',
         'AwaitingDefense',
         'CycleCompleted',
         'ElectiveCompleted',
-        'AwaitingConfirmation',
     ];
 
     private const SECURED_INTERNSHIP_MESSAGE = 'DPM Anda sudah ditunjuk atau pengajuan DPM sudah disetujui, sehingga Anda tidak dapat melamar lowongan mitra lagi.';
@@ -69,7 +77,7 @@ class ApplicationController extends Controller
                     ]);
                 }
 
-                if (! in_array($student->access_status, ['ApprovedForm1', 'HasApplication'])) {
+                if (! in_array($student->access_status, ['ApprovedForm1', 'HasApplication', 'AwaitingConfirmation'])) {
                     abort(403, 'Form 1 harus disetujui terlebih dahulu.');
                 }
 
