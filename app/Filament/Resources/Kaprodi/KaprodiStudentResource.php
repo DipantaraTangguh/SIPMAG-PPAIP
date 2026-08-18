@@ -7,6 +7,7 @@ use App\Models\Lecturer;
 use App\Models\Student;
 use App\Models\User;
 use App\Services\DpmAssignmentService;
+use App\Services\Form1DecisionService;
 use App\Services\StudentStateMachine;
 use App\Support\AccessStatus;
 use App\Support\StoredFilePath;
@@ -182,14 +183,10 @@ class KaprodiStudentResource extends Resource
                     ->color('success')
                     ->visible(fn (Student $record) => $record->access_status === 'PendingReview')
                     ->requiresConfirmation()
-                    ->action(function (Student $record) {
-                        $lecturerId = static::currentUser()?->lecturer?->id;
-                        app(StudentStateMachine::class)->transition($record, 'ApprovedForm1', [
-                            'form1_rejection_reason' => null,
-                            'form1_approved_by' => $lecturerId,
-                            'form1_approved_at' => now(),
-                        ]);
-                    }),
+                    // Logika keputusan terpusat di Form1DecisionService (dipakai
+                    // juga endpoint API) - jangan tulis transisi manual di sini.
+                    ->action(fn (Student $record) => app(Form1DecisionService::class)
+                        ->approve($record, static::currentUser()?->lecturer?->id)),
 
                 // Action reject Form 1.
                 Tables\Actions\Action::make('rejectForm1')

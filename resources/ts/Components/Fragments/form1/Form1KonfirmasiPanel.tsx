@@ -1,18 +1,17 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { BadgeCheck, Upload, Loader2, XCircle } from "lucide-react";
+import { BadgeCheck, Upload, Loader2 } from "lucide-react";
 import { useForm1Workflow } from "../../../context/StudentWorkflowContext";
 
 /**
- * Panel state AwaitingConfirmation (magang non-wajib jalur Form 2), dipakai juga
- * di HasApplication buat jalur mitra yang lapor sendiri. Mahasiswa melaporkan
- * hasilnya: diterima (upload LoA + tempat & periode aktual) atau ditolak
- * (kembali bisa mengajukan Form 2 ke perusahaan lain).
+ * Form penerimaan magang non-wajib: satu-satunya langkah setelah Form 1
+ * disetujui. Mahasiswa mengunggah LoA beserta tempat & periode magang yang
+ * sebenarnya, lalu siklusnya langsung selesai.
  *
- * allowDecline=false dipakai di jalur mitra: kalau lamarannya belum tembus,
- * mahasiswa tinggal melamar lowongan lain lewat portal, tanpa lapor apa pun.
+ * Tidak ada opsi "ditolak" -- non-wajib tidak punya Form 2 untuk diajukan
+ * ulang, jadi mahasiswa cukup membiarkan form ini sampai benar-benar diterima.
  */
-export default function Form1KonfirmasiPanel({ allowDecline = true }) {
+export default function Form1KonfirmasiPanel() {
     const { confirmCycle } = useForm1Workflow();
     const navigate = useNavigate();
 
@@ -23,7 +22,6 @@ export default function Form1KonfirmasiPanel({ allowDecline = true }) {
     const [loaFile, setLoaFile] = useState(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState(null);
-    const [decliningConfirm, setDecliningConfirm] = useState(false);
 
     const isValid =
         companyName.trim() !== "" && mulai !== "" && selesai !== "" && loaFile;
@@ -50,7 +48,6 @@ export default function Form1KonfirmasiPanel({ allowDecline = true }) {
             setError(err?.message || "Gagal mengirim konfirmasi.");
         } finally {
             setIsSubmitting(false);
-            setDecliningConfirm(false);
         }
     };
 
@@ -65,9 +62,10 @@ export default function Form1KonfirmasiPanel({ allowDecline = true }) {
                         Konfirmasi Hasil Magang Non-Wajib
                     </h3>
                     <p className="mt-1 text-sm leading-relaxed text-gray-600">
-                        {allowDecline
-                            ? 'Surat pengantar Anda disetujui atau lamaran mitra Anda diterima. Laporkan hasilnya: bila diterima, unggah bukti penerimaan (LoA) beserta tempat dan periode magang yang sebenarnya.'
-                            : 'Sudah dapat tempat magang sendiri? Laporkan langsung di sini dengan mengunggah bukti penerimaan (LoA) beserta tempat dan periode magang yang sebenarnya — tanpa perlu surat pengantar. Kalau belum, Anda masih bisa mengajukan Form 2 atau melamar lowongan lewat portal.'}
+                        Begitu Anda diterima di tempat magang, laporkan di sini
+                        dengan mengunggah bukti penerimaan (LoA) beserta tempat
+                        dan periode magang yang sebenarnya. Belum diterima?
+                        Biarkan saja — form ini menunggu sampai Anda siap.
                     </p>
                 </div>
             </div>
@@ -200,46 +198,6 @@ export default function Form1KonfirmasiPanel({ allowDecline = true }) {
                 </button>
             </div>
 
-            {allowDecline && (
-            <div className="mt-5 border-t border-gray-100 pt-4">
-                {!decliningConfirm ? (
-                    <button
-                        type="button"
-                        onClick={() => setDecliningConfirm(true)}
-                        disabled={isSubmitting}
-                        className="flex items-center gap-2 text-sm text-gray-500 transition-colors hover:text-red-600"
-                    >
-                        <XCircle className="h-4 w-4" />
-                        Saya belum/tidak diterima di perusahaan ini
-                    </button>
-                ) : (
-                    <div className="rounded-lg border border-amber-200 bg-amber-50 p-4">
-                        <p className="text-sm text-amber-800">
-                            Anda akan dikembalikan ke tahap sebelumnya dan dapat
-                            mengajukan Form 2 ke perusahaan lain. Lanjutkan?
-                        </p>
-                        <div className="mt-3 flex gap-3">
-                            <button
-                                type="button"
-                                onClick={() => submit("ditolak")}
-                                disabled={isSubmitting}
-                                className="rounded-lg bg-primary px-4 py-2 text-sm font-bold text-white hover:bg-primary-hover disabled:bg-gray-300"
-                            >
-                                Ya, Ajukan Ulang
-                            </button>
-                            <button
-                                type="button"
-                                onClick={() => setDecliningConfirm(false)}
-                                disabled={isSubmitting}
-                                className="px-4 py-2 text-sm text-gray-500 hover:text-gray-900"
-                            >
-                                Batal
-                            </button>
-                        </div>
-                    </div>
-                )}
-            </div>
-            )}
         </div>
     );
 }
