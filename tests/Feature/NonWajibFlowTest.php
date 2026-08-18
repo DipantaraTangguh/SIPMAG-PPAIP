@@ -320,6 +320,84 @@ class NonWajibFlowTest extends TestCase
         $this->assertSame(0, $student->internshipCycles()->count());
     }
 
+    public function test_non_wajib_can_self_report_acceptance_right_after_form1_approval(): void
+    {
+        // Sudah dapat tempat magang sendiri: tidak butuh surat pengantar
+        // maupun melamar lewat portal, jadi boleh langsung unggah LoA.
+        $studentUser = User::factory()->create(['role' => 'mahasiswa']);
+        $student = Student::create([
+            'user_id' => $studentUser->id,
+            'nim' => '1101214275',
+            'name' => 'Mahasiswa Dapat Sendiri',
+            'study_program' => 'Sistem Informasi',
+            'email' => 'dapat-sendiri@example.test',
+            'form1_data' => ['jenisMagang' => 'non_wajib'],
+        ]);
+        $student->forceFill(['access_status' => 'ApprovedForm1'])->save();
+
+        Storage::fake('local');
+        $this->actingAs($studentUser)->post('/api/student/cycle/confirm', [
+            'hasil' => 'diterima',
+            'company_name' => 'PT Dapat Sendiri',
+            'tanggal_mulai' => '2026-09',
+            'tanggal_selesai' => '2026-11',
+            'loa_file' => UploadedFile::fake()->create('loa.pdf', 100, 'application/pdf'),
+        ])->assertOk()->assertJsonPath('access_status', 'ElectiveCompleted');
+
+        $cycle = $student->fresh()->internshipCycles()->first();
+        $this->assertNotNull($cycle);
+        $this->assertSame('non_wajib', $cycle->jenis_magang);
+        $this->assertSame('PT Dapat Sendiri', $cycle->company_name);
+        $this->assertNotNull($cycle->loa_path);
+    }
+
+    public function test_wajib_cannot_self_report_from_approved_form1(): void
+    {
+        $studentUser = User::factory()->create(['role' => 'mahasiswa']);
+        $student = Student::create([
+            'user_id' => $studentUser->id,
+            'nim' => '1101214276',
+            'name' => 'Mahasiswa Wajib',
+            'study_program' => 'Sistem Informasi',
+            'email' => 'wajib-approved@example.test',
+            'form1_data' => ['jenisMagang' => 'wajib'],
+        ]);
+        $student->forceFill(['access_status' => 'ApprovedForm1'])->save();
+
+        Storage::fake('local');
+        $this->actingAs($studentUser)->post('/api/student/cycle/confirm', [
+            'hasil' => 'diterima',
+            'company_name' => 'PT Bukan Haknya',
+            'tanggal_mulai' => '2026-09',
+            'tanggal_selesai' => '2026-11',
+            'loa_file' => UploadedFile::fake()->create('loa.pdf', 100, 'application/pdf'),
+        ])->assertForbidden();
+
+        $this->assertSame('ApprovedForm1', $student->fresh()->access_status);
+    }
+
+    public function test_non_wajib_cannot_report_rejection_before_securing_a_place(): void
+    {
+        // "Ditolak" hanya masuk akal setelah ada tempat yang dikonfirmasi;
+        // dari ApprovedForm1 belum ada apa pun untuk ditolak.
+        $studentUser = User::factory()->create(['role' => 'mahasiswa']);
+        $student = Student::create([
+            'user_id' => $studentUser->id,
+            'nim' => '1101214277',
+            'name' => 'Mahasiswa Belum Punya Tempat',
+            'study_program' => 'Sistem Informasi',
+            'email' => 'belum-punya-tempat@example.test',
+            'form1_data' => ['jenisMagang' => 'non_wajib'],
+        ]);
+        $student->forceFill(['access_status' => 'ApprovedForm1'])->save();
+
+        $this->actingAs($studentUser)
+            ->postJson('/api/student/cycle/confirm', ['hasil' => 'ditolak'])
+            ->assertForbidden();
+
+        $this->assertSame('ApprovedForm1', $student->fresh()->access_status);
+    }
+
     public function test_non_wajib_can_self_report_acceptance_while_still_has_application(): void
     {
         // Perusahaan menerima mahasiswa di luar sistem, jadi status lamaran
