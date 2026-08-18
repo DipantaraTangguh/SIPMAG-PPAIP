@@ -112,29 +112,22 @@ class ApprovedInternshipLockTest extends TestCase
         $this->assertSame([], Storage::disk('local')->allFiles('cv'));
     }
 
-    public function test_menunggu_konfirmasi_allows_new_form2_submissions(): void
+    public function test_non_wajib_cannot_submit_form2_at_all(): void
     {
+        // Magang non-wajib tidak punya Form 2: alurnya cuma Form 1 lalu
+        // form penerimaan (unggah LoA).
         [$user, $student] = $this->studentUser('AwaitingConfirmation');
+        $student->update(['form1_data' => ['jenisMagang' => 'non_wajib']]);
         $this->actingAs($user);
 
-        // Mahasiswa non-wajib yang sudah punya Form 2 approved tetap boleh submit lagi.
-        Form2Submission::create([
-            'student_id' => $student->id,
-            'company_name' => 'PT Sudah Disetujui',
-            'nama_pimpinan' => 'Direktur',
-            'jabatan_pimpinan' => 'Direktur Utama',
-            'alamat_perusahaan' => 'Jl. Sudah No. 1',
-            'lingkup_magang' => 'Pengembangan',
-            'tanggal_mulai' => '2026-07-01',
-            'tanggal_selesai' => '2026-09-30',
-            'status' => 'ApprovedForm2',
-        ]);
-
         $this->postJson('/api/form2', $this->validForm2Payload())
-            ->assertCreated()
-            ->assertJsonPath('submission.status', 'PendingReview');
+            ->assertForbidden()
+            ->assertJsonPath(
+                'message',
+                'Magang non-wajib tidak memerlukan Form 2. Unggah bukti penerimaan (LoA) di menu Profil.',
+            );
 
-        $this->assertSame(2, $student->form2Submissions()->count());
+        $this->assertSame(0, $student->form2Submissions()->count());
     }
 
     /**

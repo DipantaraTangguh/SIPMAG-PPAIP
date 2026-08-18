@@ -2,13 +2,21 @@ import React from 'react';
 
 const tabs = [
     { key: 'mitra', label: 'Mitra' },
-    { key: 'mandiri', label: 'Mandiri' },
+    // Jalur mandiri = Form 2 (surat pengantar), khusus magang wajib.
+    { key: 'mandiri', label: 'Mandiri', wajibOnly: true },
 ];
 
-export default function TabNavigation({ activeTab, onTabChange }) {
+export default function TabNavigation({ activeTab, onTabChange, isNonWajib = false }) {
+    const visibleTabs = tabs.filter((tab) => !(tab.wajibOnly && isNonWajib));
+
+    // Satu tab saja tidak perlu switcher.
+    if (visibleTabs.length < 2) {
+        return null;
+    }
+
     return (
         <div className="inline-flex w-full rounded-full border border-gray-200 bg-gray-100 p-1 shadow-md sm:w-fit">
-            {tabs.map(({ key, label }) => {
+            {visibleTabs.map(({ key, label }) => {
                 const active = activeTab === key;
                 return (
                     <button
