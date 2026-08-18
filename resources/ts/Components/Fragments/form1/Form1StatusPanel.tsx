@@ -18,10 +18,13 @@ export default function Form1StatusPanel({
     const isApproved = form1_status === 'ApprovedForm1';
     const isCompleted = form1_status === 'CycleCompleted';
     const isNonWajibDone = form1_status === 'ElectiveCompleted';
-    // Jalur mitra non-wajib belum sempat masuk AwaitingConfirmation kalau status
-    // lamarannya belum diubah PPAIP/mitra -- beri jalan lapor sendiri dari sini.
+    // Non-wajib boleh lapor sendiri kalau sudah dapat tempat magang: dari
+    // ApprovedForm1 (dapat sendiri, tanpa surat pengantar/portal) maupun dari
+    // HasApplication (melamar lewat portal lalu diterima langsung perusahaan).
+    // Tanpa ini mereka menunggu Form 2 disetujui atau PPAIP mengubah status.
     const isNonWajib = formData?.jenisMagang === 'non_wajib';
-    const isSelfReporting = isNonWajib && form1_status === 'HasApplication';
+    const isSelfReporting =
+        isNonWajib && ['ApprovedForm1', 'HasApplication'].includes(form1_status);
     const isAwaitingConfirmation =
         form1_status === 'AwaitingConfirmation' || isSelfReporting;
 

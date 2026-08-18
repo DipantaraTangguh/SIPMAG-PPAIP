@@ -67,7 +67,7 @@ export default function Form1KonfirmasiPanel({ allowDecline = true }) {
                     <p className="mt-1 text-sm leading-relaxed text-gray-600">
                         {allowDecline
                             ? 'Surat pengantar Anda disetujui atau lamaran mitra Anda diterima. Laporkan hasilnya: bila diterima, unggah bukti penerimaan (LoA) beserta tempat dan periode magang yang sebenarnya.'
-                            : 'Sudah diterima di tempat magang? Laporkan di sini dengan mengunggah bukti penerimaan (LoA) beserta tempat dan periode magang yang sebenarnya. Kalau belum, Anda masih bisa melamar lowongan lain lewat portal.'}
+                            : 'Sudah dapat tempat magang sendiri? Laporkan langsung di sini dengan mengunggah bukti penerimaan (LoA) beserta tempat dan periode magang yang sebenarnya — tanpa perlu surat pengantar. Kalau belum, Anda masih bisa mengajukan Form 2 atau melamar lowongan lewat portal.'}
                     </p>
                 </div>
             </div>
