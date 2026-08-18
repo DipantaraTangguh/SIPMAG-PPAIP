@@ -12,7 +12,10 @@ services:
         ports:
             - "8000:8000"
         depends_on:
-            - mysql
+            # Tunggu MySQL benar-benar siap, bukan sekadar containernya jalan --
+            # tanpa ini migrate saat boot pertama bisa gagal konek.
+            mysql:
+                condition: service_healthy
 
     vite:
         image: node:22
@@ -36,8 +39,20 @@ services:
             MYSQL_ROOT_PASSWORD: admin
             MYSQL_USER: admin
             MYSQL_PASSWORD: admin
+        ports:
+            # Dibuka ke host supaya GUI database (TablePlus, DBeaver, dsb.)
+            # bisa konek ke 127.0.0.1:3307. Pakai 3307 agar tidak bentrok
+            # dengan MySQL yang mungkin sudah jalan di mesin sendiri.
+            # Aplikasi di dalam container tetap memakai host "mysql" port 3306.
+            - "3307:3306"
         volumes:
             - mysql_data:/var/lib/mysql
+        healthcheck:
+            test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-padmin"]
+            interval: 5s
+            timeout: 5s
+            retries: 20
+            start_period: 30s
 
     phpmyadmin:
         image: phpmyadmin:latest
@@ -48,7 +63,8 @@ services:
             PMA_HOST: mysql
             PMA_PORT: 3306
         depends_on:
-            - mysql
+            mysql:
+                condition: service_healthy
 
 volumes:
     mysql_data:

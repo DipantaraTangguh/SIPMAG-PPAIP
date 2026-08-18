@@ -1,6 +1,11 @@
 FROM php:8.4-fpm
 
-# Install system dependencies
+# Install system dependencies.
+#
+# libreoffice-writer wajib: seluruh surat (Form 1 & Form 2) dibuat dengan
+# merender template DOCX lewat `soffice --convert-to pdf`. Tanpa ini
+# DocxToPdfRenderer mengembalikan null dan unduh surat gagal dengan 503.
+# Dipakai varian -writer, bukan paket libreoffice penuh, supaya image ringan.
 RUN apt-get update && apt-get install -y \
     git \
     curl \
@@ -10,6 +15,9 @@ RUN apt-get update && apt-get install -y \
     libfreetype6-dev \
     libicu-dev \
     libzip-dev \
+    libreoffice-writer \
+    fonts-liberation \
+    default-mysql-client \
     && rm -rf /var/lib/apt/lists/*
 
 # Configure GD
