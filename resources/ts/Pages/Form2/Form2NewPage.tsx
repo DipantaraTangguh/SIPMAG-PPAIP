@@ -12,7 +12,10 @@ import {
 } from "lucide-react";
 import DashboardLayout from "../../Components/Layouts/DashboardLayout";
 import { useAuth } from "../../context/AppContext";
-import { useForm2Workflow } from "../../context/StudentWorkflowContext";
+import {
+    useForm1Workflow,
+    useForm2Workflow,
+} from "../../context/StudentWorkflowContext";
 import {
     canAccessPortal,
     hasSecuredInternship,
@@ -23,11 +26,21 @@ export default function Form2NewPage() {
     const navigate = useNavigate();
     const { student } = useAuth();
     const { submitForm2 } = useForm2Workflow();
+    const { form1Submission } = useForm1Workflow();
 
     const internshipSecured = hasSecuredInternship(student?.accessStatus);
+    const isNonWajib = form1Submission?.jenisMagang === "non_wajib";
 
-    // Guard keras: Form 2 jangan kebuka sebelum Form 1 approved.
+    // Guard keras: Form 2 jangan kebuka sebelum Form 1 approved, dan sama
+    // sekali tidak berlaku untuk magang non-wajib (tidak pakai surat
+    // pengantar -- langsung unggah LoA di Profil).
     useEffect(() => {
+        if (isNonWajib) {
+            navigate("/form1/status", { replace: true });
+
+            return;
+        }
+
         if (!canAccessPortal(student?.accessStatus)) {
             navigate("/portal", {
                 state: {
@@ -36,7 +49,7 @@ export default function Form2NewPage() {
                 },
             });
         }
-    }, [student?.accessStatus, navigate]);
+    }, [student?.accessStatus, isNonWajib, navigate]);
 
     // Draft form disimpan lokal sampai submit.
     const [formData, setFormData] = useState({

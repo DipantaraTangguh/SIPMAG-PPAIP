@@ -54,7 +54,15 @@ class Form2Controller extends Controller
             ]);
         }
 
-        if (! in_array($student->access_status, ['ApprovedForm1', 'HasApplication', 'AwaitingConfirmation'])) {
+        // Magang non-wajib tidak punya Form 2: alurnya cuma Form 1 lalu form
+        // penerimaan (unggah LoA), tanpa surat pengantar dari kampus.
+        if (($student->form1_data['jenisMagang'] ?? 'wajib') === 'non_wajib') {
+            return response()->json([
+                'message' => 'Magang non-wajib tidak memerlukan Form 2. Unggah bukti penerimaan (LoA) di menu Profil.',
+            ], 403);
+        }
+
+        if (! in_array($student->access_status, ['ApprovedForm1', 'HasApplication'])) {
             return response()->json(['message' => 'Form 1 harus disetujui terlebih dahulu.'], 403);
         }
 
