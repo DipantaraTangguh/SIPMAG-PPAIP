@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Ppaip;
 use App\Filament\Resources\Ppaip\PpaipForm1Resource\Pages\ListForm1Submissions;
 use App\Filament\Resources\Ppaip\PpaipForm1Resource\Pages\ViewForm1Submission;
 use App\Models\Student;
+use App\Support\AccessStatus;
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Infolist;
@@ -83,7 +84,11 @@ class PpaipForm1Resource extends Resource
                         TextEntry::make('name')->label('Nama'),
                         TextEntry::make('email')->label('Email'),
                         TextEntry::make('study_program')->label('Program Studi'),
-                        TextEntry::make('access_status')->label('Status')->badge(),
+                        TextEntry::make('access_status')
+                            ->label('Status')
+                            ->badge()
+                            ->formatStateUsing(fn (string $state): string => AccessStatus::label($state))
+                            ->color(fn (string $state): string => AccessStatus::color($state)),
                     ])
                     ->columns(2),
 
@@ -156,12 +161,8 @@ class PpaipForm1Resource extends Resource
                 Tables\Columns\TextColumn::make('access_status')
                     ->label('Status')
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
-                        'PendingReview' => 'warning',
-                        'RejectedForm1' => 'danger',
-                        'ApprovedForm1' => 'success',
-                        default => 'gray',
-                    }),
+                    ->formatStateUsing(fn (string $state): string => AccessStatus::label($state))
+                    ->color(fn (string $state): string => AccessStatus::color($state)),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->label('Diajukan')
                     ->dateTime('d M Y H:i')

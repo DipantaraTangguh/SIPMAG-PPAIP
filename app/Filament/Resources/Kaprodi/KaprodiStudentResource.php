@@ -8,6 +8,7 @@ use App\Models\Student;
 use App\Models\User;
 use App\Services\DpmAssignmentService;
 use App\Services\StudentStateMachine;
+use App\Support\AccessStatus;
 use App\Support\StoredFilePath;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -69,17 +70,7 @@ class KaprodiStudentResource extends Resource
                 Forms\Components\TextInput::make('study_program')->label('Program Studi')->disabled(),
                 Forms\Components\Select::make('access_status')
                     ->label('Status Akses')
-                    ->options([
-                        'Unverified' => 'Unverified',
-                        'PendingReview' => 'PendingReview',
-                        'RejectedForm1' => 'RejectedForm1',
-                        'ApprovedForm1' => 'ApprovedForm1',
-                        'HasApplication' => 'HasApplication',
-                        'HasDPM' => 'HasDPM',
-                        'LogbookComplete' => 'LogbookComplete',
-                        'AwaitingDefense' => 'AwaitingDefense',
-                        'CycleCompleted' => 'CycleCompleted',
-                    ])
+                    ->options(AccessStatus::options())
                     ->disabled(),
             ])->columns(2),
 
@@ -124,15 +115,8 @@ class KaprodiStudentResource extends Resource
                 Tables\Columns\TextColumn::make('access_status')
                     ->label('Status')
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
-                        'Unverified' => 'gray',
-                        'PendingReview', 'AwaitingDefense' => 'warning',
-                        'RejectedForm1' => 'danger',
-                        'ApprovedForm1', 'LogbookComplete' => 'success',
-                        'HasApplication' => 'info',
-                        'HasDPM' => 'primary',
-                        default => 'gray',
-                    }),
+                    ->formatStateUsing(fn (string $state): string => AccessStatus::label($state))
+                    ->color(fn (string $state): string => AccessStatus::color($state)),
                 Tables\Columns\TextColumn::make('catatan_khusus')
                     ->label('Catatan Khusus')
                     ->getStateUsing(fn (Student $record): ?string => $record->form1_data['catatanKhusus'] ?? null)
@@ -150,15 +134,7 @@ class KaprodiStudentResource extends Resource
             ->filters([
                 Tables\Filters\SelectFilter::make('access_status')
                     ->label('Status')
-                    ->options([
-                        'Unverified' => 'Unverified',
-                        'PendingReview' => 'PendingReview',
-                        'ApprovedForm1' => 'ApprovedForm1',
-                        'HasApplication' => 'HasApplication',
-                        'HasDPM' => 'HasDPM',
-                        'LogbookComplete' => 'LogbookComplete',
-                        'AwaitingDefense' => 'AwaitingDefense',
-                    ]),
+                    ->options(AccessStatus::options()),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),

@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Ppaip;
 use App\Filament\Resources\Ppaip\PpaipStudentResource\Pages\ListStudents;
 use App\Models\Student;
 use App\Services\DefenseAssessmentService;
+use App\Support\AccessStatus;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -56,15 +57,8 @@ class PpaipStudentResource extends Resource
                 Tables\Columns\TextColumn::make('access_status')
                     ->label('Status')
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
-                        'Unverified' => 'gray',
-                        'PendingReview', 'AwaitingDefense' => 'warning',
-                        'RejectedForm1' => 'danger',
-                        'ApprovedForm1', 'LogbookComplete' => 'success',
-                        'HasApplication' => 'info',
-                        'HasDPM' => 'primary',
-                        default => 'gray',
-                    }),
+                    ->formatStateUsing(fn (string $state): string => AccessStatus::label($state))
+                    ->color(fn (string $state): string => AccessStatus::color($state)),
                 Tables\Columns\TextColumn::make('dpm.lecturer_name')->label('DPM')->placeholder('-'),
                 Tables\Columns\TextColumn::make('approved_logbook_count')->label('Logbook')->sortable(),
                 Tables\Columns\TextColumn::make('assessment_progress')
@@ -111,16 +105,7 @@ class PpaipStudentResource extends Resource
             ->filters([
                 Tables\Filters\SelectFilter::make('access_status')
                     ->label('Status')
-                    ->options([
-                        'Unverified' => 'Unverified',
-                        'PendingReview' => 'PendingReview',
-                        'ApprovedForm1' => 'ApprovedForm1',
-                        'HasApplication' => 'HasApplication',
-                        'HasDPM' => 'HasDPM',
-                        'LogbookComplete' => 'LogbookComplete',
-                        'AwaitingDefense' => 'AwaitingDefense',
-                        'CycleCompleted' => 'CycleCompleted',
-                    ]),
+                    ->options(AccessStatus::options()),
                 Tables\Filters\SelectFilter::make('study_program')
                     ->label('Prodi')
                     ->options([
