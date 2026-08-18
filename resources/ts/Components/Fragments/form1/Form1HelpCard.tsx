@@ -1,16 +1,18 @@
-import React from 'react';
-import { HelpCircle } from 'lucide-react';
+import React from "react";
+import { HelpCircle } from "lucide-react";
 
 export default function Form1HelpCard() {
     return (
         <div className="rounded-xl border border-gray-200 bg-gray-50 p-5">
             <div className="mb-2 flex items-center gap-2">
-                <HelpCircle className="h-[18px] w-[18px] text-primary" />
-                <h4 className="text-sm font-bold text-primary">Butuh Bantuan?</h4>
+                <HelpCircle className="h-4.5 w-4.5 text-primary" />
+                <h4 className="text-sm font-bold text-primary">
+                    Butuh Bantuan?
+                </h4>
             </div>
             <p className="text-[13px] leading-relaxed text-gray-600">
-                Jika pengajuan Anda belum mendapatkan pembaruan lebih dari 3 hari
-                kerja, silakan hubungi PPAIP.
+                Jika pengajuan Anda belum mendapatkan pembaruan lebih dari 3
+                hari kerja, silakan hubungi PPAIP.
             </p>
         </div>
     );
