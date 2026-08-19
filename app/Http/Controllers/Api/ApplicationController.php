@@ -9,6 +9,7 @@ use App\Models\Application;
 use App\Models\Internship;
 use App\Models\Student;
 use App\Services\StudentStateMachine;
+use App\Support\AccessStatus;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -19,23 +20,6 @@ use Throwable;
 
 class ApplicationController extends Controller
 {
-    /**
-     * Status yang berarti tempat magang sudah benar-benar didapat, sehingga
-     * mahasiswa tidak boleh melamar lowongan mitra lagi.
-     *
-     * AwaitingConfirmation sengaja TIDAK masuk: non-wajib berada di state itu
-     * sejak Form 1 disetujui, justru saat belum mengonfirmasi diterima di mana
-     * pun. Daftar ini harus sama dengan SECURED_INTERNSHIP_STATUSES di
-     * accessUtils.js -- sebelumnya beda dan bikin portal menolak diam-diam.
-     */
-    private const SECURED_INTERNSHIP_STATUSES = [
-        'HasDPM',
-        'LogbookComplete',
-        'AwaitingDefense',
-        'CycleCompleted',
-        'ElectiveCompleted',
-    ];
-
     private const SECURED_INTERNSHIP_MESSAGE = 'DPM Anda sudah ditunjuk atau pengajuan DPM sudah disetujui, sehingga Anda tidak dapat melamar lowongan mitra lagi.';
 
     public function index(Request $request)
@@ -71,7 +55,7 @@ class ApplicationController extends Controller
             $application = DB::transaction(function () use ($request, $validated, $studentId, &$cvPath) {
                 $student = Student::query()->lockForUpdate()->findOrFail($studentId);
 
-                if ($this->studentHasSecuredInternship($student)) {
+                if (AccessStatus::hasSecuredInternship($student->access_status)) {
                     throw ValidationException::withMessages([
                         'internship_id' => self::SECURED_INTERNSHIP_MESSAGE,
                     ]);
@@ -144,10 +128,5 @@ class ApplicationController extends Controller
             'message' => 'Lamaran berhasil dikirim.',
             'application' => ApplicationResource::make($application->load('internship:id,company_name,position'))->resolve($request),
         ], 201);
-    }
-
-    private function studentHasSecuredInternship(Student $student): bool
-    {
-        return in_array($student->access_status, self::SECURED_INTERNSHIP_STATUSES, true);
     }
 }

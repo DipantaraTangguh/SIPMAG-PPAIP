@@ -45,6 +45,38 @@ class AccessStatus
     ];
 
     /**
+     * State yang berarti tempat magang sudah benar-benar didapat, sehingga
+     * mahasiswa tidak boleh melamar lowongan mitra maupun mengajukan Form 2.
+     *
+     * AwaitingConfirmation sengaja TIDAK masuk: non-wajib berada di state itu
+     * sejak Form 1 disetujui, justru saat belum mengonfirmasi diterima di mana
+     * pun.
+     *
+     * Daftar ini harus sama dengan SECURED_INTERNSHIP_STATUSES di
+     * accessUtils.js -- dulu dua salinan di controller sempat beda dan bikin
+     * portal menolak diam-diam. Pesan penolakannya beda per konteks, jadi
+     * tetap tinggal di controller masing-masing.
+     *
+     * @var array<int, string>
+     */
+    public const SECURED_INTERNSHIP = [
+        'HasDPM',
+        'LogbookComplete',
+        'AwaitingDefense',
+        'CycleCompleted',
+        'ElectiveCompleted',
+    ];
+
+    /**
+     * True bila mahasiswa sudah mengamankan tempat magang. State null
+     * (mis. profil mahasiswa belum ada) dianggap belum mengamankan apa pun.
+     */
+    public static function hasSecuredInternship(?string $state): bool
+    {
+        return in_array($state, self::SECURED_INTERNSHIP, true);
+    }
+
+    /**
      * Label Indonesia untuk satu state. State tak dikenal dikembalikan apa
      * adanya supaya tidak ada data yang "hilang" dari layar.
      */
