@@ -17,7 +17,6 @@ RUN apt-get update && apt-get install -y \
     libzip-dev \
     libreoffice-writer \
     fonts-liberation \
-    default-mysql-client \
     && rm -rf /var/lib/apt/lists/*
 
 # Configure GD
@@ -53,4 +52,13 @@ RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
 EXPOSE 9000
 
 #CMD ["php-fpm"]
-CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
+# public/storage di-gitignore dan environment-specific, jadi dibuat saat start.
+# Tanpa ini clone baru + `docker compose up` bikin logo perusahaan 404.
+#
+# Dibuat pakai `ln` relatif, bukan `artisan storage:link`: direktori ini
+# bind-mount, jadi symlink yang sama dibaca dari container (/var/www/...) dan
+# dari host (/Users/...). Symlink absolut hanya benar di salah satunya.
+# Opsi --relative milik artisan butuh paket symfony/filesystem yang tidak
+# terpasang, dan tidak sepadan hanya demi satu symlink.
+# -f -n aman diulang: symlink lama ditimpa, bukan ditembus.
+CMD ["sh", "-c", "ln -sfn ../storage/app/public public/storage && php artisan serve --host=0.0.0.0 --port=8000"]
