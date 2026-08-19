@@ -34,19 +34,8 @@ class StudentCycleController extends Controller
     }
 
     /**
-     * State yang boleh dipakai mahasiswa non-wajib untuk melapor sendiri bahwa
-     * dia sudah diterima, tanpa menunggu Form 2 disetujui atau status lamaran
-     * mitra diubah PPAIP.
-     *
-     * ApprovedForm1: sudah dapat tempat sendiri, tidak butuh surat pengantar
-     * maupun melamar lewat portal.
-     * HasApplication: melamar lewat portal lalu diterima langsung perusahaan.
-     */
-    private const SELF_REPORTABLE_STATUSES = ['ApprovedForm1', 'HasApplication'];
-
-    /**
      * Konfirmasi hasil magang non-wajib (state AwaitingConfirmation, atau
-     * lapor mandiri dari SELF_REPORTABLE_STATUSES):
+     * HasApplication untuk jalur mitra yang lapor sendiri):
      * - diterima : wajib bukti LoA + tempat & periode aktual → ElectiveCompleted + riwayat.
      * - ditolak  : mundur ke ApprovedForm1 agar bisa mengajukan Form 2 lagi.
      */
@@ -61,12 +50,12 @@ class StudentCycleController extends Controller
 
         $validated = $request->validated();
 
-        // Lapor mandiri: mahasiswa non-wajib yang sudah dapat tempat sendiri
-        // boleh langsung mengunggah LoA, tanpa menunggu Form 2 disetujui atau
-        // status lamaran mitra diubah PPAIP. Penolakan tidak perlu dilaporkan
-        // dari sini -- mereka tinggal mengajukan Form 2 atau melamar lagi.
+        // Jalur mitra: mahasiswa non-wajib yang lamarannya diterima langsung
+        // oleh perusahaan boleh melapor sendiri, tanpa menunggu PPAIP/mitra
+        // mengubah status lamaran lebih dulu. Penolakan tidak perlu dilaporkan
+        // dari sini -- mereka tinggal melamar lowongan lain lewat portal.
         if (
-            in_array($student->access_status, self::SELF_REPORTABLE_STATUSES, true)
+            $student->access_status === 'HasApplication'
             && $validated['hasil'] === 'diterima'
             && ($student->form1_data['jenisMagang'] ?? 'wajib') === 'non_wajib'
         ) {

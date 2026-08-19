@@ -1,9 +1,17 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BookOpen, CheckSquare } from 'lucide-react';
+import { useForm1Workflow } from '../../../context/StudentWorkflowContext';
 
 export default function IndependentSidePanel() {
     const navigate = useNavigate();
+    const { form1Submission } = useForm1Workflow();
+
+    // Non-wajib tidak punya Bimbingan & Logbook -- LoA-nya diunggah lewat
+    // panel konfirmasi magang di Profil.
+    const isNonWajib = form1Submission?.jenisMagang === 'non_wajib';
+    const loaMenuLabel = isNonWajib ? 'Profil' : 'Bimbingan & Logbook';
+    const loaMenuPath = isNonWajib ? '/form1/status' : '/guidance';
 
     return (
         <div className="self-start lg:sticky lg:top-6">
@@ -84,9 +92,9 @@ export default function IndependentSidePanel() {
                     secara terpisah melalui menu{' '}
                     <span
                         className="cursor-pointer font-bold text-primary underline hover:text-primary-hover"
-                        onClick={() => navigate('/guidance')}
+                        onClick={() => navigate(loaMenuPath)}
                     >
-                        Bimbingan &amp; Logbook
+                        {loaMenuLabel}
                     </span>{' '}
                     untuk memulai periode magang resmi.
                 </p>

@@ -24,8 +24,8 @@ const WAJIB_TIPS = [
 
 // Non-wajib tidak punya logbook maupun sidang, jadi tipsnya beda.
 const NON_WAJIB_TIPS = [
+    'Ajukan Form 2 untuk surat pengantar, atau lamar lowongan mitra lewat portal.',
     'Setelah diterima, unggah bukti penerimaan (LoA) di menu Profil agar magang Anda tercatat.',
-    'Simpan LoA dalam bentuk PDF atau gambar yang jelas terbaca, maksimal 5MB.',
 ];
 function deriveStep(status) {
     switch (status) {
@@ -51,7 +51,7 @@ function deriveStep(status) {
     }
 }
 
-// Non-wajib cuma dua langkah: Form 1 lalu konfirmasi penerimaan (unggah LoA).
+// Non-wajib berhenti di konfirmasi LoA — tanpa DPM/logbook/sidang.
 function deriveNonWajibStep(status) {
     switch (status) {
         case 'Unverified':
@@ -60,10 +60,11 @@ function deriveNonWajibStep(status) {
             return 1;
         case 'ApprovedForm1':
         case 'HasApplication':
-        case 'AwaitingConfirmation':
             return 2;
+        case 'AwaitingConfirmation':
+            return 3;
         case 'ElectiveCompleted':
-            return 3; // 2 langkah selesai
+            return 4; // 3 langkah selesai
         default:
             return 1;
     }

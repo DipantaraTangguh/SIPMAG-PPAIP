@@ -13,6 +13,7 @@ import {
     Check,
     CheckSquare,
 } from 'lucide-react';
+import { useForm1Workflow } from '../../../context/StudentWorkflowContext';
 
 export default function VacancyApplySidebar({
     vacancy,
@@ -32,6 +33,14 @@ export default function VacancyApplySidebar({
     const navigate = useNavigate();
     const fileInputRef = useRef(null);
     const [showConfirmModal, setShowConfirmModal] = useState(false);
+    const { form1Submission } = useForm1Workflow();
+
+    // Non-wajib tidak punya Bimbingan & Logbook -- LoA-nya diunggah lewat
+    // panel konfirmasi magang di Profil.
+    const loaMenuLabel =
+        form1Submission?.jenisMagang === 'non_wajib'
+            ? 'Profil'
+            : 'Bimbingan & Logbook';
 
     const handleDropzoneClick = () => fileInputRef.current?.click();
 
@@ -192,7 +201,7 @@ export default function VacancyApplySidebar({
                                     Setelah diterima magang, Anda wajib mengunggah{' '}
                                     <span className="font-semibold text-gray-900">Letter of Acceptance (LoA)</span>{' '}
                                     secara terpisah melalui menu{' '}
-                                    <span className="font-semibold text-primary underline">Bimbingan &amp; Logbook</span>{' '}
+                                    <span className="font-semibold text-primary underline">{loaMenuLabel}</span>{' '}
                                     untuk memulai periode magang resmi.
                                 </p>
                             </div>
