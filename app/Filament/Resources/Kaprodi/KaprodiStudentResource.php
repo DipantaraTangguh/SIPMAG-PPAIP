@@ -10,7 +10,6 @@ use App\Services\DpmAssignmentService;
 use App\Services\Form1DecisionService;
 use App\Services\StudentStateMachine;
 use App\Support\AccessStatus;
-use App\Support\StoredFilePath;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
@@ -85,23 +84,6 @@ class KaprodiStudentResource extends Resource
                 Forms\Components\Textarea::make('form1_rejection_reason')
                     ->label('Alasan Penolakan')
                     ->disabled(),
-                Forms\Components\Placeholder::make('transkrip_status')
-                    ->label('Transkrip Nilai')
-                    ->content(function (?Student $record): HtmlString {
-                        if (! $record || ! $record->form1_pdf_path) {
-                            return new HtmlString('<span class="text-gray-400">Belum diunggah</span>');
-                        }
-                        $previewUrl = route('transkrip.preview', $record->id);
-                        $downloadUrl = route('transkrip.download', $record->id);
-
-                        return new HtmlString(
-                            '<div class="flex items-center gap-3">'.
-                            '<span class="text-green-600 font-medium">✅ '.basename($record->form1_pdf_path).'</span>'.
-                            '<a href="'.$previewUrl.'" target="_blank" class="text-sm text-blue-600 hover:underline">Lihat</a>'.
-                            '<a href="'.$downloadUrl.'" class="text-sm text-blue-600 hover:underline">Download</a>'.
-                            '</div>'
-                        );
-                    }),
             ])->collapsible(),
         ]);
     }
@@ -438,62 +420,6 @@ class KaprodiStudentResource extends Resource
                             ->body($body)
                             ->success()
                             ->send();
-                    }),
-
-                // Bulk download transkrip buat kebutuhan review.
-                Tables\Actions\BulkAction::make('bulkDownloadTranskrip')
-                    ->label('Download Transkrip')
-                    ->icon('heroicon-o-arrow-down-tray')
-                    ->color('info')
-                    ->deselectRecordsAfterCompletion()
-                    ->action(function (Collection $records) {
-                        $students = $records->filter(fn (Student $s) => ! empty($s->form1_pdf_path));
-
-                        if ($students->isEmpty()) {
-                            Notification::make()
-                                ->title('Tidak ada transkrip')
-                                ->body('Mahasiswa yang dipilih belum mengunggah transkrip.')
-                                ->warning()
-                                ->send();
-
-                            return;
-                        }
-
-                        // Kalau cuma satu, langsung download aja.
-                        if ($students->count() === 1) {
-                            $student = $students->first();
-                            $path = StoredFilePath::resolve(storage_path('app/private'), $student->form1_pdf_path);
-                            if ($path) {
-                                $ext = pathinfo($path, PATHINFO_EXTENSION);
-
-                                return response()->download($path, "transkrip_{$student->nim}.{$ext}");
-                            }
-
-                            return;
-                        }
-
-                        // Kalau banyak, zip dulu biar rapi.
-                        $zipName = 'transkrip_'.now()->format('Ymd_His').'.zip';
-                        $zipPath = storage_path('app/private/temp/'.$zipName);
-
-                        if (! is_dir(dirname($zipPath))) {
-                            mkdir(dirname($zipPath), 0755, true);
-                        }
-
-                        $zip = new \ZipArchive;
-                        $zip->open($zipPath, \ZipArchive::CREATE | \ZipArchive::OVERWRITE);
-
-                        foreach ($students as $student) {
-                            $filePath = StoredFilePath::resolve(storage_path('app/private'), $student->form1_pdf_path);
-                            if ($filePath) {
-                                $ext = pathinfo($filePath, PATHINFO_EXTENSION);
-                                $zip->addFile($filePath, "transkrip_{$student->nim}_{$student->name}.{$ext}");
-                            }
-                        }
-
-                        $zip->close();
-
-                        return response()->download($zipPath, $zipName)->deleteFileAfterSend(true);
                     }),
             ]);
     }

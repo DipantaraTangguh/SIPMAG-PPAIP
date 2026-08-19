@@ -78,9 +78,6 @@ Route::middleware('auth:sanctum')->group(function () {
 
         // Data mahasiswa buat dashboard Kaprodi.
         Route::get('/students', [StudentController::class, 'indexForKaprodi']);
-
-        // Transkrip tetap dibatasi per prodi.
-        Route::get('/students/{studentId}/transkrip', [Form1Controller::class, 'downloadTranskrip']);
     });
 
     // DPM hanya pegang mahasiswa assign-an dia.
