@@ -7,24 +7,16 @@ use App\Http\Requests\Form2\RejectForm2Request;
 use App\Http\Requests\Form2\StoreForm2Request;
 use App\Http\Resources\Form2SubmissionResource;
 use App\Models\Form2Submission;
-use App\Models\Student;
 use App\Models\User;
 use App\Services\Form2DecisionService;
 use App\Services\PdfService;
+use App\Support\AccessStatus;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\ValidationException;
 
 class Form2Controller extends Controller
 {
-    private const SECURED_INTERNSHIP_STATUSES = [
-        'HasDPM',
-        'LogbookComplete',
-        'AwaitingDefense',
-        'CycleCompleted',
-        'ElectiveCompleted',
-    ];
-
     private const SECURED_INTERNSHIP_MESSAGE = 'DPM Anda sudah ditunjuk atau pengajuan DPM sudah disetujui, sehingga Form 2 tidak dapat diajukan lagi.';
 
     public function index(Request $request)
@@ -48,7 +40,7 @@ class Form2Controller extends Controller
 
         $student = $this->authenticatedUser($request)->student;
 
-        if ($this->studentHasSecuredInternship($student)) {
+        if (AccessStatus::hasSecuredInternship($student?->access_status)) {
             throw ValidationException::withMessages([
                 'company_name' => self::SECURED_INTERNSHIP_MESSAGE,
             ]);
@@ -154,14 +146,5 @@ class Form2Controller extends Controller
         abort_unless($user instanceof User, 401);
 
         return $user;
-    }
-
-    private function studentHasSecuredInternship(?Student $student): bool
-    {
-        if (! $student) {
-            return false;
-        }
-
-        return in_array($student->access_status, self::SECURED_INTERNSHIP_STATUSES, true);
     }
 }
