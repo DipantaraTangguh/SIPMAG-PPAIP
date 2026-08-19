@@ -24,5 +24,10 @@ Homestead.json
 Homestead.yaml
 Thumbs.db
 seluruh_codebase.txt
-/public/js/filament
-/public/css/filament
+
+# Aset Filament SENGAJA ikut di-commit, jangan di-ignore.
+# Build Railway memakai `composer install --no-scripts`, jadi hook
+# post-autoload-dump (yang memanggil filament:upgrade -> filament:assets)
+# tidak pernah jalan di production. Kalau aset ini di-ignore, hasil clone
+# tidak punya public/css/filament maupun public/js/filament dan panel admin
+# tampil tanpa styling. Regenerasi dengan: php artisan filament:assets
