@@ -147,9 +147,9 @@ class PpaipForm2Resource extends Resource
                     ->visible(fn (Form2Submission $record) => $record->status === 'PendingReview')
                     ->requiresConfirmation()
                     ->modalHeading('Setujui Form 2')
-                    // Form 2 hanya ada di jalur wajib; non-wajib tidak pernah
-                    // sampai ke sini karena ditolak sejak pengajuan.
-                    ->modalDescription('Mahasiswa akan lanjut ke tahap pengajuan dosen pembimbing (DPM).')
+                    ->modalDescription(fn (Form2Submission $record): string => ($record->student?->form1_data['jenisMagang'] ?? 'wajib') === 'non_wajib'
+                        ? 'Magang non-wajib: mahasiswa akan diminta konfirmasi penerimaan (upload LoA), lalu siklus selesai tanpa tahap DPM/sidang.'
+                        : 'Magang wajib: mahasiswa akan lanjut ke tahap pengajuan dosen pembimbing (DPM).')
                     // Logika keputusan terpusat di Form2DecisionService (dipakai
                     // juga endpoint API) - jangan tulis transisi manual di sini.
                     ->action(fn (Form2Submission $record) => app(Form2DecisionService::class)->approve($record)),

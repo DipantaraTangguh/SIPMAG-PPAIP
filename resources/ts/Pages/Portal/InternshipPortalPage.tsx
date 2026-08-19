@@ -1,10 +1,7 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AppContext";
-import {
-    useApplicationWorkflow,
-    useForm1Workflow,
-} from "../../context/StudentWorkflowContext";
+import { useApplicationWorkflow } from "../../context/StudentWorkflowContext";
 import {
     canAccessPortal,
     hasSecuredInternship,
@@ -81,12 +78,9 @@ const mockActiveApplications = [
 export default function InternshipPortalPage() {
     const { student } = useAuth();
     const { activeApplications } = useApplicationWorkflow();
-    const { form1Submission } = useForm1Workflow();
     const navigate = useNavigate();
     const location = useLocation();
     const accessStatus = student?.accessStatus;
-    // Non-wajib tidak punya Form 2, jadi tab Mandiri tidak berlaku.
-    const isNonWajib = form1Submission?.jenisMagang === "non_wajib";
 
     // Balik dari Form 2 harus tetap mendarat di tab Mandiri.
     const [activeTab, setActiveTab] = useState(
@@ -216,9 +210,8 @@ export default function InternshipPortalPage() {
                 <TabNavigation
                     activeTab={activeTab}
                     onTabChange={setActiveTab}
-                    isNonWajib={isNonWajib}
                 />
-                {activeTab === "mitra" || isNonWajib ? (
+                {activeTab === "mitra" ? (
                     <>
                         {showAccessBanner && (
                             <div className="flex flex-col gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 sm:flex-row sm:items-center">

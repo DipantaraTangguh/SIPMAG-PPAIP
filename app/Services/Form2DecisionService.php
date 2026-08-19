@@ -6,9 +6,9 @@ use App\Models\Form2Submission;
 
 /**
  * Satu-satunya tempat keputusan Form 2 dieksekusi (dipakai API controller DAN
- * action Filament PPAIP): ApprovedForm1 → HasApplication, lanjut tahap DPM.
- *
- * Form 2 khusus magang wajib. Non-wajib tidak lewat sini sama sekali.
+ * action Filament PPAIP) supaya cabang wajib/non-wajib tidak pernah duplikat:
+ * - wajib     : ApprovedForm1 → HasApplication (lanjut tahap DPM)
+ * - non-wajib : → AwaitingConfirmation (mahasiswa wajib konfirmasi + upload LoA)
  */
 class Form2DecisionService
 {
@@ -26,9 +26,11 @@ class Form2DecisionService
             return;
         }
 
-        // Form 2 hanya ada di jalur wajib -- non-wajib ditolak sejak
-        // Form2Controller@store, jadi tidak ada cabang non-wajib di sini.
-        if ($student->access_status === 'ApprovedForm1') {
+        $jenis = $student->form1_data['jenisMagang'] ?? 'wajib';
+
+        if ($jenis === 'non_wajib' && in_array($student->access_status, ['ApprovedForm1', 'HasApplication'], true)) {
+            $this->stateMachine->transition($student, 'AwaitingConfirmation');
+        } elseif ($jenis !== 'non_wajib' && $student->access_status === 'ApprovedForm1') {
             $this->stateMachine->transition($student, 'HasApplication');
         }
     }

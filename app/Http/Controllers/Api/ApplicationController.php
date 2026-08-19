@@ -20,6 +20,20 @@ use Throwable;
 
 class ApplicationController extends Controller
 {
+    /**
+     * Melamar lowongan mitra dikunci lebih ketat daripada Form 2: begitu
+     * mahasiswa masuk tahap konfirmasi (Form 2 disetujui / lamaran mitra
+     * diterima), dia sudah punya tempat sehingga tidak boleh melamar lagi.
+     *
+     * Form 2 sengaja TIDAK memakai batasan tambahan ini -- kalau ternyata
+     * ditolak perusahaan, mahasiswa masih boleh mengajukan Form 2 ke tempat
+     * lain tanpa menunggu mundur dulu.
+     */
+    private const SECURED_FOR_APPLYING = [
+        ...AccessStatus::SECURED_INTERNSHIP,
+        'AwaitingConfirmation',
+    ];
+
     private const SECURED_INTERNSHIP_MESSAGE = 'DPM Anda sudah ditunjuk atau pengajuan DPM sudah disetujui, sehingga Anda tidak dapat melamar lowongan mitra lagi.';
 
     public function index(Request $request)
@@ -55,13 +69,13 @@ class ApplicationController extends Controller
             $application = DB::transaction(function () use ($request, $validated, $studentId, &$cvPath) {
                 $student = Student::query()->lockForUpdate()->findOrFail($studentId);
 
-                if (AccessStatus::hasSecuredInternship($student->access_status)) {
+                if (in_array($student->access_status, self::SECURED_FOR_APPLYING, true)) {
                     throw ValidationException::withMessages([
                         'internship_id' => self::SECURED_INTERNSHIP_MESSAGE,
                     ]);
                 }
 
-                if (! in_array($student->access_status, ['ApprovedForm1', 'HasApplication', 'AwaitingConfirmation'])) {
+                if (! in_array($student->access_status, ['ApprovedForm1', 'HasApplication'])) {
                     abort(403, 'Form 1 harus disetujui terlebih dahulu.');
                 }
 

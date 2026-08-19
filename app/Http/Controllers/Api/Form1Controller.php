@@ -8,7 +8,6 @@ use App\Http\Requests\Form1\StoreForm1Request;
 use App\Http\Resources\Form1Resource;
 use App\Http\Resources\StudentResource;
 use App\Models\Student;
-use App\Services\Form1DecisionService;
 use App\Services\PdfService;
 use App\Services\StudentStateMachine;
 use Illuminate\Http\Request;
@@ -130,14 +129,15 @@ class Form1Controller extends Controller
 
         Gate::authorize('reviewForm1', $student);
 
-        // Cabang wajib/non-wajib terpusat di Form1DecisionService -- dipakai
-        // juga action Filament Kaprodi, jangan tulis transisi manual di sini.
-        $decision = app(Form1DecisionService::class);
-        $decision->approve($student, $lecturer->id);
+        app(StudentStateMachine::class)->transition($student, 'ApprovedForm1', [
+            'form1_rejection_reason' => null,
+            'form1_approved_by' => $lecturer->id,
+            'form1_approved_at' => now(),
+        ]);
 
         return response()->json([
             'message' => 'Form 1 disetujui.',
-            'access_status' => $decision->resultingStatus($student),
+            'access_status' => 'ApprovedForm1',
         ]);
     }
 
