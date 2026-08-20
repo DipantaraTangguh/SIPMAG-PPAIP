@@ -324,6 +324,148 @@ class InternshipSeeder extends Seeder
                 'deadline' => '2026-12-31',
                 'is_active' => true,
             ],
+
+            // Empat lowongan di bawah menutup program studi yang belum
+            // kebagian di atas -- Ilmu Politik, Teknik Sipil, Ilmu &
+            // Teknologi Pangan, dan Teknik Lingkungan -- supaya mahasiswa
+            // dari kesepuluh prodi punya lowongan mitra yang bisa dilamar.
+            [
+                'company_name' => 'PT Bakrie & Brothers Tbk',
+                'logo_path' => 'logo-perusahaan/01KZRFXDY470HGTREXBKPPJJQD.png',
+                'position' => 'Corporate Affairs & Public Policy Intern',
+                'description' => 'Mendukung tim Corporate Affairs dalam memantau kebijakan publik dan menjaga hubungan dengan pemangku kepentingan.',
+                'capacity' => '2 Posisi',
+                'duration' => '3 Bulan',
+                'study_programs' => [
+                    'Ilmu Politik',
+                    'Ilmu Komunikasi',
+                ],
+                'start_date' => '2026-12-01',
+                'job_description' => [
+                    'Memantau isu kebijakan publik dan regulasi yang berdampak pada lini bisnis perusahaan.',
+                    'Menyusun ringkasan kebijakan dan analisis pemangku kepentingan untuk manajemen.',
+                    'Membantu persiapan pertemuan dengan mitra pemerintah dan asosiasi industri.',
+                    'Mendokumentasikan kegiatan hubungan kelembagaan perusahaan.',
+                ],
+                'skills' => [
+                    'Analisis Kebijakan',
+                    'Riset',
+                    'Penulisan Laporan',
+                    'Komunikasi Publik',
+                ],
+                'requirements' => [
+                    'Mengikuti isu politik, regulasi, dan pemerintahan di Indonesia.',
+                    'Mampu menulis ringkasan analitis yang padat dan terstruktur.',
+                    'Teliti dalam mengolah sumber data sekunder.',
+                ],
+                'minimum_education' => 'S1 Mahasiswa Aktif (Semester 6 ke atas) - Ilmu Politik, Ilmu Komunikasi, atau sejenisnya.',
+                'sistem_kerja' => 'Hybrid',
+                'location' => 'Jakarta Selatan',
+                'deadline' => '2026-12-31',
+                'is_active' => true,
+            ],
+            [
+                'company_name' => 'PT Bakrieland Development Tbk',
+                'logo_path' => 'logo-perusahaan/01KZRG4NPADEJR3ZGAVEWSRK5F.png',
+                'position' => 'Site Engineer Intern',
+                'description' => 'Mendampingi tim proyek di lapangan untuk pengawasan mutu pekerjaan struktur dan pelaporan progres konstruksi.',
+                'capacity' => '2 Posisi',
+                'duration' => '3 Bulan',
+                'study_programs' => [
+                    'Teknik Sipil',
+                ],
+                'start_date' => '2026-12-01',
+                'job_description' => [
+                    'Mendampingi pengawasan pekerjaan struktur dan arsitektur di lokasi proyek.',
+                    'Menyusun laporan progres harian dan mingguan bersama site manager.',
+                    'Membantu pemeriksaan volume pekerjaan terhadap gambar kerja.',
+                    'Mendokumentasikan temuan lapangan terkait mutu dan keselamatan kerja.',
+                ],
+                'skills' => [
+                    'AutoCAD',
+                    'Pembacaan Gambar Kerja',
+                    'Quantity Take-off',
+                    'K3 Konstruksi',
+                ],
+                'requirements' => [
+                    'Memahami dasar mekanika rekayasa dan teknologi bahan konstruksi.',
+                    'Mampu membaca gambar kerja struktur dan arsitektur.',
+                    'Bersedia ditempatkan di lokasi proyek.',
+                ],
+                'minimum_education' => 'S1 Mahasiswa Aktif (Semester 6 ke atas) - Teknik Sipil.',
+                'sistem_kerja' => 'WFO (On-site)',
+                'location' => 'Jakarta Selatan',
+                'deadline' => '2026-12-31',
+                'is_active' => true,
+            ],
+            [
+                'company_name' => 'PT Bakrie Sumatera Plantations Tbk',
+                'logo_path' => 'logo-perusahaan/01KZRG72D76AHA2T4ZGDA03C9G.png',
+                'position' => 'Quality Assurance & Food Safety Intern',
+                'description' => 'Bergabung dengan tim Quality Assurance untuk pengujian mutu produk turunan kelapa sawit dan penerapan standar keamanan pangan.',
+                'capacity' => '2 Posisi',
+                'duration' => '3 Bulan',
+                'study_programs' => [
+                    'Ilmu & Teknologi Pangan',
+                ],
+                'start_date' => '2026-12-01',
+                'job_description' => [
+                    'Melakukan pengujian mutu bahan baku dan produk jadi di laboratorium.',
+                    'Membantu penerapan dan pemutakhiran dokumen HACCP serta GMP.',
+                    'Mencatat dan menganalisis data hasil uji untuk laporan mutu bulanan.',
+                    'Mendukung persiapan audit internal keamanan pangan.',
+                ],
+                'skills' => [
+                    'Analisis Laboratorium',
+                    'HACCP',
+                    'GMP',
+                    'Pengendalian Mutu',
+                ],
+                'requirements' => [
+                    'Memahami prinsip keamanan pangan dan pengendalian mutu.',
+                    'Terbiasa bekerja dengan prosedur laboratorium yang baku.',
+                    'Teliti dalam pencatatan data hasil pengujian.',
+                ],
+                'minimum_education' => 'S1 Mahasiswa Aktif (Semester 6 ke atas) - Ilmu & Teknologi Pangan, Teknologi Hasil Pertanian, atau sejenisnya.',
+                'sistem_kerja' => 'WFO (On-site)',
+                'location' => 'Jakarta Selatan',
+                'deadline' => '2026-12-31',
+                'is_active' => true,
+            ],
+            [
+                'company_name' => 'PT Kaltim Prima Coal Tbk',
+                'logo_path' => 'logo-perusahaan/01KZRGDK065CE7YF3K0WM64SCR.png',
+                'position' => 'Environmental Compliance Intern',
+                'description' => 'Mendukung tim Environment dalam pemantauan kualitas lingkungan dan pelaporan kepatuhan terhadap dokumen AMDAL.',
+                'capacity' => '2 Posisi',
+                'duration' => '3 Bulan',
+                'study_programs' => [
+                    'Teknik Lingkungan',
+                ],
+                'start_date' => '2026-12-01',
+                'job_description' => [
+                    'Membantu pemantauan kualitas air, udara, dan pengelolaan limbah di area operasi.',
+                    'Mengolah data hasil pemantauan menjadi laporan kepatuhan lingkungan berkala.',
+                    'Mendukung penyusunan laporan pelaksanaan RKL-RPL.',
+                    'Membantu sosialisasi program lingkungan kepada unit kerja terkait.',
+                ],
+                'skills' => [
+                    'Pemantauan Kualitas Lingkungan',
+                    'Pengelolaan Limbah',
+                    'AMDAL / RKL-RPL',
+                    'Pengolahan Data',
+                ],
+                'requirements' => [
+                    'Memahami regulasi lingkungan hidup dan dokumen AMDAL.',
+                    'Mampu mengolah data pemantauan menggunakan spreadsheet.',
+                    'Bersedia melakukan pengambilan sampel di lapangan.',
+                ],
+                'minimum_education' => 'S1 Mahasiswa Aktif (Semester 6 ke atas) - Teknik Lingkungan.',
+                'sistem_kerja' => 'WFO (On-site)',
+                'location' => 'Jakarta Selatan',
+                'deadline' => '2026-12-31',
+                'is_active' => true,
+            ],
         ];
     }
 }
