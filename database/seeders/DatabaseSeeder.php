@@ -16,9 +16,6 @@ class DatabaseSeeder extends Seeder
             LecturerSeeder::class,
             StudentSeeder::class,
             InternshipSeeder::class,
-            // Didaftarkan di sini supaya 100 mahasiswa demo ikut terbentuk
-            // ulang setiap `migrate:fresh --seed`, bukan hilang begitu saja.
-            DemoStudentsSeeder::class,
             // Paling akhir: peserta uji coba dan Kaprodi asli tiap prodi.
             // Urutannya penting -- seeder ini memakai ulang baris Kaprodi
             // contoh dari LecturerSeeder supaya tidak ada prodi yang punya

@@ -112,6 +112,15 @@ class TestingAccountsSeeder extends Seeder
                 ->first()
                 ?? new Lecturer(['nidn' => $nidn]);
 
+            // Lecturer dipindah ke user Kaprodi yang baru -- user lama (kalau
+            // beda dan memang Kaprodi contoh bawaan) jadi yatim piatu tanpa
+            // prodi. Hapus supaya tidak ada kredensial nyasar yang login-nya
+            // hidup tapi tidak terhubung ke prodi manapun.
+            $previousUserId = $lecturer->exists ? $lecturer->user_id : null;
+            if ($previousUserId && $previousUserId !== $user->id) {
+                User::where('id', $previousUserId)->where('role', 'kaprodi')->delete();
+            }
+
             $lecturer->fill([
                 'user_id' => $user->id,
                 'lecturer_name' => $name,
