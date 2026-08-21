@@ -14,7 +14,8 @@ class LecturerSeeder extends Seeder
         // DPM demo pertama.
         // DPM demo kedua.
         // DPM demo ketiga.
-        // Dosen penguji demo.
+        // Dosen penguji demo. user_id 8 -- bergeser dari 9 setelah user
+        // "Raka Logbook Pratama" (dulu id 8) dihapus dari UserSeeder.
 
         DB::table('lecturers')->insert([
             [
@@ -63,7 +64,7 @@ class LecturerSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
-                'user_id' => 9,
+                'user_id' => 8,
                 'nidn' => '0316048703',
                 'lecturer_name' => 'Dr. Maya Puspita, M.Kom.',
                 'contact' => 'maya.puspita@bakrie.ac.id',

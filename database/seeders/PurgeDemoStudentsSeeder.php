@@ -9,8 +9,10 @@ use Illuminate\Database\Seeder;
 
 /**
  * Utilitas sekali pakai: menghapus (soft delete) 100 mahasiswa demo yang
- * dulu dibuat DemoStudentsSeeder, supaya tidak bercampur dengan peserta
- * uji coba sungguhan di TestingAccountsSeeder.
+ * dulu dibuat DemoStudentsSeeder, plus mahasiswa demo "Raka Logbook
+ * Pratama" (NIM 1101214231) dari StudentSeeder yang seedernya sudah
+ * dihapus juga -- supaya tidak bercampur dengan peserta uji coba
+ * sungguhan di TestingAccountsSeeder.
  *
  * NIM demo dihitung ulang persis dengan algoritma DemoStudentsSeeder
  * (pola 2026PPNN) sehingga baris yang dihapus dijamin sama dengan yang
@@ -29,9 +31,12 @@ class PurgeDemoStudentsSeeder extends Seeder
 {
     private const PER_PROGRAM = 10;
 
+    /** NIM mahasiswa demo "Raka Logbook Pratama" dari StudentSeeder lama. */
+    private const RAKA_NIM = '1101214231';
+
     public function run(): void
     {
-        $nims = $this->demoNims();
+        $nims = [...$this->demoNims(), self::RAKA_NIM];
 
         $students = Student::whereIn('nim', $nims)->get();
         $userIds = $students->pluck('user_id');
