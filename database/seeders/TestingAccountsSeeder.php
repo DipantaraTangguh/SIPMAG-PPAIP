@@ -10,9 +10,10 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
 /**
- * Akun untuk sesi uji coba: 20 mahasiswa peserta, 1 Kaprodi tiap program
- * studi, dan 3 dosen tiap program studi (1 pembimbing/DPM + 2 penguji).
- * Akun PPAIP tidak disentuh -- tetap pakai yang lama.
+ * Akun untuk sesi uji coba: 21 mahasiswa peserta, 10 akun cadangan (1 per
+ * program studi), 1 Kaprodi tiap program studi, dan 3 dosen tiap program
+ * studi (1 pembimbing/DPM + 2 penguji). Akun PPAIP tidak disentuh -- tetap
+ * pakai yang lama.
  *
  * Aman dijalankan di database yang sudah berisi data:
  * - Idempotent, dicocokkan lewat NIM (mahasiswa), program studi (Kaprodi),
@@ -83,6 +84,28 @@ class TestingAccountsSeeder extends Seeder
         ['1231002008', 'Micko Ardiansyah', 'Akuntansi'],
         ['1232002087', 'Achmad Taufik Alfarizy', 'Sistem Informasi'],
         ['1232002056', 'Abshina Attar Kaur', 'Sistem Informasi'],
+        ['1231002005', 'Alia Diandra Cahyani', 'Akuntansi'],
+    ];
+
+    /**
+     * Akun cadangan buat jaga-jaga kalau ada akun mahasiswa yang bermasalah
+     * pas sesi uji coba -- satu per program studi, NIM sengaja dibuat beda
+     * jauh dari pola NIM asli (0000000001..0000000010) supaya gampang
+     * dikenali sebagai akun cadangan, bukan mahasiswa sungguhan.
+     *
+     * @var array<int, array{0: string, 1: string, 2: string}>
+     */
+    private const SPARE_STUDENTS = [
+        ['0000000001', 'Testing 1', 'Manajemen'],
+        ['0000000002', 'Testing 2', 'Akuntansi'],
+        ['0000000003', 'Testing 3', 'Ilmu Politik'],
+        ['0000000004', 'Testing 4', 'Ilmu Komunikasi'],
+        ['0000000005', 'Testing 5', 'Informatika'],
+        ['0000000006', 'Testing 6', 'Sistem Informasi'],
+        ['0000000007', 'Testing 7', 'Teknik Industri'],
+        ['0000000008', 'Testing 8', 'Teknik Sipil'],
+        ['0000000009', 'Testing 9', 'Ilmu & Teknologi Pangan'],
+        ['0000000010', 'Testing 10', 'Teknik Lingkungan'],
     ];
 
     /**
@@ -163,7 +186,8 @@ class TestingAccountsSeeder extends Seeder
         $this->cleanupSupersededDosen();
         $this->seedKaprodi();
         $this->seedDosen();
-        $this->seedStudents();
+        $this->seedStudents(self::STUDENTS, 'Peserta uji coba');
+        $this->seedStudents(self::SPARE_STUDENTS, 'Akun cadangan');
     }
 
     private function cleanupSupersededDosen(): void
@@ -259,12 +283,15 @@ class TestingAccountsSeeder extends Seeder
         $this->command?->table(['Program Studi', 'Peran', 'Nama', 'Email'], $rows);
     }
 
-    private function seedStudents(): void
+    /**
+     * @param array<int, array{0: string, 1: string, 2: string}> $students
+     */
+    private function seedStudents(array $students, string $label): void
     {
         $password = Hash::make(self::PASSWORD);
         $rows = [];
 
-        foreach (self::STUDENTS as [$nim, $name, $program]) {
+        foreach ($students as [$nim, $name, $program]) {
             $email = $this->studentEmail($name);
 
             $user = User::firstOrNew(['email' => $email]);
@@ -298,7 +325,7 @@ class TestingAccountsSeeder extends Seeder
             $rows[] = [$nim, $name, $program, $email];
         }
 
-        $this->command?->info('Peserta uji coba siap: '.count($rows).' mahasiswa. Kata sandi semua akun: '.self::PASSWORD);
+        $this->command?->info($label.' siap: '.count($rows).' mahasiswa. Kata sandi semua akun: '.self::PASSWORD);
         $this->command?->table(['NIM (untuk login)', 'Nama', 'Program Studi', 'Email'], $rows);
     }
 
