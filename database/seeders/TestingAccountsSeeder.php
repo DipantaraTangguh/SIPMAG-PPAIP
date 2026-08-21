@@ -16,7 +16,7 @@ use Illuminate\Support\Str;
  *
  * Aman dijalankan di database yang sudah berisi data:
  * - Idempotent, dicocokkan lewat NIM (mahasiswa), program studi (Kaprodi),
- *   dan NIDN placeholder (dosen).
+ *   dan email/user_id (dosen).
  * - access_status hanya diisi saat baris mahasiswa BARU dibuat, supaya
  *   menjalankan ulang seeder di tengah pengujian tidak menghapus progres.
  * - NIDN dan tanda tangan Kaprodi yang sudah ada tidak ditimpa.
@@ -94,10 +94,11 @@ class TestingAccountsSeeder extends Seeder
      * menjadwalkan sidang. Beda dari Kaprodi: tidak ada batas satu per
      * prodi, jadi tidak perlu logika reuse/hapus akun lama.
      *
-     * Dua awalan email diberi akhiran (dita.nurmadewi.dpm,
-     * maya.puspita.penguji) karena nama itu sudah dipakai akun dosen
-     * demo bawaan lain (Sistem Informasi) -- dibuat beda supaya tidak
-     * menimpa identitas akun lama yang tidak terkait.
+     * Dua nama ("Dita Nurmadewi", "Maya Puspita") sama persis dengan akun
+     * dosen demo bawaan (dari LecturerSeeder, Sistem Informasi) -- sengaja
+     * dijadikan satu identitas, bukan dibuat akun baru. Awalan emailnya
+     * dibuat sama dengan email lama supaya seedDosen() menemukan dan
+     * memakai ulang baris Lecturer itu (lihat catatan di seedDosen()).
      *
      * @var array<int, array{0: string, 1: string, 2: string, 3: string}>
      */
@@ -122,13 +123,13 @@ class TestingAccountsSeeder extends Seeder
         ['Informatika', 'Guson P. Kuntarto, S.T., M.Sc., MACM', 'dosen_penguji', 'guson.kuntarto'],
         ['Informatika', 'Albert Arapenta Sembiring, S.T., M.Kom, MIEEE', 'dosen_penguji', 'albert.sembiring'],
 
-        ['Sistem Informasi', 'Dita Nurmadewi S.Kom, M.Kom', 'dpm', 'dita.nurmadewi.dpm'],
+        ['Sistem Informasi', 'Dita Nurmadewi S.Kom, M.Kom', 'dpm', 'dita.nurmadewi'],
         ['Sistem Informasi', 'Zakiul Fahmi Jailani S.Kom, M.Kom', 'dosen_penguji', 'zakiul.jailani'],
         ['Sistem Informasi', 'Haris Rafi S.Kom, M.Kom', 'dosen_penguji', 'haris.rafi'],
 
         ['Teknik Industri', 'Mirsa Diah Novianti, S.T., M.T.', 'dpm', 'mirsa.novianti'],
         ['Teknik Industri', 'Arief Bimantoro Suharko, Ph.D.', 'dosen_penguji', 'arief.suharko'],
-        ['Teknik Industri', 'Maya Puspita, PhD.', 'dosen_penguji', 'maya.puspita.penguji'],
+        ['Teknik Industri', 'Maya Puspita, PhD.', 'dosen_penguji', 'maya.puspita'],
 
         ['Teknik Sipil', 'Jouvan Chandra Pratama Putra, S.T., M.Eng.', 'dpm', 'jouvan.putra'],
         ['Teknik Sipil', 'Safrilah, S.T., M.Sc., IPP.', 'dosen_penguji', 'safrilah'],
@@ -143,11 +144,37 @@ class TestingAccountsSeeder extends Seeder
         ['Ilmu & Teknologi Pangan', 'Dr. Rizki Maryam Astuti, S.Si., M.Si.', 'dosen_penguji', 'rizki.astuti'],
     ];
 
+    /**
+     * Email dosen yang sempat dibuat sebagai identitas terpisah (versi
+     * seeder sebelumnya, sebelum "Dita Nurmadewi" dan "Maya Puspita"
+     * digabung jadi satu akun dengan dosen bawaan bernama sama). Kalau
+     * sempat ke-seed di database manapun, dibersihkan supaya tidak ada
+     * dosen yang kelihatan dobel.
+     *
+     * @var array<int, string>
+     */
+    private const SUPERSEDED_DOSEN_EMAILS = [
+        'dita.nurmadewi.dpm@bakrie.ac.id',
+        'maya.puspita.penguji@bakrie.ac.id',
+    ];
+
     public function run(): void
     {
+        $this->cleanupSupersededDosen();
         $this->seedKaprodi();
         $this->seedDosen();
         $this->seedStudents();
+    }
+
+    private function cleanupSupersededDosen(): void
+    {
+        // Lecturer tidak pakai soft delete, jadi ini hard delete -- aman
+        // karena email ini cuma pernah dipakai baris dosen yang sekarang
+        // digabung, belum pernah ditunjuk jadi DPM atau penguji sidang.
+        foreach (User::whereIn('email', self::SUPERSEDED_DOSEN_EMAILS)->get() as $user) {
+            Lecturer::where('user_id', $user->id)->delete();
+            $user->delete();
+        }
     }
 
     private function seedKaprodi(): void
@@ -200,9 +227,6 @@ class TestingAccountsSeeder extends Seeder
 
         foreach (self::DOSEN as $index => [$program, $name, $role, $emailPrefix]) {
             $email = $emailPrefix.self::EMAIL_DOMAIN;
-            // Placeholder unik per baris -- ganti lewat panel admin kalau
-            // sudah dapat NIDN asli.
-            $nidn = '07'.str_pad((string) ($index + 1), 8, '0', STR_PAD_LEFT);
 
             $user = User::firstOrNew(['email' => $email]);
             $user->fill(['name' => $name, 'role' => $role]);
@@ -211,15 +235,22 @@ class TestingAccountsSeeder extends Seeder
             }
             $user->save();
 
-            Lecturer::updateOrCreate(
-                ['nidn' => $nidn],
-                [
-                    'user_id' => $user->id,
-                    'lecturer_name' => $name,
-                    'contact' => $email,
-                    'study_program' => $program,
-                ],
-            );
+            // Kunci lewat user_id, bukan NIDN baru -- kalau user ini sudah
+            // punya baris Lecturer (mis. akun dosen demo bawaan yang
+            // namanya sama persis dengan salah satu dosen di daftar ini),
+            // baris itu dipakai ulang sebagai SATU identitas, bukan
+            // ditambah baris kedua yang bikin dosen kelihatan dobel.
+            $lecturer = Lecturer::where('user_id', $user->id)->first()
+                // Placeholder unik per baris -- ganti lewat panel admin
+                // kalau sudah dapat NIDN asli.
+                ?? new Lecturer(['nidn' => '07'.str_pad((string) ($index + 1), 8, '0', STR_PAD_LEFT)]);
+
+            $lecturer->fill([
+                'user_id' => $user->id,
+                'lecturer_name' => $name,
+                'contact' => $email,
+                'study_program' => $program,
+            ])->save();
 
             $rows[] = [$program, $role === 'dpm' ? 'Pembimbing' : 'Penguji', $name, $email];
         }
