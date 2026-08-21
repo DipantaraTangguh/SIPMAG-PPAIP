@@ -10,11 +10,13 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
 /**
- * Akun untuk sesi uji coba: 20 mahasiswa peserta + 1 Kaprodi untuk tiap
- * program studi. Akun PPAIP tidak disentuh -- tetap pakai yang lama.
+ * Akun untuk sesi uji coba: 20 mahasiswa peserta, 1 Kaprodi tiap program
+ * studi, dan 3 dosen tiap program studi (1 pembimbing/DPM + 2 penguji).
+ * Akun PPAIP tidak disentuh -- tetap pakai yang lama.
  *
  * Aman dijalankan di database yang sudah berisi data:
- * - Idempotent, dicocokkan lewat NIM (mahasiswa) dan program studi (Kaprodi).
+ * - Idempotent, dicocokkan lewat NIM (mahasiswa), program studi (Kaprodi),
+ *   dan NIDN placeholder (dosen).
  * - access_status hanya diisi saat baris mahasiswa BARU dibuat, supaya
  *   menjalankan ulang seeder di tengah pengujian tidak menghapus progres.
  * - NIDN dan tanda tangan Kaprodi yang sudah ada tidak ditimpa.
@@ -83,9 +85,68 @@ class TestingAccountsSeeder extends Seeder
         ['1232002056', 'Abshina Attar Kaur', 'Sistem Informasi'],
     ];
 
+    /**
+     * Tiga dosen per program studi: pembimbing (DPM) lalu dua penguji.
+     * [program studi, nama, role, awalan email].
+     *
+     * role 'dpm' -> muncul di pilihan "Pilih DPM" Kaprodi. role
+     * 'dosen_penguji' -> muncul di pilihan Dosen Penguji 1/2 saat
+     * menjadwalkan sidang. Beda dari Kaprodi: tidak ada batas satu per
+     * prodi, jadi tidak perlu logika reuse/hapus akun lama.
+     *
+     * Dua awalan email diberi akhiran (dita.nurmadewi.dpm,
+     * maya.puspita.penguji) karena nama itu sudah dipakai akun dosen
+     * demo bawaan lain (Sistem Informasi) -- dibuat beda supaya tidak
+     * menimpa identitas akun lama yang tidak terkait.
+     *
+     * @var array<int, array{0: string, 1: string, 2: string, 3: string}>
+     */
+    private const DOSEN = [
+        ['Manajemen', 'Prof. Muchsin Saggaff Shihab, S.E., M.Sc., MBA, Ph.D.', 'dpm', 'muchsin.shihab'],
+        ['Manajemen', 'Ananda Fortunisa, SE., MSi.', 'dosen_penguji', 'ananda.fortunisa'],
+        ['Manajemen', 'Ir. Aurino Rilman A. Djamaris, MM', 'dosen_penguji', 'aurino.djamaris'],
+
+        ['Akuntansi', 'Drs. Tri Pujadi Susilo, S.E., M.M., Ak., CA', 'dpm', 'tri.susilo'],
+        ['Akuntansi', 'Dr. Jurica Lucyanda, SE, M.Si.', 'dosen_penguji', 'jurica.lucyanda'],
+        ['Akuntansi', 'Dr. Tita Djuitaningsih, SE., M.Si., Ak., CA', 'dosen_penguji', 'tita.djuitaningsih'],
+
+        ['Ilmu Komunikasi', 'Mirana Hanathasia, S.Sos., M. Media Prac.', 'dpm', 'mirana.hanathasia'],
+        ['Ilmu Komunikasi', 'Dr. Dessy Kania, B.A., M.A.', 'dosen_penguji', 'dessy.kania'],
+        ['Ilmu Komunikasi', 'Dianingtyas Murtanti Putri, S.Sos., M.Si.', 'dosen_penguji', 'dianingtyas.putri'],
+
+        ['Ilmu Politik', 'Asmiati Malik, Ph.D.', 'dpm', 'asmiati.malik'],
+        ['Ilmu Politik', 'Dr. M. Tri Andika Kurniawan, S.Sos., M.A.', 'dosen_penguji', 'tri.kurniawan'],
+        ['Ilmu Politik', 'Dr. Bambang Sukma Wijaya', 'dosen_penguji', 'bambang.wijaya'],
+
+        ['Informatika', 'Berkah Iman Santoso, S.T., M.T.I., MIEEE', 'dpm', 'berkah.santoso'],
+        ['Informatika', 'Guson P. Kuntarto, S.T., M.Sc., MACM', 'dosen_penguji', 'guson.kuntarto'],
+        ['Informatika', 'Albert Arapenta Sembiring, S.T., M.Kom, MIEEE', 'dosen_penguji', 'albert.sembiring'],
+
+        ['Sistem Informasi', 'Dita Nurmadewi S.Kom, M.Kom', 'dpm', 'dita.nurmadewi.dpm'],
+        ['Sistem Informasi', 'Zakiul Fahmi Jailani S.Kom, M.Kom', 'dosen_penguji', 'zakiul.jailani'],
+        ['Sistem Informasi', 'Haris Rafi S.Kom, M.Kom', 'dosen_penguji', 'haris.rafi'],
+
+        ['Teknik Industri', 'Mirsa Diah Novianti, S.T., M.T.', 'dpm', 'mirsa.novianti'],
+        ['Teknik Industri', 'Arief Bimantoro Suharko, Ph.D.', 'dosen_penguji', 'arief.suharko'],
+        ['Teknik Industri', 'Maya Puspita, PhD.', 'dosen_penguji', 'maya.puspita.penguji'],
+
+        ['Teknik Sipil', 'Jouvan Chandra Pratama Putra, S.T., M.Eng.', 'dpm', 'jouvan.putra'],
+        ['Teknik Sipil', 'Safrilah, S.T., M.Sc., IPP.', 'dosen_penguji', 'safrilah'],
+        ['Teknik Sipil', 'Bima S.T', 'dosen_penguji', 'bima'],
+
+        ['Teknik Lingkungan', 'Prof. Deffi Ayu Puspito Sari, S.T., M.Agr.Sc., Ph.D., IPM., ASEAN Eng.', 'dpm', 'deffi.sari'],
+        ['Teknik Lingkungan', 'Prof Siti S.T', 'dosen_penguji', 'siti.lingkungan'],
+        ['Teknik Lingkungan', 'Prof Faiz S.T', 'dosen_penguji', 'faiz.lingkungan'],
+
+        ['Ilmu & Teknologi Pangan', 'Prof. Ardiansyah, S.TP., M.Si., Ph.D.', 'dpm', 'ardiansyah'],
+        ['Ilmu & Teknologi Pangan', 'Dr.agr. Wahyudi David, S.TP., M.Sc.', 'dosen_penguji', 'wahyudi.david'],
+        ['Ilmu & Teknologi Pangan', 'Dr. Rizki Maryam Astuti, S.Si., M.Si.', 'dosen_penguji', 'rizki.astuti'],
+    ];
+
     public function run(): void
     {
         $this->seedKaprodi();
+        $this->seedDosen();
         $this->seedStudents();
     }
 
@@ -130,6 +191,41 @@ class TestingAccountsSeeder extends Seeder
         }
 
         $this->command?->info('Kaprodi siap: '.count(self::KAPRODI).' program studi.');
+    }
+
+    private function seedDosen(): void
+    {
+        $password = Hash::make(self::PASSWORD);
+        $rows = [];
+
+        foreach (self::DOSEN as $index => [$program, $name, $role, $emailPrefix]) {
+            $email = $emailPrefix.self::EMAIL_DOMAIN;
+            // Placeholder unik per baris -- ganti lewat panel admin kalau
+            // sudah dapat NIDN asli.
+            $nidn = '07'.str_pad((string) ($index + 1), 8, '0', STR_PAD_LEFT);
+
+            $user = User::firstOrNew(['email' => $email]);
+            $user->fill(['name' => $name, 'role' => $role]);
+            if (! $user->exists) {
+                $user->password = $password;
+            }
+            $user->save();
+
+            Lecturer::updateOrCreate(
+                ['nidn' => $nidn],
+                [
+                    'user_id' => $user->id,
+                    'lecturer_name' => $name,
+                    'contact' => $email,
+                    'study_program' => $program,
+                ],
+            );
+
+            $rows[] = [$program, $role === 'dpm' ? 'Pembimbing' : 'Penguji', $name, $email];
+        }
+
+        $this->command?->info('Dosen pembimbing & penguji siap: '.count(self::DOSEN).' dosen ('.(count(self::DOSEN) / 3).' prodi x 3).');
+        $this->command?->table(['Program Studi', 'Peran', 'Nama', 'Email'], $rows);
     }
 
     private function seedStudents(): void

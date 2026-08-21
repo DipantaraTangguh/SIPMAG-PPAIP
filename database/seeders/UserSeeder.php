@@ -76,15 +76,6 @@ class UserSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
-            // Mahasiswa demo siap isi logbook.
-            [
-                'name' => 'Raka Logbook Pratama',
-                'email' => 'raka.logbook@student.bakrie.ac.id',
-                'password' => $password,
-                'role' => 'mahasiswa',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
             // Akun dosen penguji demo.
             [
                 'name' => 'Dr. Maya Puspita, M.Kom.',
