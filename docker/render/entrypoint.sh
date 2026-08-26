@@ -110,4 +110,27 @@ php artisan config:cache
 php artisan route:cache
 php artisan view:cache
 
+# ── MPM Apache ───────────────────────────────────────────────────────────────
+# mod_php hanya jalan di atas mpm_prefork. Kalau MPM lain ikut aktif, Apache
+# menolak start dengan "More than one MPM loaded", tidak ada yang mendengarkan
+# di port, dan health check platform menggantung sampai menyerah -- kegagalan
+# yang menyesatkan karena seluruh langkah sebelumnya terlihat sukses.
+#
+# Ditegakkan saat start, bukan saat build, karena kondisinya pernah berbeda
+# antara image yang dibangun lokal dan yang dibangun di platform.
+mpm_aktif=$(ls /etc/apache2/mods-enabled/ 2>/dev/null | grep -c '^mpm_.*\.load$' || true)
+if [ "${mpm_aktif}" != "1" ]; then
+    echo "MPM Apache bermasalah: ${mpm_aktif} MPM aktif, seharusnya tepat 1 (mpm_prefork). Memperbaiki."
+    ls /etc/apache2/mods-enabled/ | grep '^mpm_' || true
+    a2dismod mpm_event mpm_worker >/dev/null 2>&1 || true
+    a2enmod mpm_prefork >/dev/null 2>&1 || true
+fi
+
+# Gagalkan di sini dengan pesan Apache sendiri, bukan setelah exec, supaya
+# alasannya tercetak utuh di log.
+apache2ctl -t || {
+    echo "FATAL: konfigurasi Apache tidak valid, lihat pesan di atas." >&2
+    exit 1
+}
+
 exec apache2-foreground
