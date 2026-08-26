@@ -1,10 +1,42 @@
 .git
 .gitignore
+.github
+.vscode
+.claude
+.DS_Store
+
+# Dipasang ulang di dalam image. node_modules milik host bisa berisi binary
+# khusus macOS yang tidak jalan di container Linux.
 vendor
 node_modules
+
+# Rahasia lokal tidak boleh ikut terbawa ke image. Di Render seluruh
+# konfigurasi datang dari environment variable.
 .env
+.env.*
+!.env.example
+
+# Dibangun ulang di tahap assets.
+public/build
+public/hot
+public/storage
 
 storage/logs/*
 storage/framework/cache/*
 storage/framework/sessions/*
 storage/framework/views/*
+.phpunit.result.cache
+
+# Cache paket hasil `composer install` di mesin lokal ikut memuat paket dev
+# seperti Tinker. Kalau terbawa, `package:discover` di dalam image (yang
+# dibangun --no-dev) gagal karena kelasnya memang tidak terpasang.
+bootstrap/cache/*.php
+
+# Tidak dipakai saat runtime produksi.
+tests
+docs
+*.md
+!README.md
+UAT-SIPMAG.xlsx
+compose.yaml
+Dockerfile.dev
