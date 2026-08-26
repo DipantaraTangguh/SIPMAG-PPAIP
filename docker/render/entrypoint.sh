@@ -8,6 +8,15 @@ set -e
 
 PORT="${PORT:-10000}"
 
+# Dicetak paling awal supaya satu baris pertama log deploy sudah cukup untuk
+# memastikan konfigurasi terbaca benar, tanpa perlu membedah jejak tumpukan.
+echo "SIPMAG boot: PORT=${PORT}" \
+     "DB_CONNECTION=${DB_CONNECTION:-<bawaan>}" \
+     "DB_HOST=${DB_HOST:-<kosong>}" \
+     "DB_PORT=${DB_PORT:-<kosong>}" \
+     "DB_DATABASE=${DB_DATABASE:-<kosong>}" \
+     "APP_URL=${APP_URL:-<dari platform>}"
+
 # ── Apache mendengarkan di port yang ditentukan Render ───────────────────────
 sed -i "s/^Listen .*/Listen ${PORT}/" /etc/apache2/ports.conf
 sed -i "s/__PORT__/${PORT}/" /etc/apache2/sites-available/000-default.conf
@@ -48,8 +57,21 @@ ln -sfn ../storage/app/public public/storage
 chown -R www-data:www-data storage bootstrap/cache
 
 # ── Database ─────────────────────────────────────────────────────────────────
-# MySQL jalan sebagai private service terpisah dan bisa saja belum siap
-# menerima koneksi saat web service sudah start.
+# Diperiksa sebelum menyentuh artisan. Tanpa penjagaan ini, DB_HOST yang kosong
+# lolos begitu saja lalu `migrate` gagal dengan galat PDO "No such file or
+# directory" (PDO jatuh ke mode unix socket saat host kosong) plus jejak
+# tumpukan puluhan baris -- menyesatkan, karena akar masalahnya cuma variabel
+# yang belum diisi. Containernya lalu mati berulang dan health check platform
+# tidak pernah hijau.
+if [ "${DB_CONNECTION:-}" = "mysql" ] && [ -z "${DB_HOST}" ]; then
+    echo "FATAL: DB_CONNECTION=mysql tetapi DB_HOST kosong." >&2
+    echo "Isi DB_HOST, DB_PORT (3306, bukan port web), DB_DATABASE, DB_USERNAME, dan DB_PASSWORD." >&2
+    echo "Di Railway, arahkan ke service MySQL-nya, misalnya DB_HOST=\${{MySQL.MYSQLHOST}}." >&2
+    exit 1
+fi
+
+# MySQL jalan sebagai service terpisah dan bisa saja belum siap menerima
+# koneksi saat web service sudah start.
 if [ -n "${DB_HOST}" ]; then
     printf 'Menunggu MySQL di %s:%s' "${DB_HOST}" "${DB_PORT:-3306}"
     i=0
