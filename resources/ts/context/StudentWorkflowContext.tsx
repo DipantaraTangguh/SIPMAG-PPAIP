@@ -11,6 +11,16 @@ const LogbookContext = createContext<any>(null);
 const DefenseContext = createContext<any>(null);
 const WorkflowNotificationsContext = createContext<any>(null);
 
+// Status lamaran mitra tetap dipakai mentah (bahasa Inggris) untuk logika,
+// tapi tampilannya butuh label Indonesia + warna. Kuncinya harus persis sama
+// dengan enum kolom applications.status di database.
+const APPLICATION_STATUS_DISPLAY = {
+    Applied: { label: 'Dilamar', color: 'blue' },
+    Accepted: { label: 'Diterima', color: 'green' },
+    RejectedByCompany: { label: 'Ditolak Perusahaan', color: 'red' },
+    Canceled: { label: 'Dibatalkan', color: 'amber' },
+};
+
 const EMPTY_STATE = {
     form1Submission: null,
     form2Submissions: [],
@@ -71,6 +81,8 @@ export function StudentWorkflowProvider({ children }) {
                         companyName: a.internship?.company_name,
                         position: a.internship?.position,
                         status: a.status,
+                        statusLabel: APPLICATION_STATUS_DISPLAY[a.status]?.label ?? a.status,
+                        statusColor: APPLICATION_STATUS_DISPLAY[a.status]?.color ?? 'blue',
                         appliedAt: a.created_at,
                     }))
                     : [],
@@ -375,14 +387,19 @@ export function StudentWorkflowProvider({ children }) {
         if (state.activeApplications && state.activeApplications.length > 0) {
             state.activeApplications.forEach((app) => {
                 const dateStr = app.appliedAt ? new Date(app.appliedAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }) : '';
-                if (app.status === 'Diterima' || app.status === 'Accepted') {
+                if (app.status === 'Accepted') {
                     list.push({
-                        message: `Selamat! Lamaran Anda sebagai ${app.position} di ${app.companyName} telah Diterima.`,
+                        message: `Selamat! Lamaran Anda sebagai ${app.position} di ${app.companyName} telah diterima.`,
                         time: dateStr || 'Baru saja',
                     });
-                } else if (app.status === 'Ditolak' || app.status === 'Rejected') {
+                } else if (app.status === 'RejectedByCompany') {
                     list.push({
-                        message: `Lamaran Anda sebagai ${app.position} di ${app.companyName} ditolak.`,
+                        message: `Lamaran Anda sebagai ${app.position} di ${app.companyName} ditolak perusahaan.`,
+                        time: dateStr || 'Baru saja',
+                    });
+                } else if (app.status === 'Canceled') {
+                    list.push({
+                        message: `Lamaran Anda sebagai ${app.position} di ${app.companyName} dibatalkan.`,
                         time: dateStr || 'Baru saja',
                     });
                 } else {
