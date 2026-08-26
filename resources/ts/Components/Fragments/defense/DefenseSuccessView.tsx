@@ -1,17 +1,29 @@
 import React from 'react';
 import { Clock } from 'lucide-react';
 import { useAuth } from '../../../context/AppContext';
-import { useApplicationWorkflow } from '../../../context/StudentWorkflowContext';
+import {
+    useApplicationWorkflow,
+    useGuidanceWorkflow,
+    useLogbookWorkflow,
+} from '../../../context/StudentWorkflowContext';
 
 export default function DefenseSuccessView() {
     const { student } = useAuth();
     const { activeApplications } = useApplicationWorkflow();
+    const { pengajuanPembimbing } = useGuidanceWorkflow();
+    const { logbookEntries } = useLogbookWorkflow();
 
-    const acceptedApp = activeApplications?.find(a => a.status === 'Diterima') || {
-        company: 'Traveloka Indonesia',
-        position: 'UI/UX Designer Intern'
-    };
-    const dpmName = student?.dpm?.name || 'Dita Nurmadewi S.Kom';
+    // Sumber kebenaran tempat magang di tahap sidang adalah pengajuan
+    // pembimbing: itu yang diverifikasi Kaprodi saat menetapkan DPM, dan
+    // selalu ada di kedua jalur. Lamaran mitra cuma cadangan -- mahasiswa
+    // jalur Form 2 mandiri tidak punya lamaran mitra sama sekali.
+    const acceptedApp = activeApplications?.find(a => a.status === 'Accepted');
+    const companyName = pengajuanPembimbing?.namaPerusahaan || acceptedApp?.companyName || '-';
+    const position = pengajuanPembimbing?.lingkupMagang || acceptedApp?.position || '-';
+    const dpmName = student?.dpm?.name || '-';
+    const approvedLogbooks = (logbookEntries || [])
+        .filter(e => e.status === 'Disetujui' || e.status === 'Approved')
+        .length;
 
     return (
         <div className="animate-in fade-in duration-500">
@@ -41,11 +53,11 @@ export default function DefenseSuccessView() {
                     <div className="rounded-xl bg-primary-pale/30 px-4 py-2 sm:px-6">
                         <div className="flex flex-col gap-1 border-b border-primary-pale/50 py-4 sm:flex-row sm:items-center sm:justify-between">
                             <span className="text-gray-500 text-[13px] font-medium">Perusahaan</span>
-                            <span className="text-[#1A1A1A] text-[14px] font-bold">{acceptedApp.company || acceptedApp.companyName}</span>
+                            <span className="text-[#1A1A1A] text-[14px] font-bold">{companyName}</span>
                         </div>
                         <div className="flex flex-col gap-1 border-b border-primary-pale/50 py-4 sm:flex-row sm:items-center sm:justify-between">
-                            <span className="text-gray-500 text-[13px] font-medium">Posisi</span>
-                            <span className="text-[#1A1A1A] text-[14px] font-bold">{acceptedApp.position}</span>
+                            <span className="text-gray-500 text-[13px] font-medium">Lingkup Magang</span>
+                            <span className="text-[#1A1A1A] text-[14px] font-bold sm:max-w-[60%] sm:text-right">{position}</span>
                         </div>
                         <div className="flex flex-col gap-1 border-b border-primary-pale/50 py-4 sm:flex-row sm:items-center sm:justify-between">
                             <span className="text-gray-500 text-[13px] font-medium">Dosen Pembimbing</span>
@@ -54,7 +66,7 @@ export default function DefenseSuccessView() {
                         <div className="flex flex-col gap-2 py-4 sm:flex-row sm:items-center sm:justify-between">
                             <span className="text-gray-500 text-[13px] font-medium">Total Logbook</span>
                             <span className="bg-primary text-white px-3 py-1 rounded-full text-[11px] font-bold">
-                                6/6 Entri Disetujui
+                                {approvedLogbooks} Entri Disetujui
                             </span>
                         </div>
                     </div>
