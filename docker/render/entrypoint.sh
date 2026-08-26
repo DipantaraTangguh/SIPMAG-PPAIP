@@ -8,32 +8,46 @@ set -e
 
 PORT="${PORT:-10000}"
 
-# Dicetak paling awal supaya satu baris pertama log deploy sudah cukup untuk
-# memastikan konfigurasi terbaca benar, tanpa perlu membedah jejak tumpukan.
+# ── APP_URL harus sama persis dengan origin yang dibuka browser ──────────────
+# Kalau berbeda, unggah berkas di panel Filament menggantung tanpa pesan error
+# dan sesi API ikut rusak. Nama variabelnya berbeda tiap platform dan baru ada
+# saat runtime, jadi tidak bisa dibakukan ke dalam image:
+#   Render  -> RENDER_EXTERNAL_URL (URL lengkap dengan skema)
+#   Railway -> RAILWAY_PUBLIC_DOMAIN (hostname saja, tanpa skema)
+if [ -z "${APP_URL}" ]; then
+    if [ -n "${RENDER_EXTERNAL_URL}" ]; then
+        export APP_URL="${RENDER_EXTERNAL_URL}"
+    elif [ -n "${RAILWAY_PUBLIC_DOMAIN}" ]; then
+        export APP_URL="https://${RAILWAY_PUBLIC_DOMAIN}"
+    fi
+fi
+
+# Sanctum memakai sesi cookie, bukan token. Host aplikasi wajib terdaftar di
+# sini atau setiap permintaan API dari SPA ditolak sebagai lintas domain --
+# mahasiswa gagal login meski kata sandinya benar. Diisi hostname tanpa skema.
+if [ -z "${SANCTUM_STATEFUL_DOMAINS}" ]; then
+    if [ -n "${RENDER_EXTERNAL_HOSTNAME}" ]; then
+        export SANCTUM_STATEFUL_DOMAINS="${RENDER_EXTERNAL_HOSTNAME}"
+    elif [ -n "${RAILWAY_PUBLIC_DOMAIN}" ]; then
+        export SANCTUM_STATEFUL_DOMAINS="${RAILWAY_PUBLIC_DOMAIN}"
+    fi
+fi
+
+# Dicetak setelah APP_URL dan SANCTUM_STATEFUL_DOMAINS diselesaikan supaya yang
+# tampil adalah nilai yang benar-benar dipakai, bukan yang belum terisi. Satu
+# baris ini cukup untuk memastikan konfigurasi terbaca benar, tanpa perlu
+# membedah jejak tumpukan.
 echo "SIPMAG boot: PORT=${PORT}" \
      "DB_CONNECTION=${DB_CONNECTION:-<bawaan>}" \
      "DB_HOST=${DB_HOST:-<kosong>}" \
      "DB_PORT=${DB_PORT:-<kosong>}" \
      "DB_DATABASE=${DB_DATABASE:-<kosong>}" \
-     "APP_URL=${APP_URL:-<dari platform>}"
+     "APP_URL=${APP_URL:-<kosong>}" \
+     "SANCTUM=${SANCTUM_STATEFUL_DOMAINS:-<kosong>}"
 
-# ── Apache mendengarkan di port yang ditentukan Render ───────────────────────
+# ── Server mendengarkan di port yang ditentukan platform ─────────────────────
 sed -i "s/^Listen .*/Listen ${PORT}/" /etc/apache2/ports.conf
 sed -i "s/__PORT__/${PORT}/" /etc/apache2/sites-available/000-default.conf
-
-# ── APP_URL harus sama persis dengan origin yang dibuka browser ──────────────
-# Kalau berbeda, unggah berkas di panel Filament menggantung tanpa pesan error
-# dan sesi API ikut rusak. RENDER_EXTERNAL_URL hanya tersedia saat runtime,
-# jadi tidak bisa dibakukan ke dalam image.
-if [ -z "${APP_URL}" ] && [ -n "${RENDER_EXTERNAL_URL}" ]; then
-    export APP_URL="${RENDER_EXTERNAL_URL}"
-fi
-
-# Sanctum memakai sesi cookie, bukan token. Host aplikasi wajib terdaftar di
-# sini atau setiap permintaan API dari SPA ditolak sebagai lintas domain.
-if [ -z "${SANCTUM_STATEFUL_DOMAINS}" ] && [ -n "${RENDER_EXTERNAL_HOSTNAME}" ]; then
-    export SANCTUM_STATEFUL_DOMAINS="${RENDER_EXTERNAL_HOSTNAME}"
-fi
 
 # ── Persistent disk ──────────────────────────────────────────────────────────
 # storage/app ditimpa mount disk, jadi saat deploy pertama isinya kosong --
