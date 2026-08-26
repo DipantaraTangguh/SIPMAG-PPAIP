@@ -10,7 +10,6 @@ use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\RateLimiter;
-use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 
@@ -20,13 +19,6 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        // Railway (dan PaaS lain) terminate TLS di edge lalu forward HTTP polos
-        // ke container -- tanpa ini, asset()/Vite men-generate URL http://
-        // walau situs diakses via https://, memicu mixed-content block browser.
-        if ($this->app->environment('production')) {
-            URL::forceScheme('https');
-        }
-
         Application::observe(ApplicationObserver::class);
         DefenseAssessment::observe(DefenseAssessmentObserver::class);
 

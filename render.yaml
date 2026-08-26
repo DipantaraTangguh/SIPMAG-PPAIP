@@ -1,0 +1,110 @@
+# Blueprint Render -- deploy Docker penuh.
+#
+# Dua service: aplikasi Laravel (publik) dan MySQL (privat, tidak terjangkau
+# dari internet). Keduanya memakai persistent disk, jadi butuh instance
+# berbayar -- disk tidak tersedia di paket free.
+#
+# Cara pakai: Render Dashboard -> New -> Blueprint, arahkan ke repo ini.
+# Render akan menanyakan nilai untuk variabel yang ditandai `sync: false`.
+
+services:
+    - name: sipmag
+      type: web
+      runtime: docker
+      dockerfilePath: ./Dockerfile
+      dockerContext: .
+      plan: starter
+      region: singapore
+      # Rute bawaan Laravel, sudah aktif lewat withRouting(health: '/up').
+      healthCheckPath: /up
+
+      # Unggahan mahasiswa (CV, LoA, dokumen sidang) dan logo perusahaan
+      # disimpan di storage/app lewat disk 'local'. Filesystem Render bersifat
+      # sementara: tanpa disk ini semua berkas hilang setiap kali deploy.
+      #
+      # Di-mount tepat di storage/app, bukan di storage/, supaya cache dan log
+      # framework tetap di filesystem container -- keduanya memang sementara
+      # dan tidak perlu ikut memakan ruang disk.
+      disk:
+          name: sipmag-storage
+          mountPath: /var/www/storage/app
+          sizeGB: 5
+
+      envVars:
+          # Laravel butuh kunci 32 byte berformat `base64:...`. generateValue
+          # milik Render tidak memakai awalan itu, jadi diisi manual.
+          # Hasilkan dengan: php artisan key:generate --show
+          - key: APP_KEY
+            sync: false
+
+          - key: APP_ENV
+            value: production
+          - key: APP_DEBUG
+            value: "false"
+          - key: APP_LOCALE
+            value: id
+
+          # APP_URL dan SANCTUM_STATEFUL_DOMAINS sengaja tidak diisi di sini.
+          # Entrypoint mengisinya dari RENDER_EXTERNAL_URL saat container start,
+          # supaya selalu sama persis dengan origin yang dibuka browser.
+          # Isi manual hanya kalau memakai domain kustom.
+
+          - key: DB_CONNECTION
+            value: mysql
+          - key: DB_HOST
+            fromService:
+                name: sipmag-mysql
+                type: pserv
+                property: host
+          - key: DB_PORT
+            value: "3306"
+          - key: DB_DATABASE
+            value: sipmag
+          - key: DB_USERNAME
+            value: sipmag
+          - key: DB_PASSWORD
+            fromService:
+                name: sipmag-mysql
+                type: pserv
+                envVarKey: MYSQL_PASSWORD
+
+          # Sesi, antrean, dan cache semuanya bersandar ke database supaya
+          # tetap utuh saat container diganti.
+          - key: SESSION_DRIVER
+            value: database
+          - key: SESSION_ENCRYPT
+            value: "true"
+          - key: QUEUE_CONNECTION
+            value: database
+          - key: CACHE_STORE
+            value: database
+          - key: FILESYSTEM_DISK
+            value: local
+
+          - key: LOG_CHANNEL
+            value: stderr
+          - key: LOG_LEVEL
+            value: warning
+
+    - name: sipmag-mysql
+      type: pserv
+      runtime: image
+      image:
+          url: docker.io/library/mysql:8.4
+      plan: starter
+      region: singapore
+
+      disk:
+          name: sipmag-mysql-data
+          mountPath: /var/lib/mysql
+          sizeGB: 5
+
+      envVars:
+          - key: MYSQL_DATABASE
+            value: sipmag
+          - key: MYSQL_USER
+            value: sipmag
+          - key: MYSQL_PASSWORD
+            generateValue: true
+          - key: MYSQL_ROOT_PASSWORD
+            generateValue: true
