@@ -6,6 +6,7 @@ use App\Filament\Resources\Ppaip\PpaipMitraApplicantResource\Pages\ListMitraAppl
 use App\Filament\Resources\Ppaip\PpaipMitraApplicantResource\Pages\ViewMitraApplicant;
 use App\Models\Application;
 use App\Support\AccessStatus;
+use App\Support\StudyProgram;
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Infolist;
@@ -19,6 +20,17 @@ use Illuminate\Support\HtmlString;
 
 class PpaipMitraApplicantResource extends Resource
 {
+    /**
+     * Label Indonesia untuk enum applications.status. Statusnya sendiri tetap
+     * bahasa Inggris di database; ini cuma untuk tampilan.
+     */
+    private const APPLICATION_STATUS_LABELS = [
+        'Applied' => 'Dilamar',
+        'Accepted' => 'Diterima',
+        'RejectedByCompany' => 'Ditolak Perusahaan',
+        'Canceled' => 'Dibatalkan',
+    ];
+
     protected static ?string $model = Application::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-user-group';
@@ -109,7 +121,8 @@ class PpaipMitraApplicantResource extends Resource
                                 'Accepted' => 'success',
                                 'RejectedByCompany', 'Canceled' => 'danger',
                                 default => 'gray',
-                            }),
+                            })
+                            ->formatStateUsing(fn (string $state): string => self::APPLICATION_STATUS_LABELS[$state] ?? $state),
                         TextEntry::make('created_at')->label('Tanggal Lamar')->dateTime('d M Y H:i'),
                     ])
                     ->columns(2),
@@ -159,7 +172,8 @@ class PpaipMitraApplicantResource extends Resource
                         'Accepted' => 'success',
                         'RejectedByCompany', 'Canceled' => 'danger',
                         default => 'gray',
-                    }),
+                    })
+                    ->formatStateUsing(fn (string $state): string => self::APPLICATION_STATUS_LABELS[$state] ?? $state),
                 Tables\Columns\IconColumn::make('cv_file_path')
                     ->label('CV')
                     ->icon(fn ($state) => $state ? 'heroicon-o-document-check' : 'heroicon-o-document')
@@ -172,18 +186,10 @@ class PpaipMitraApplicantResource extends Resource
             ->filters([
                 Tables\Filters\SelectFilter::make('status')
                     ->label('Status Lamaran')
-                    ->options([
-                        'Applied' => 'Dilamar',
-                        'Accepted' => 'Diterima',
-                        'RejectedByCompany' => 'Ditolak Perusahaan',
-                        'Canceled' => 'Dibatalkan',
-                    ]),
+                    ->options(self::APPLICATION_STATUS_LABELS),
                 Tables\Filters\SelectFilter::make('study_program')
                     ->label('Prodi')
-                    ->options([
-                        'Sistem Informasi' => 'Sistem Informasi',
-                        'Informatika' => 'Informatika',
-                    ])
+                    ->options(StudyProgram::options())
                     ->query(fn (Builder $query, array $data): Builder => $query
                         ->when(
                             $data['value'] ?? null,

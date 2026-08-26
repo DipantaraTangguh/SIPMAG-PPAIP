@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Shared;
 
+use App\Support\StudyProgram;
 use App\Filament\Resources\Shared\InternshipCycleResource\Pages\ListInternshipCycles;
 use App\Filament\Resources\Shared\InternshipCycleResource\Pages\ViewInternshipCycle;
 use App\Models\InternshipCycle;
@@ -190,10 +191,7 @@ class InternshipCycleResource extends Resource
             ->filters([
                 Tables\Filters\SelectFilter::make('study_program')
                     ->label('Prodi')
-                    ->options([
-                        'Sistem Informasi' => 'Sistem Informasi',
-                        'Informatika' => 'Informatika',
-                    ])
+                    ->options(StudyProgram::options())
                     // Kaprodi sudah terkunci ke prodinya lewat getEloquentQuery.
                     ->visible(fn (): bool => static::currentUser()?->role === 'ppaip'),
                 Tables\Filters\SelectFilter::make('jenis_magang')

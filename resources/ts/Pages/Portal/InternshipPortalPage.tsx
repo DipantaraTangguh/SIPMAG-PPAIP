@@ -57,24 +57,6 @@ function mapInternship(i) {
     };
 }
 
-const mockActiveApplications = [
-    {
-        id: 1,
-        companyName: "Shopee International",
-        position: "Product Manager Intern",
-        status: "Dilamar",
-        statusColor: "blue",
-        appliedAt: "12 Mei 2024",
-    },
-    {
-        id: 2,
-        companyName: "Dana Indonesia",
-        position: "QA Engineer Intern",
-        status: "Dilamar",
-        statusColor: "blue",
-        appliedAt: "28 Apr 2024",
-    },
-];
 export default function InternshipPortalPage() {
     const { student } = useAuth();
     const { activeApplications } = useApplicationWorkflow();

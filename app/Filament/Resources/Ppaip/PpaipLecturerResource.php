@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Ppaip;
 
+use App\Support\StudyProgram;
 use App\Models\Lecturer;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -37,10 +38,7 @@ class PpaipLecturerResource extends Resource
                 Forms\Components\TextInput::make('contact')->label('Kontak')->email(),
                 Forms\Components\Select::make('study_program')
                     ->label('Program Studi')
-                    ->options([
-                        'Sistem Informasi' => 'Sistem Informasi',
-                        'Informatika'      => 'Informatika',
-                    ])
+                    ->options(StudyProgram::options())
                     ->nullable(),
                 Forms\Components\Select::make('user_id')
                     ->label('User Account')

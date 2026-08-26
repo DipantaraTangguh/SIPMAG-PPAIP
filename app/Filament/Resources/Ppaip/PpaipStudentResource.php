@@ -6,6 +6,7 @@ use App\Filament\Resources\Ppaip\PpaipStudentResource\Pages\ListStudents;
 use App\Models\Student;
 use App\Services\DefenseAssessmentService;
 use App\Support\AccessStatus;
+use App\Support\StudyProgram;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -108,10 +109,7 @@ class PpaipStudentResource extends Resource
                     ->options(AccessStatus::options()),
                 Tables\Filters\SelectFilter::make('study_program')
                     ->label('Prodi')
-                    ->options([
-                        'Sistem Informasi' => 'Sistem Informasi',
-                        'Informatika' => 'Informatika',
-                    ]),
+                    ->options(StudyProgram::options()),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),

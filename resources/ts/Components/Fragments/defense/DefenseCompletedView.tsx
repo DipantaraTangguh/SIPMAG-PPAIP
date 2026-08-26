@@ -14,8 +14,9 @@ export default function DefenseCompletedView() {
     const perusahaan = pengajuanPembimbing?.namaPerusahaan || 'Perusahaan Magang';
     const posisi = pengajuanPembimbing?.lingkupMagang || pengajuanPembimbing?.jabatanPraktisi || 'Peserta Magang';
     const dosenPembimbing = student?.dpm?.name || 'Dosen Pembimbing';
-    const approvedLogbook = (logbookEntries || []).filter(e => e.status === 'Disetujui').length;
-    const totalRequired = 6;
+    const approvedLogbook = (logbookEntries || [])
+        .filter(e => e.status === 'Disetujui' || e.status === 'Approved')
+        .length;
 
     return (
         <div className="animate-in fade-in duration-500">
@@ -55,7 +56,7 @@ export default function DefenseCompletedView() {
                         <div className="flex flex-col gap-2 px-5 py-[20px] sm:flex-row sm:items-center sm:justify-between sm:px-[28px]">
                             <span className="text-gray-500 text-[14px] font-normal">Total Logbook</span>
                             <span className="bg-primary text-white text-[13px] font-bold rounded-full px-4 py-1.5 inline-block text-right">
-                                {approvedLogbook}/{totalRequired} Entri Disetujui
+                                {approvedLogbook} Entri Disetujui
                             </span>
                         </div>
                     </div>

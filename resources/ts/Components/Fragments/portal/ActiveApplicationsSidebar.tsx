@@ -55,7 +55,7 @@ export default function ActiveApplicationsSidebar({
                                             badgeColors.blue
                                         }`}
                                     >
-                                        {app.status}
+                                        {app.statusLabel || app.status}
                                     </span>
                                 </div>
                             </div>

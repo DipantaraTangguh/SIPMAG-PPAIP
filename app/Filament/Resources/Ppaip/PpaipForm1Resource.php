@@ -6,6 +6,7 @@ use App\Filament\Resources\Ppaip\PpaipForm1Resource\Pages\ListForm1Submissions;
 use App\Filament\Resources\Ppaip\PpaipForm1Resource\Pages\ViewForm1Submission;
 use App\Models\Student;
 use App\Support\AccessStatus;
+use App\Support\StudyProgram;
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Infolist;
@@ -178,10 +179,7 @@ class PpaipForm1Resource extends Resource
                     ]),
                 Tables\Filters\SelectFilter::make('study_program')
                     ->label('Prodi')
-                    ->options([
-                        'Sistem Informasi' => 'Sistem Informasi',
-                        'Informatika' => 'Informatika',
-                    ]),
+                    ->options(StudyProgram::options()),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
