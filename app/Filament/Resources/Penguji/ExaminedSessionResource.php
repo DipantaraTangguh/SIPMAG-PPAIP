@@ -80,6 +80,36 @@ class ExaminedSessionResource extends Resource
         return false;
     }
 
+    /**
+     * Jumlah sidang yang menunggu penilaian dari penguji yang sedang login.
+     *
+     * Syaratnya disamakan dengan policy assess(): hanya sidang berstatus
+     * Scheduled, dan hanya yang belum ia nilai. Sidang yang sudah dinilai
+     * tidak lagi menuntut tindakan, jadi tidak ikut dihitung meski tombolnya
+     * berubah jadi "Edit Nilai".
+     */
+    public static function getNavigationBadge(): ?string
+    {
+        $lecturerId = Auth::user()?->lecturer?->id;
+
+        if (! $lecturerId) {
+            return null;
+        }
+
+        $count = static::getModel()::query()
+            ->assessableBy($lecturerId)
+            ->where('status', 'Scheduled')
+            ->whereDoesntHave('assessments', fn (Builder $query) => $query->where('lecturer_id', $lecturerId))
+            ->count();
+
+        return $count > 0 ? (string) $count : null;
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return 'warning';
+    }
+
     public static function getEloquentQuery(): Builder
     {
         $lecturerId = Auth::user()?->lecturer?->id;

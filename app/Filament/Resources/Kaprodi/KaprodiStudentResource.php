@@ -49,6 +49,53 @@ class KaprodiStudentResource extends Resource
         return static::currentUser()?->role === 'kaprodi';
     }
 
+    /**
+     * Jumlah mahasiswa yang menunggu tindakan Kaprodi.
+     *
+     * Dari sebelas access status, hanya tiga yang menuntut tindakan di sini:
+     * Form 1 menunggu review, pengajuan pembimbing menunggu penunjukan DPM,
+     * dan sidang menunggu dijadwalkan. Sisanya giliran mahasiswa atau DPM,
+     * jadi tidak ikut dihitung -- badge ini menjawab "ada kerjaan untuk saya",
+     * bukan "berapa mahasiswa yang sedang berproses".
+     *
+     * Syarat tiap cabang sengaja disamakan persis dengan kondisi visible()
+     * masing-masing tombol, supaya angkanya tidak pernah menjanjikan
+     * pekerjaan yang ternyata tidak ada tombolnya.
+     */
+    public static function getNavigationBadge(): ?string
+    {
+        $prodi = static::currentUser()?->resolveStudyProgram();
+
+        if (! $prodi) {
+            return null;
+        }
+
+        $count = static::getModel()::query()
+            ->where('study_program', $prodi)
+            ->where(function (Builder $query): void {
+                $query
+                    // Setujui / Tolak Form 1
+                    ->where('access_status', 'PendingReview')
+                    // Tunjuk DPM
+                    ->orWhere(fn (Builder $sub) => $sub
+                        ->where('access_status', 'HasApplication')
+                        ->whereNull('dpm_id')
+                        ->whereHas('supervisorApplication'))
+                    // Jadwalkan Sidang
+                    ->orWhere(fn (Builder $sub) => $sub
+                        ->where('access_status', 'AwaitingDefense')
+                        ->whereHas('sidangSubmission', fn (Builder $s) => $s->where('status', 'Pending')));
+            })
+            ->count();
+
+        return $count > 0 ? (string) $count : null;
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return 'warning';
+    }
+
     public static function getEloquentQuery(): Builder
     {
         $prodi = static::currentUser()?->resolveStudyProgram();
