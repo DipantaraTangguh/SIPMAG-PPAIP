@@ -57,28 +57,26 @@ class InternshipCycleSnapshotService
     }
 
     /**
-     * Tempat & periode magang: utamakan Form 2 (jalur mandiri), fallback ke
-     * pengajuan DPM (jalur perusahaan) bila ada.
+     * Tempat & periode magang.
+     *
+     * Pengajuan pembimbing magang didahulukan karena itulah satu-satunya
+     * berkas yang menyatakan mahasiswa DITERIMA di mana -- mahasiswa
+     * mengisinya sambil mengunggah LoA. Form 2 hanya surat pengantar ke
+     * perusahaan yang dituju, jadi perusahaannya belum tentu yang akhirnya
+     * menerima; memakai Form 2 lebih dulu membuat rekap mencatat tempat yang
+     * salah untuk mahasiswa wajib yang diterima di perusahaan lain.
+     *
+     * Form 2 tetap dipakai sebagai sumber untuk magang non-wajib, yang memang
+     * tidak pernah punya pengajuan pembimbing (SupervisorController menolak
+     * mereka) dan berhenti di Form 2.
+     *
+     * Lamaran mitra sengaja tidak dilihat sama sekali: statusnya tidak pernah
+     * menyatakan diterima atau tidak, hanya minat mahasiswa.
      *
      * @return array{0:?string,1:?string,2:?string,3:mixed,4:mixed}
      */
     private function placementSnapshot(Student $student): array
     {
-        $form2 = $student->form2Submissions()
-            ->where('status', 'ApprovedForm2')
-            ->latest('submitted_at')
-            ->first();
-
-        if ($form2) {
-            return [
-                $form2->company_name,
-                $form2->alamat_perusahaan,
-                $form2->nama_pimpinan,
-                $form2->tanggal_mulai,
-                $form2->tanggal_selesai,
-            ];
-        }
-
         $supervisor = $student->supervisorApplication;
 
         if ($supervisor) {
@@ -91,20 +89,18 @@ class InternshipCycleSnapshotService
             ];
         }
 
-        // Jalur mitra PPAIP: lamaran yang diterima jadi tempat magang.
-        $accepted = $student->applications()
-            ->where('status', 'Accepted')
-            ->with('internship:id,company_name,location,start_date')
-            ->latest('updated_at')
+        $form2 = $student->form2Submissions()
+            ->where('status', 'ApprovedForm2')
+            ->latest('submitted_at')
             ->first();
 
-        if ($accepted?->internship) {
+        if ($form2) {
             return [
-                $accepted->internship->company_name,
-                $accepted->internship->location,
-                null,
-                $accepted->internship->start_date,
-                null,
+                $form2->company_name,
+                $form2->alamat_perusahaan,
+                $form2->nama_pimpinan,
+                $form2->tanggal_mulai,
+                $form2->tanggal_selesai,
             ];
         }
 

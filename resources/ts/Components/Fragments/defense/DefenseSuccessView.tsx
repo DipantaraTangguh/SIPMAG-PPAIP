@@ -2,24 +2,20 @@ import React from 'react';
 import { Clock } from 'lucide-react';
 import { useAuth } from '../../../context/AppContext';
 import {
-    useApplicationWorkflow,
     useGuidanceWorkflow,
     useLogbookWorkflow,
 } from '../../../context/StudentWorkflowContext';
 
 export default function DefenseSuccessView() {
     const { student } = useAuth();
-    const { activeApplications } = useApplicationWorkflow();
     const { pengajuanPembimbing } = useGuidanceWorkflow();
     const { logbookEntries } = useLogbookWorkflow();
 
-    // Sumber kebenaran tempat magang di tahap sidang adalah pengajuan
-    // pembimbing: itu yang diverifikasi Kaprodi saat menetapkan DPM, dan
-    // selalu ada di kedua jalur. Lamaran mitra cuma cadangan -- mahasiswa
-    // jalur Form 2 mandiri tidak punya lamaran mitra sama sekali.
-    const acceptedApp = activeApplications?.find(a => a.status === 'Accepted');
-    const companyName = pengajuanPembimbing?.namaPerusahaan || acceptedApp?.companyName || '-';
-    const position = pengajuanPembimbing?.lingkupMagang || acceptedApp?.position || '-';
+    // Satu-satunya sumber tempat magang: pengajuan pembimbing. Di situlah
+    // mahasiswa menulis perusahaan yang benar-benar menerimanya, sekalian
+    // mengunggah LoA. Lamaran mitra tidak pernah menyatakan diterima.
+    const companyName = pengajuanPembimbing?.namaPerusahaan || '-';
+    const position = pengajuanPembimbing?.lingkupMagang || '-';
     const dpmName = student?.dpm?.name || '-';
     const approvedLogbooks = (logbookEntries || [])
         .filter(e => e.status === 'Disetujui' || e.status === 'Approved')
