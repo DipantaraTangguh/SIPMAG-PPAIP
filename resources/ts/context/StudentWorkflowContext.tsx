@@ -14,6 +14,7 @@ const WorkflowNotificationsContext = createContext<any>(null);
 // Status lamaran mitra tetap dipakai mentah (bahasa Inggris) untuk logika,
 // tapi tampilannya butuh label Indonesia + warna. Kuncinya harus persis sama
 // dengan enum kolom applications.status di database.
+// Sistem cuma menghasilkan 'Applied'; sisanya untuk baris lama saja.
 const APPLICATION_STATUS_DISPLAY = {
     Applied: { label: 'Dilamar', color: 'blue' },
     Accepted: { label: 'Diterima', color: 'green' },
@@ -387,27 +388,10 @@ export function StudentWorkflowProvider({ children }) {
         if (state.activeApplications && state.activeApplications.length > 0) {
             state.activeApplications.forEach((app) => {
                 const dateStr = app.appliedAt ? new Date(app.appliedAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }) : '';
-                if (app.status === 'Accepted') {
-                    list.push({
-                        message: `Selamat! Lamaran Anda sebagai ${app.position} di ${app.companyName} telah diterima.`,
-                        time: dateStr || 'Baru saja',
-                    });
-                } else if (app.status === 'RejectedByCompany') {
-                    list.push({
-                        message: `Lamaran Anda sebagai ${app.position} di ${app.companyName} ditolak perusahaan.`,
-                        time: dateStr || 'Baru saja',
-                    });
-                } else if (app.status === 'Canceled') {
-                    list.push({
-                        message: `Lamaran Anda sebagai ${app.position} di ${app.companyName} dibatalkan.`,
-                        time: dateStr || 'Baru saja',
-                    });
-                } else {
-                    list.push({
-                        message: `Lamaran Anda sebagai ${app.position} di ${app.companyName} berhasil dikirim.`,
-                        time: dateStr || 'Baru saja',
-                    });
-                }
+                list.push({
+                    message: `Lamaran Anda sebagai ${app.position} di ${app.companyName} berhasil dikirim.`,
+                    time: dateStr || 'Baru saja',
+                });
             });
         }
 

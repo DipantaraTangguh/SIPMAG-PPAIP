@@ -23,6 +23,11 @@ class PpaipMitraApplicantResource extends Resource
     /**
      * Label Indonesia untuk enum applications.status. Statusnya sendiri tetap
      * bahasa Inggris di database; ini cuma untuk tampilan.
+     *
+     * Hanya 'Applied' yang bisa muncul dari sistem: lamaran mitra tidak
+     * menentukan mahasiswa diterima di mana -- itu ditulis mahasiswa di
+     * pengajuan pembimbing magang. Tiga label sisanya dipertahankan supaya
+     * baris lama tetap terbaca, bukan tanda ada alur yang menghasilkannya.
      */
     private const APPLICATION_STATUS_LABELS = [
         'Applied' => 'Dilamar',

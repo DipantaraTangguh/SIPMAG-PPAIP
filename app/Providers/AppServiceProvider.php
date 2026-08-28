@@ -2,9 +2,7 @@
 
 namespace App\Providers;
 
-use App\Models\Application;
 use App\Models\DefenseAssessment;
-use App\Observers\ApplicationObserver;
 use App\Observers\DefenseAssessmentObserver;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
@@ -19,7 +17,6 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        Application::observe(ApplicationObserver::class);
         DefenseAssessment::observe(DefenseAssessmentObserver::class);
 
         RateLimiter::for('login', function (Request $request): array {

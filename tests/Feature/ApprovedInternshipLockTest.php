@@ -17,7 +17,7 @@ class ApprovedInternshipLockTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_accepted_partner_application_allows_new_partner_applications(): void
+    public function test_pending_partner_application_allows_new_partner_applications(): void
     {
         Storage::fake('local');
 
@@ -27,7 +27,7 @@ class ApprovedInternshipLockTest extends TestCase
         Application::create([
             'student_id' => $student->id,
             'internship_id' => $this->internship()->id,
-            'status' => 'Accepted',
+            'status' => 'Applied',
         ]);
 
         $this->withHeader('Accept', 'application/json')->post('/api/applications', [
@@ -40,7 +40,7 @@ class ApprovedInternshipLockTest extends TestCase
         $this->assertCount(1, Storage::disk('local')->allFiles('cv'));
     }
 
-    public function test_accepted_partner_application_allows_form2_submissions(): void
+    public function test_pending_partner_application_allows_form2_submissions(): void
     {
         [$user, $student] = $this->studentUser('HasApplication');
         $this->actingAs($user);
@@ -48,7 +48,7 @@ class ApprovedInternshipLockTest extends TestCase
         Application::create([
             'student_id' => $student->id,
             'internship_id' => $this->internship()->id,
-            'status' => 'Accepted',
+            'status' => 'Applied',
         ]);
 
         $this->postJson('/api/form2', $this->validForm2Payload())
