@@ -45,10 +45,17 @@ class StudentPolicy
             && $student->access_status === 'AwaitingDefense';
     }
 
+    /**
+     * Berlaku untuk Kaprodi maupun Staff Prodi yang bertindak atas namanya.
+     * Keduanya ber-role kaprodi; bedanya hanya dari mana program studinya
+     * diambil, dan itu sudah ditangani resolveStudyProgram().
+     */
     private function sameStudyProgramKaprodi(User $user, Student $student): bool
     {
+        $studyProgram = $user->resolveStudyProgram();
+
         return $user->isKaprodi()
-            && $user->lecturer?->study_program !== null
-            && $user->lecturer->study_program === $student->study_program;
+            && $studyProgram !== null
+            && $studyProgram === $student->study_program;
     }
 }

@@ -102,12 +102,14 @@ class Form1Controller extends Controller
     {
         Gate::authorize('viewAny', Student::class);
 
-        $lecturer = $request->user()->lecturer;
-        if (! $lecturer || ! $lecturer->study_program) {
+        // Staff Prodi tidak punya baris dosen, jadi program studinya diambil
+        // lewat helper -- bukan langsung dari relasi lecturer.
+        $studyProgram = $request->user()->resolveStudyProgram();
+        if (! $studyProgram) {
             return response()->json(['message' => 'Akses ditolak.'], 403);
         }
 
-        $students = Student::where('study_program', $lecturer->study_program)
+        $students = Student::where('study_program', $studyProgram)
             ->whereIn('access_status', ['PendingReview', 'ApprovedForm1', 'RejectedForm1'])
             ->whereNotNull('form1_data')
             ->select(['id', 'nim', 'name', 'study_program', 'access_status', 'form1_data', 'form1_pdf_path', 'form1_rejection_reason', 'updated_at'])
@@ -121,7 +123,7 @@ class Form1Controller extends Controller
 
     public function approve(Request $request, int $studentId)
     {
-        $lecturer = $request->user()->lecturer;
+        $user = $request->user();
 
         $student = Student::where('id', $studentId)
             ->where('access_status', 'PendingReview')
@@ -129,9 +131,21 @@ class Form1Controller extends Controller
 
         Gate::authorize('reviewForm1', $student);
 
+        // Nama dan NIDN yang tercetak di Surat Keterangan diambil dari
+        // form1_approved_by. Untuk Staff Prodi, yang disimpan adalah dosen
+        // Kaprodi-nya, bukan staff itu sendiri -- surat tetap atas nama
+        // pejabat yang berwenang meski staff yang memprosesnya.
+        $signatory = $user->signatoryLecturer();
+
+        if (! $signatory) {
+            return response()->json([
+                'message' => 'Penandatangan surat tidak dapat ditentukan. Pastikan program studi ini punya tepat satu akun Kaprodi.',
+            ], 422);
+        }
+
         app(StudentStateMachine::class)->transition($student, 'ApprovedForm1', [
             'form1_rejection_reason' => null,
-            'form1_approved_by' => $lecturer->id,
+            'form1_approved_by' => $signatory->id,
             'form1_approved_at' => now(),
         ]);
 
@@ -145,7 +159,6 @@ class Form1Controller extends Controller
     {
         $validated = $request->validated();
 
-        $lecturer = $request->user()->lecturer;
         $student = Student::where('id', $studentId)
             ->where('access_status', 'PendingReview')
             ->firstOrFail();

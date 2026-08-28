@@ -51,7 +51,7 @@ class KaprodiStudentResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        $prodi = static::currentUser()?->lecturer?->study_program;
+        $prodi = static::currentUser()?->resolveStudyProgram();
 
         return parent::getEloquentQuery()
             ->where('study_program', $prodi)
@@ -165,10 +165,27 @@ class KaprodiStudentResource extends Resource
                     ->visible(fn (Student $record) => $record->access_status === 'PendingReview')
                     ->requiresConfirmation()
                     ->action(function (Student $record) {
-                        $lecturerId = static::currentUser()?->lecturer?->id;
+                        $user = static::currentUser();
+
+                        // Nama dan NIDN di Surat Keterangan diambil dari
+                        // form1_approved_by. Untuk Staff Prodi yang disimpan
+                        // adalah dosen Kaprodi-nya, supaya surat tetap atas
+                        // nama pejabat yang berwenang.
+                        $signatory = $user?->signatoryLecturer();
+
+                        if (! $signatory) {
+                            Notification::make()
+                                ->title('Penandatangan surat tidak dapat ditentukan')
+                                ->body('Pastikan program studi ini punya tepat satu akun Kaprodi.')
+                                ->danger()
+                                ->send();
+
+                            return;
+                        }
+
                         app(StudentStateMachine::class)->transition($record, 'ApprovedForm1', [
                             'form1_rejection_reason' => null,
-                            'form1_approved_by' => $lecturerId,
+                            'form1_approved_by' => $signatory->id,
                             'form1_approved_at' => now(),
                         ]);
                     }),
@@ -249,7 +266,7 @@ class KaprodiStudentResource extends Resource
                                 ));
                         }
 
-                        $kaprodiProdi = static::currentUser()?->lecturer?->study_program;
+                        $kaprodiProdi = static::currentUser()?->resolveStudyProgram();
 
                         $fields[] = Forms\Components\Select::make('dpm_id')
                             ->label('Pilih DPM')
@@ -298,7 +315,7 @@ class KaprodiStudentResource extends Resource
                             ->label('Dosen Penguji 1')
                             ->required()
                             ->options(function (Student $record) {
-                                $prodi = static::currentUser()?->lecturer?->study_program;
+                                $prodi = static::currentUser()?->resolveStudyProgram();
 
                                 return Lecturer::whereNotNull('user_id')
                                     ->when($prodi, fn ($q) => $q->where('study_program', $prodi))
@@ -312,7 +329,7 @@ class KaprodiStudentResource extends Resource
                             ->required()
                             ->different('dosen_penguji_1_id')
                             ->options(function (Student $record) {
-                                $prodi = static::currentUser()?->lecturer?->study_program;
+                                $prodi = static::currentUser()?->resolveStudyProgram();
 
                                 return Lecturer::whereNotNull('user_id')
                                     ->when($prodi, fn ($q) => $q->where('study_program', $prodi))
@@ -323,7 +340,7 @@ class KaprodiStudentResource extends Resource
                             ->preload(),
                     ])
                     ->action(function (Student $record, array $data) {
-                        $lecturerId = static::currentUser()?->lecturer?->id;
+                        $lecturerId = static::currentUser()?->signatoryLecturer()?->id;
 
                         $record->sidangSubmission->update([
                             'status' => 'Scheduled',
@@ -369,7 +386,7 @@ class KaprodiStudentResource extends Resource
                             ->label('Dosen Penguji 1')
                             ->required()
                             ->options(function () {
-                                $prodi = static::currentUser()?->lecturer?->study_program;
+                                $prodi = static::currentUser()?->resolveStudyProgram();
 
                                 return Lecturer::whereNotNull('user_id')
                                     ->when($prodi, fn ($q) => $q->where('study_program', $prodi))
@@ -382,7 +399,7 @@ class KaprodiStudentResource extends Resource
                             ->required()
                             ->different('dosen_penguji_1_id')
                             ->options(function () {
-                                $prodi = static::currentUser()?->lecturer?->study_program;
+                                $prodi = static::currentUser()?->resolveStudyProgram();
 
                                 return Lecturer::whereNotNull('user_id')
                                     ->when($prodi, fn ($q) => $q->where('study_program', $prodi))
@@ -392,7 +409,7 @@ class KaprodiStudentResource extends Resource
                             ->preload(),
                     ])
                     ->action(function (Collection $records, array $data) {
-                        $lecturerId = static::currentUser()?->lecturer?->id;
+                        $lecturerId = static::currentUser()?->signatoryLecturer()?->id;
 
                         $eligible = $records->filter(fn (Student $s) => $s->access_status === 'AwaitingDefense' &&
                             $s->sidangSubmission &&

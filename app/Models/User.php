@@ -20,6 +20,9 @@ class User extends Authenticatable implements FilamentUser
         'email',
         'password',
         'role',
+        // Hanya diisi untuk Staff Prodi. Kaprodi mendapat program studinya
+        // dari baris dosen miliknya, bukan dari kolom ini.
+        'study_program',
     ];
 
     protected $hidden = [
@@ -61,6 +64,62 @@ class User extends Authenticatable implements FilamentUser
     public function isDosenPenguji(): bool
     {
         return $this->role === 'dosen_penguji';
+    }
+
+    /**
+     * Staff Prodi: berperan sebagai Kaprodi, tapi bukan dosen.
+     *
+     * Dikenali dari ketiadaan baris dosen, bukan dari role tersendiri --
+     * kewenangannya memang identik dengan Kaprodi, yang berbeda hanya
+     * identitas yang tercetak di dokumen resmi.
+     */
+    public function isStaffProdi(): bool
+    {
+        return $this->isKaprodi() && $this->lecturer === null;
+    }
+
+    /**
+     * Program studi yang dipegang pengguna ini.
+     *
+     * Kaprodi dan dosen mendapatkannya dari baris dosen miliknya. Staff Prodi
+     * tidak punya baris dosen, jadi diambil dari kolom users.study_program.
+     */
+    public function resolveStudyProgram(): ?string
+    {
+        return $this->lecturer?->study_program ?? $this->study_program;
+    }
+
+    /**
+     * Dosen yang namanya sah tercetak di dokumen resmi atas tindakan ini.
+     *
+     * Kaprodi menandatangani atas namanya sendiri. Staff Prodi bertindak atas
+     * nama Kaprodi program studinya, sehingga surat tetap memuat nama dan NIDN
+     * Kaprodi meski yang menekan tombol adalah staff.
+     *
+     * Mengembalikan null bila penandatangannya tidak bisa ditentukan secara
+     * pasti -- tidak ada Kaprodi di prodi itu, atau justru ada lebih dari satu.
+     * Menebak penandatangan dokumen resmi adalah mode kegagalan yang salah,
+     * jadi pemanggilnya wajib menolak tindakan tersebut.
+     */
+    public function signatoryLecturer(): ?Lecturer
+    {
+        if ($this->lecturer) {
+            return $this->lecturer;
+        }
+
+        $studyProgram = $this->study_program;
+
+        if ($studyProgram === null) {
+            return null;
+        }
+
+        $candidates = Lecturer::query()
+            ->where('study_program', $studyProgram)
+            ->whereHas('user', fn ($query) => $query->where('role', 'kaprodi'))
+            ->take(2)
+            ->get();
+
+        return $candidates->count() === 1 ? $candidates->first() : null;
     }
 
     public function canAccessPanel(Panel $panel): bool

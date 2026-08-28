@@ -120,7 +120,8 @@ class PpaipForm1Resource extends Resource
                             ->placeholder('Tidak ada catatan')
                             ->columnSpanFull(),
                         TextEntry::make('form1Approver.lecturer_name')
-                            ->label('Disetujui Oleh')
+                            ->label('Ditandatangani Oleh')
+                            ->helperText('Nama ini yang tercetak di Surat Keterangan.')
                             ->placeholder('-'),
                         TextEntry::make('form1_approved_at')
                             ->label('Tanggal Persetujuan')
