@@ -31,7 +31,8 @@ class PpaipForm1Resource extends Resource
 
     protected static ?string $pluralModelLabel = 'Pengajuan Form 1';
 
-    protected static ?int $navigationSort = 0;
+    // Hanya pantauan -- keputusan Form 1 ada di Kaprodi, bukan di sini.
+    protected static ?int $navigationSort = 1;
 
     protected static ?string $slug = 'ppaip/form1';
 
