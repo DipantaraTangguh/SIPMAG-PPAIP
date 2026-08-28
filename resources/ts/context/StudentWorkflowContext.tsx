@@ -14,12 +14,10 @@ const WorkflowNotificationsContext = createContext<any>(null);
 // Status lamaran mitra tetap dipakai mentah (bahasa Inggris) untuk logika,
 // tapi tampilannya butuh label Indonesia + warna. Kuncinya harus persis sama
 // dengan enum kolom applications.status di database.
-// Sistem cuma menghasilkan 'Applied'; sisanya untuk baris lama saja.
+// Cuma 'Applied' yang bisa muncul: lamaran mitra tidak menentukan mahasiswa
+// diterima di mana. Status tak dikenal jatuh ke fallback, bukan error.
 const APPLICATION_STATUS_DISPLAY = {
     Applied: { label: 'Dilamar', color: 'blue' },
-    Accepted: { label: 'Diterima', color: 'green' },
-    RejectedByCompany: { label: 'Ditolak Perusahaan', color: 'red' },
-    Canceled: { label: 'Dibatalkan', color: 'amber' },
 };
 
 const EMPTY_STATE = {
