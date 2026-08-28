@@ -24,16 +24,14 @@ class PpaipMitraApplicantResource extends Resource
      * Label Indonesia untuk enum applications.status. Statusnya sendiri tetap
      * bahasa Inggris di database; ini cuma untuk tampilan.
      *
-     * Hanya 'Applied' yang bisa muncul dari sistem: lamaran mitra tidak
-     * menentukan mahasiswa diterima di mana -- itu ditulis mahasiswa di
-     * pengajuan pembimbing magang. Tiga label sisanya dipertahankan supaya
-     * baris lama tetap terbaca, bukan tanda ada alur yang menghasilkannya.
+     * Cuma 'Applied' yang didaftar karena cuma itu yang bisa muncul: lamaran
+     * mitra tidak menentukan mahasiswa diterima di mana -- itu ditulis
+     * mahasiswa di pengajuan pembimbing magang. Nilai enum lain masih ada di
+     * kolomnya, jadi tampilannya tetap menoleransi status tak dikenal
+     * (dibiarkan mentah, warna gray) alih-alih meledak.
      */
     private const APPLICATION_STATUS_LABELS = [
         'Applied' => 'Dilamar',
-        'Accepted' => 'Diterima',
-        'RejectedByCompany' => 'Ditolak Perusahaan',
-        'Canceled' => 'Dibatalkan',
     ];
 
     protected static ?string $model = Application::class;
@@ -123,8 +121,6 @@ class PpaipMitraApplicantResource extends Resource
                             ->badge()
                             ->color(fn (string $state): string => match ($state) {
                                 'Applied' => 'info',
-                                'Accepted' => 'success',
-                                'RejectedByCompany', 'Canceled' => 'danger',
                                 default => 'gray',
                             })
                             ->formatStateUsing(fn (string $state): string => self::APPLICATION_STATUS_LABELS[$state] ?? $state),
@@ -174,8 +170,6 @@ class PpaipMitraApplicantResource extends Resource
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
                         'Applied' => 'info',
-                        'Accepted' => 'success',
-                        'RejectedByCompany', 'Canceled' => 'danger',
                         default => 'gray',
                     })
                     ->formatStateUsing(fn (string $state): string => self::APPLICATION_STATUS_LABELS[$state] ?? $state),
@@ -189,9 +183,8 @@ class PpaipMitraApplicantResource extends Resource
                     ->sortable(),
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('status')
-                    ->label('Status Lamaran')
-                    ->options(self::APPLICATION_STATUS_LABELS),
+                // Tanpa filter status: cuma 'Applied' yang bisa muncul, jadi
+                // menyaringnya tidak pernah mengubah apa pun.
                 Tables\Filters\SelectFilter::make('study_program')
                     ->label('Prodi')
                     ->options(StudyProgram::options())
