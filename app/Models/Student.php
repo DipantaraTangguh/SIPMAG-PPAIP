@@ -61,6 +61,10 @@ class Student extends Model
         return $this->belongsTo(Lecturer::class, 'dpm_id');
     }
 
+    /**
+     * Dosen yang namanya tercetak di Surat Keterangan. Untuk persetujuan yang
+     * diproses Staff Prodi, ini tetap Kaprodi -- bukan staff-nya.
+     */
     public function form1Approver()
     {
         return $this->belongsTo(Lecturer::class, 'form1_approved_by');
