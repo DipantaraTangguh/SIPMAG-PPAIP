@@ -27,7 +27,7 @@ class KaprodiStudentResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-academic-cap';
 
-    protected static ?string $navigationLabel = 'Mahasiswa';
+    protected static ?string $navigationLabel = 'Semua Mahasiswa';
 
     protected static ?string $navigationGroup = 'Akademik';
 
@@ -35,7 +35,7 @@ class KaprodiStudentResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Mahasiswa';
 
-    protected static ?int $navigationSort = 1;
+    protected static ?int $navigationSort = 4;
 
     protected static ?string $slug = 'kaprodi/students';
 
@@ -50,19 +50,42 @@ class KaprodiStudentResource extends Resource
     }
 
     /**
-     * Jumlah mahasiswa yang menunggu tindakan Kaprodi.
+     * Tiga tumpukan pekerjaan Kaprodi.
      *
-     * Dari sebelas access status, hanya tiga yang menuntut tindakan di sini:
-     * Form 1 menunggu review, pengajuan pembimbing menunggu penunjukan DPM,
-     * dan sidang menunggu dijadwalkan. Sisanya giliran mahasiswa atau DPM,
-     * jadi tidak ikut dihitung -- badge ini menjawab "ada kerjaan untuk saya",
-     * bukan "berapa mahasiswa yang sedang berproses".
-     *
-     * Syarat tiap cabang sengaja disamakan persis dengan kondisi visible()
-     * masing-masing tombol, supaya angkanya tidak pernah menjanjikan
-     * pekerjaan yang ternyata tidak ada tombolnya.
+     * Dari sebelas access status, hanya tiga yang menuntut tindakan di sini;
+     * sisanya giliran mahasiswa atau DPM. Syarat masing-masing sengaja
+     * disamakan persis dengan kondisi visible() tombolnya, dan didefinisikan
+     * sekali di sini supaya halaman khususnya, badge, dan tombolnya tidak
+     * bisa berbeda tanpa ketahuan.
      */
-    public static function getNavigationBadge(): ?string
+    public static function whereNeedsForm1Review(Builder $query): Builder
+    {
+        return $query->where('access_status', 'PendingReview');
+    }
+
+    public static function whereNeedsDpm(Builder $query): Builder
+    {
+        return $query
+            ->where('access_status', 'HasApplication')
+            ->whereNull('dpm_id')
+            ->whereHas('supervisorApplication');
+    }
+
+    public static function whereNeedsDefenseSchedule(Builder $query): Builder
+    {
+        return $query
+            ->where('access_status', 'AwaitingDefense')
+            ->whereHas('sidangSubmission', fn (Builder $sub) => $sub->where('status', 'Pending'));
+    }
+
+    /**
+     * Menghitung satu tumpukan pekerjaan untuk badge di sidebar.
+     *
+     * Dipakai turunan resource ini. Halaman "Semua Mahasiswa" sendiri tidak
+     * memasang badge: angkanya akan sekadar menjumlahkan ketiga entri di
+     * atasnya, dan badge yang mengulang informasi hanya jadi bising.
+     */
+    protected static function countPile(callable $scope): ?string
     {
         $prodi = static::currentUser()?->resolveStudyProgram();
 
@@ -70,23 +93,7 @@ class KaprodiStudentResource extends Resource
             return null;
         }
 
-        $count = static::getModel()::query()
-            ->where('study_program', $prodi)
-            ->where(function (Builder $query): void {
-                $query
-                    // Setujui / Tolak Form 1
-                    ->where('access_status', 'PendingReview')
-                    // Tunjuk DPM
-                    ->orWhere(fn (Builder $sub) => $sub
-                        ->where('access_status', 'HasApplication')
-                        ->whereNull('dpm_id')
-                        ->whereHas('supervisorApplication'))
-                    // Jadwalkan Sidang
-                    ->orWhere(fn (Builder $sub) => $sub
-                        ->where('access_status', 'AwaitingDefense')
-                        ->whereHas('sidangSubmission', fn (Builder $s) => $s->where('status', 'Pending')));
-            })
-            ->count();
+        $count = $scope(static::getModel()::query()->where('study_program', $prodi))->count();
 
         return $count > 0 ? (string) $count : null;
     }

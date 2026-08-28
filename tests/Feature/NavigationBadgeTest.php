@@ -3,6 +3,9 @@
 namespace Tests\Feature;
 
 use App\Filament\Resources\Dpm\DpmLogbookResource;
+use App\Filament\Resources\Kaprodi\KaprodiDefenseScheduleResource;
+use App\Filament\Resources\Kaprodi\KaprodiDpmAssignmentResource;
+use App\Filament\Resources\Kaprodi\KaprodiForm1ReviewResource;
 use App\Filament\Resources\Kaprodi\KaprodiStudentResource;
 use App\Filament\Resources\Ppaip\PpaipForm2Resource;
 use App\Models\Form2Submission;
@@ -26,16 +29,16 @@ class NavigationBadgeTest extends TestCase
 
     private const PRODI = 'Manajemen';
 
-    public function test_kaprodi_badge_counts_only_the_three_actionable_states(): void
+    public function test_each_kaprodi_pile_counts_only_its_own_work(): void
     {
         $kaprodi = $this->kaprodi();
 
-        // Tiga yang menuntut tindakan.
+        // Satu untuk tiap tumpukan.
         $this->student('4101000001', 'PendingReview');
         $this->studentAwaitingDpm('4101000002');
         $this->studentAwaitingSchedule('4101000003');
 
-        // Yang giliran orang lain -- tidak boleh ikut terhitung.
+        // Yang giliran orang lain -- tidak boleh ikut terhitung di mana pun.
         $this->student('4101000004', 'Unverified');
         $this->student('4101000005', 'ApprovedForm1');
         $this->student('4101000006', 'HasDPM');
@@ -44,10 +47,44 @@ class NavigationBadgeTest extends TestCase
 
         $this->actingAs($kaprodi);
 
-        $this->assertSame('3', KaprodiStudentResource::getNavigationBadge());
+        $this->assertSame('1', KaprodiForm1ReviewResource::getNavigationBadge());
+        $this->assertSame('1', KaprodiDpmAssignmentResource::getNavigationBadge());
+        $this->assertSame('1', KaprodiDefenseScheduleResource::getNavigationBadge());
+
+        // Halaman "Semua Mahasiswa" sengaja tanpa badge -- angkanya hanya
+        // akan menjumlahkan ketiga entri di atasnya.
+        $this->assertNull(KaprodiStudentResource::getNavigationBadge());
     }
 
-    public function test_kaprodi_badge_ignores_other_study_programs(): void
+    public function test_each_kaprodi_pile_lists_only_its_own_rows(): void
+    {
+        $kaprodi = $this->kaprodi();
+
+        $this->student('4101000020', 'PendingReview');
+        $this->studentAwaitingDpm('4101000021');
+        $this->studentAwaitingSchedule('4101000022');
+        $this->student('4101000023', 'HasDPM');
+
+        $this->actingAs($kaprodi);
+
+        $this->assertSame(
+            ['4101000020'],
+            KaprodiForm1ReviewResource::getEloquentQuery()->pluck('nim')->all()
+        );
+        $this->assertSame(
+            ['4101000021'],
+            KaprodiDpmAssignmentResource::getEloquentQuery()->pluck('nim')->all()
+        );
+        $this->assertSame(
+            ['4101000022'],
+            KaprodiDefenseScheduleResource::getEloquentQuery()->pluck('nim')->all()
+        );
+
+        // Halaman menyeluruh tetap memuat semuanya.
+        $this->assertCount(4, KaprodiStudentResource::getEloquentQuery()->get());
+    }
+
+    public function test_kaprodi_piles_ignore_other_study_programs(): void
     {
         $kaprodi = $this->kaprodi();
 
@@ -56,7 +93,7 @@ class NavigationBadgeTest extends TestCase
 
         $this->actingAs($kaprodi);
 
-        $this->assertSame('1', KaprodiStudentResource::getNavigationBadge());
+        $this->assertSame('1', KaprodiForm1ReviewResource::getNavigationBadge());
     }
 
     public function test_kaprodi_badge_is_hidden_when_there_is_nothing_to_do(): void
@@ -66,7 +103,9 @@ class NavigationBadgeTest extends TestCase
 
         $this->actingAs($kaprodi);
 
-        $this->assertNull(KaprodiStudentResource::getNavigationBadge());
+        $this->assertNull(KaprodiForm1ReviewResource::getNavigationBadge());
+        $this->assertNull(KaprodiDpmAssignmentResource::getNavigationBadge());
+        $this->assertNull(KaprodiDefenseScheduleResource::getNavigationBadge());
     }
 
     public function test_dpm_badge_counts_students_not_pending_logbook_entries(): void
