@@ -31,7 +31,9 @@ class PpaipForm2Resource extends Resource
 
     protected static ?string $pluralModelLabel = 'Pengajuan Form 2';
 
-    protected static ?int $navigationSort = 1;
+    // Paling atas di grupnya: ini satu-satunya entri PPAIP yang menuntut
+    // keputusan. Form 1 dan Pelamar Mitra di bawahnya hanya untuk dilihat.
+    protected static ?int $navigationSort = 0;
 
     protected static ?string $slug = 'ppaip/form2';
 
