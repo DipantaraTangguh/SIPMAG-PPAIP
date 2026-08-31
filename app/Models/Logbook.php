@@ -17,6 +17,19 @@ class Logbook extends Model
         'dpm_note',
     ];
 
+    /**
+     * Nilai bawaan status juga ditulis di sini, bukan cuma sebagai default
+     * kolom di database. Mahasiswa tidak mengirim status saat membuat
+     * logbook, jadi tanpa ini instance hasil Logbook::create() pulang dengan
+     * status null -- default kolomnya baru terisi di sisi database dan tidak
+     * ikut kebaca kembali. Akibatnya respons API menyertakan status null dan
+     * badge di tabel logbook mahasiswa tampil kosong sampai halaman dimuat
+     * ulang.
+     */
+    protected $attributes = [
+        'status' => 'PendingReview',
+    ];
+
     protected function casts(): array
     {
         return [
