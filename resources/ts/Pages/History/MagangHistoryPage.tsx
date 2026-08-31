@@ -11,9 +11,6 @@ import {
     Loader2,
 } from "lucide-react";
 import DashboardLayout from "../../Components/Layouts/DashboardLayout";
-import CycleResetButton from "../../Components/Fragments/form1/CycleResetButton";
-import { useAuth } from "../../context/AppContext";
-import { canResetCycle } from "../../utils/accessUtils";
 import { api } from "../../lib/api";
 
 function formatPeriod(start, end) {
@@ -179,7 +176,6 @@ function CycleDetail({ cycle }) {
 }
 
 export default function MagangHistoryPage() {
-    const { student } = useAuth();
     const [cycles, setCycles] = useState([]);
     const [selectedId, setSelectedId] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -206,33 +202,12 @@ export default function MagangHistoryPage() {
 
     const selected = cycles.find((c) => c.id === selectedId) ?? null;
 
-    const bisaReset = canResetCycle(student?.accessStatus);
-
     return (
         <DashboardLayout pageTitle="Riwayat Magang">
             <p className="mb-6 text-sm text-primary">
                 Daftar siklus magang yang telah Anda selesaikan. Riwayat tetap
                 tersimpan walaupun siklus magang sudah direset.
             </p>
-
-            {/* Setelah dinilai, mahasiswa membuka halaman inilah yang lebih
-                dulu -- bukan menu Profil, satu-satunya tempat tombol reset
-                sebelumnya berada. Tanpa jalan masuk di sini, siklus
-                berikutnya terasa tidak bisa dimulai padahal endpoint-nya
-                sudah menerima. */}
-            {bisaReset && (
-                <div className="mb-6 rounded-xl border border-primary/20 bg-primary-pale/40 p-5">
-                    <h3 className="text-sm font-bold text-gray-900">
-                        Siklus magang Anda sudah selesai
-                    </h3>
-                    <p className="mt-1 text-[13px] leading-relaxed text-gray-600">
-                        Nilai sudah terbit dan siklus ini tercatat permanen di
-                        riwayat. Mulai siklus baru bila Anda hendak mengambil
-                        magang lagi.
-                    </p>
-                    <CycleResetButton />
-                </div>
-            )}
 
             {isLoading ? (
                 <div className="flex items-center justify-center gap-2 py-20 text-gray-400">

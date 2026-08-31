@@ -28,16 +28,6 @@ export const FORM2_LOCKED_MESSAGE =
 export const hasSecuredInternship = (accessStatus) =>
     SECURED_INTERNSHIP_STATUSES.includes(accessStatus);
 
-/**
- * Harus sama dengan InternshipCycleResetService::RESETTABLE_STATUSES.
- * Server tetap penentunya; daftar ini hanya menentukan kapan tombolnya
- * ditawarkan supaya mahasiswa tidak menekan tombol yang pasti ditolak.
- */
-const RESETTABLE_STATUSES = ['CycleCompleted', 'ElectiveCompleted'];
-
-export const canResetCycle = (accessStatus) =>
-    RESETTABLE_STATUSES.includes(accessStatus);
-
 const SIDANG_ACCESS_STATUSES = [
     'LogbookComplete',
     'AwaitingDefense',
