@@ -35,7 +35,7 @@ class LogbookIntegrityTest extends TestCase
         $this->assertSame(1, $student->logbooks()->count());
     }
 
-    public function test_logbook_date_cannot_be_before_internship_start(): void
+    public function test_logbook_date_cannot_be_in_the_future_or_outside_internship_period(): void
     {
         [$user, $student] = $this->createStudentWithPeriod(
             today()->subDays(10),
@@ -43,32 +43,16 @@ class LogbookIntegrityTest extends TestCase
         );
         $this->actingAs($user);
 
-        $this->postJson('/api/logbooks', $this->logbookPayload(today()->subDays(11)->toDateString()))
-            ->assertUnprocessable()
-            ->assertJsonValidationErrors('tanggal');
+        foreach ([
+            today()->subDays(11)->toDateString(),
+            today()->addDay()->toDateString(),
+        ] as $invalidDate) {
+            $this->postJson('/api/logbooks', $this->logbookPayload($invalidDate))
+                ->assertUnprocessable()
+                ->assertJsonValidationErrors('tanggal');
+        }
 
         $this->assertSame(0, $student->logbooks()->count());
-    }
-
-    /**
-     * TEMPORARY untuk sesi uji coba (lihat komentar di
-     * StoreLogbookRequest::internshipPeriod()): batas atas tanggal logbook
-     * sengaja tidak lagi dikunci ke hari ini, supaya peserta bisa isi
-     * logbook tanggal besok hari ini juga. Kembalikan test ini ke bentuk
-     * "cannot be in the future" bareng revert kode-nya setelah sesi selesai.
-     */
-    public function test_logbook_date_in_the_future_is_temporarily_allowed_for_testing_session(): void
-    {
-        [$user, $student] = $this->createStudentWithPeriod(
-            today()->subDays(10),
-            today()->addDays(10)
-        );
-        $this->actingAs($user);
-
-        $this->postJson('/api/logbooks', $this->logbookPayload(today()->addDay()->toDateString()))
-            ->assertCreated();
-
-        $this->assertSame(1, $student->logbooks()->count());
     }
 
     public function test_logbook_date_cannot_be_after_completed_internship_period(): void
