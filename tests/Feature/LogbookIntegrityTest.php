@@ -35,6 +35,29 @@ class LogbookIntegrityTest extends TestCase
         $this->assertSame(1, $student->logbooks()->count());
     }
 
+    /**
+     * Status bawaan harus ikut pulang di respons, bukan cuma tersimpan di
+     * database. Mahasiswa tidak mengirim status, jadi kalau modelnya tidak
+     * punya nilai bawaan sendiri, instance hasil create pulang dengan status
+     * null dan badge di tabel logbook tampil kosong sampai halaman dimuat
+     * ulang.
+     */
+    public function test_created_logbook_is_returned_with_its_pending_status(): void
+    {
+        [$user, $student] = $this->createStudentWithPeriod(
+            today()->subDays(10),
+            today()->addDays(10)
+        );
+        $this->actingAs($user);
+
+        $this->postJson('/api/logbooks', $this->logbookPayload(today()->toDateString()))
+            ->assertCreated()
+            ->assertJsonPath('logbook.status', 'PendingReview')
+            ->assertJsonPath('logbook.dpm_note', null);
+
+        $this->assertSame('PendingReview', $student->logbooks()->sole()->status);
+    }
+
     public function test_logbook_date_cannot_be_in_the_future_or_outside_internship_period(): void
     {
         [$user, $student] = $this->createStudentWithPeriod(
