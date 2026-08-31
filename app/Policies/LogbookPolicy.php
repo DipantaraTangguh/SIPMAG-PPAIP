@@ -23,12 +23,6 @@ class LogbookPolicy
         return $user->isMahasiswa();
     }
 
-    public function update(User $user, Logbook $logbook): bool
-    {
-        return $user->student?->id === $logbook->student_id
-            && in_array($logbook->status, ['PendingReview', 'Rejected'], true);
-    }
-
     public function review(User $user, Logbook $logbook): bool
     {
         return $user->isDpm()

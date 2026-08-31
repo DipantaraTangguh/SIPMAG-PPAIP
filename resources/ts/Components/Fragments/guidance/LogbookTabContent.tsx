@@ -39,11 +39,9 @@ export default function LogbookTabContent() {
         logbookEntries,
         logbookPeriod,
         addLogbookEntry,
-        updateLogbookEntry,
     } = useLogbookWorkflow();
 
     const [showAddModal, setShowAddModal] = useState(false);
-    const [editEntry, setEditEntry] = useState(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [modalError, setModalError] = useState(null);
     const [newEntry, setNewEntry] = useState({
@@ -90,40 +88,15 @@ export default function LogbookTabContent() {
         }
     };
 
-    const handleEditSave = async () => {
-        if (!editEntry.kegiatanHarian.trim() || !editEntry.hasil.trim()) return;
-        setIsSubmitting(true);
-        setModalError(null);
-        try {
-            await updateLogbookEntry(editEntry.id, {
-                kegiatanHarian: editEntry.kegiatanHarian,
-                hasil: editEntry.hasil,
-            });
-            setEditEntry(null);
-        } catch (err) {
-            setModalError(
-                err?.message || "Gagal memperbarui entri. Silakan coba lagi.",
-            );
-        } finally {
-            setIsSubmitting(false);
-        }
-    };
-
     // Helper kecil biar buka/tutup modal nggak nyebar ke JSX.
-    const isEdit = editEntry !== null;
-    const isModalOpen = showAddModal || isEdit;
-    const modalTitle = isEdit
-        ? "Perbaiki Entri Logbook"
-        : "Tambah Entri Logbook";
-    const activeData = isEdit ? editEntry : newEntry;
+    const isModalOpen = showAddModal;
+    const modalTitle = "Tambah Entri Logbook";
+    const activeData = newEntry;
     const updateActiveData = (updates) =>
-        isEdit
-            ? setEditEntry({ ...editEntry, ...updates })
-            : setNewEntry({ ...newEntry, ...updates });
-    const handleModalSave = isEdit ? handleEditSave : handleAddEntry;
+        setNewEntry({ ...newEntry, ...updates });
+    const handleModalSave = handleAddEntry;
     const closeAllModals = () => {
         setShowAddModal(false);
-        setEditEntry(null);
         setModalError(null);
     };
     const openDatePicker = () => {
@@ -281,32 +254,6 @@ export default function LogbookTabContent() {
                                         >
                                             {entry.status}
                                         </span>
-                                        {/* Entri yang ditolak percuma diberi
-                                            catatan kalau mahasiswa tidak
-                                            punya jalan memperbaikinya.
-                                            Server menerima perubahan selama
-                                            status masih PendingReview atau
-                                            Rejected, jadi tombolnya muncul
-                                            di kedua keadaan itu. */}
-                                        {(entry.status === "Ditolak" ||
-                                            entry.status ===
-                                                "Menunggu Review") && (
-                                            <button
-                                                type="button"
-                                                onClick={() =>
-                                                    setEditEntry({
-                                                        id: entry.id,
-                                                        tanggal: entry.tanggal,
-                                                        kegiatanHarian:
-                                                            entry.kegiatanHarian,
-                                                        hasil: entry.hasil,
-                                                    })
-                                                }
-                                                className="mt-2 block w-full text-[12px] font-semibold text-primary underline-offset-2 hover:underline"
-                                            >
-                                                Perbaiki
-                                            </button>
-                                        )}
                                     </td>
                                 </tr>
                             ))}
@@ -379,15 +326,8 @@ export default function LogbookTabContent() {
                                                         : ""
                                                 }
                                                 onClick={openDatePicker}
-                                                // Saat memperbaiki entri,
-                                                // tanggalnya tidak ikut
-                                                // dikirim ke server, jadi
-                                                // field-nya dikunci daripada
-                                                // terlihat bisa diubah lalu
-                                                // diam-diam diabaikan.
                                                 disabled={
-                                                    !hasSelectableLogbookDate ||
-                                                    isEdit
+                                                    !hasSelectableLogbookDate
                                                 }
                                                 onChange={(e) =>
                                                     updateActiveData({

@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Logbooks\RejectLogbookRequest;
 use App\Http\Requests\Logbooks\StoreLogbookRequest;
-use App\Http\Requests\Logbooks\UpdateLogbookRequest;
 use App\Http\Resources\LogbookResource;
 use App\Models\Logbook;
 use App\Models\Student;
@@ -62,36 +61,6 @@ class LogbookController extends Controller
             'message' => 'Logbook berhasil disimpan.',
             'logbook' => LogbookResource::make($logbook)->resolve($request),
         ], 201);
-    }
-
-    public function update(UpdateLogbookRequest $request, int $id)
-    {
-        $student = $request->user()->student;
-
-        $logbook = Logbook::where('id', $id)
-            ->whereIn('status', ['PendingReview', 'Rejected'])
-            ->firstOrFail();
-
-        Gate::authorize('update', $logbook);
-
-        $validated = $request->validated();
-
-        // Edit logbook berarti DPM perlu review ulang.
-        $validated['status'] = 'PendingReview';
-        $validated['dpm_note'] = null;
-
-        try {
-            $logbook->update($validated);
-        } catch (UniqueConstraintViolationException) {
-            throw ValidationException::withMessages([
-                'tanggal' => 'Logbook untuk tanggal ini sudah ada.',
-            ]);
-        }
-
-        return response()->json([
-            'message' => 'Logbook berhasil diperbarui.',
-            'logbook' => LogbookResource::make($logbook)->resolve($request),
-        ]);
     }
 
     public function indexForDpm(Request $request)
