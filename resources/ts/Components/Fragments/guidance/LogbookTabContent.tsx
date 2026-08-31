@@ -1,13 +1,7 @@
 import React, { useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
-import {
-    BookOpen,
-    CalendarDays,
-    GraduationCap,
-    Info,
-    X,
-} from "lucide-react";
+import { BookOpen, GraduationCap, Info, X } from "lucide-react";
 import { useLogbookWorkflow } from "../../../context/StudentWorkflowContext";
 
 const formatLogbookDate = (dateStr) => {
@@ -328,7 +322,7 @@ export default function LogbookTabContent() {
                                         >
                                             Tanggal
                                         </label>
-                                        <div className="relative">
+                                        <div>
                                             <input
                                                 ref={dateInputRef}
                                                 id="logbook-tanggal"
@@ -363,19 +357,8 @@ export default function LogbookTabContent() {
                                                     })
                                                 }
                                                 aria-required="true"
-                                                className="h-11 w-full cursor-pointer rounded-lg border border-gray-200 px-3 pr-11 outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-primary/10 disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-400"
+                                                className="h-11 w-full cursor-pointer rounded-lg border border-gray-200 px-3 outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-primary/10 disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-400"
                                             />
-                                            <button
-                                                type="button"
-                                                onClick={openDatePicker}
-                                                disabled={
-                                                    !hasSelectableLogbookDate
-                                                }
-                                                aria-label="Buka kalender logbook"
-                                                className="absolute right-2 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-md text-gray-400 transition-colors hover:bg-gray-100 hover:text-primary focus:outline-none focus:ring-2 focus:ring-primary/20 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-gray-400"
-                                            >
-                                                <CalendarDays className="h-4.5 w-4.5" />
-                                            </button>
                                         </div>
                                         {unavailableDateMessage && (
                                             <p className="mt-2 text-[12px] font-medium text-amber-600">
