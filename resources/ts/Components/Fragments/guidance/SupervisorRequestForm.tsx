@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { Lock, ArrowRight, Info, BookOpen } from 'lucide-react';
 import { useAuth } from '../../../context/AppContext';
 import FileDropInput from '../../Elements/FileDropInput';
-import LogbookGuideCard from './LogbookGuideCard';
 
 export default function SupervisorRequestForm({ onSubmit }) {
     const { student } = useAuth();
@@ -301,7 +300,6 @@ export default function SupervisorRequestForm({ onSubmit }) {
                         </p>
                     </div>
                 </div>
-                <LogbookGuideCard />
             </div>
         </div>
     );
