@@ -66,13 +66,7 @@ class StoreLogbookRequest extends FormRequest
         return [
             'start_date' => $application->mulai_magang->toDateString(),
             'end_date' => $application->selesai_magang->toDateString(),
-            // TEMPORARY untuk sesi uji coba: batas atas biasanya dikunci ke
-            // min(selesai_magang, hari ini) supaya mahasiswa tidak bisa isi
-            // logbook tanggal depan. Testing butuh isi logbook tanggal besok
-            // hari ini juga, jadi sementara batas atasnya cuma selesai_magang.
-            // Kembalikan ke `$application->selesai_magang->min(today())`
-            // setelah sesi uji coba selesai.
-            'maximum_date' => $application->selesai_magang->toDateString(),
+            'maximum_date' => $application->selesai_magang->min(today())->toDateString(),
         ];
     }
 }
