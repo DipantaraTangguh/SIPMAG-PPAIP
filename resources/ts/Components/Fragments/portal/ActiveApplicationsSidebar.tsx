@@ -1,5 +1,5 @@
 import React from 'react';
-import { ClipboardList } from 'lucide-react';
+import { BookOpen, ClipboardList } from 'lucide-react';
 
 const badgeColors = {
     blue: 'bg-blue-100 text-blue-600',
@@ -7,6 +7,31 @@ const badgeColors = {
     amber: 'bg-amber-100 text-amber-600',
     red: 'bg-red-100 text-red-600',
 };
+
+/**
+ * Langkahnya mengikuti alur yang benar-benar berlaku di sistem, bukan saran
+ * umum: melamar lewat portal tidak otomatis mencatat mahasiswa diterima --
+ * penerimaan terjadi di luar sistem, dan yang mencatatnya adalah pengajuan
+ * pembimbing magang (wajib) atau konfirmasi hasil magang (non-wajib).
+ */
+const PORTAL_STEPS = [
+    {
+        judul: 'Pilih jalurnya',
+        isi: 'Tab Mitra berisi lowongan yang sudah bekerja sama dengan PPAIP. Tab Mandiri untuk perusahaan yang Anda cari sendiri, lewat pengajuan Form 2.',
+    },
+    {
+        judul: 'Kirim lamaran',
+        isi: 'Jalur Mitra: unggah CV berformat PDF maksimal 5MB. Anda boleh melamar ke lebih dari satu lowongan sekaligus.',
+    },
+    {
+        judul: 'Tunggu kabar perusahaan',
+        isi: 'Hasil seleksi disampaikan perusahaan langsung kepada Anda, di luar portal ini. Simpan surat penerimaan (LoA) yang Anda terima.',
+    },
+    {
+        judul: 'Laporkan penerimaan',
+        isi: 'Magang wajib: isi pengajuan pembimbing di menu Bimbingan & Logbook. Magang non-wajib: konfirmasi di menu Profil. Setelah DPM ditunjuk, portal tertutup untuk lamaran baru.',
+    },
+];
 
 export default function ActiveApplicationsSidebar({
     applications = [],
@@ -63,20 +88,42 @@ export default function ActiveApplicationsSidebar({
                     </div>
                 )}
             </div>
-            <div className="rounded-xl border border-gray-200 bg-gray-50 p-5">
-                <h4 className="text-sm font-bold text-primary">
-                    Tips Mahasiswa
-                </h4>
-                <p className="mt-2 text-[13px] leading-relaxed text-gray-600">
-                    Pastikan CV dan Portofolio Anda sudah diperbarui sebelum
-                    melamar ke mitra perusahaan baru.
-                </p>
-                <button
-                    type="button"
-                    className="mt-3 text-[13px] font-bold text-primary hover:underline"
-                >
-                    Lihat Panduan CV →
-                </button>
+            <div className="rounded-xl border border-gray-200 bg-white p-5">
+                <div className="flex items-center gap-2 border-b-2 border-primary/10 pb-4">
+                    <BookOpen className="h-[18px] w-[18px] text-primary" />
+                    <h3 className="text-[15px] font-bold text-[#1A1A1A]">
+                        Panduan Portal Magang
+                    </h3>
+                </div>
+
+                <div className="mt-5 flex flex-col">
+                    {PORTAL_STEPS.map((step, idx) => (
+                        <div key={step.judul} className="flex">
+                            <div className="mr-3 flex flex-col items-center">
+                                <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-gray-200 text-xs font-bold text-gray-500">
+                                    {idx + 1}
+                                </div>
+                                {idx !== PORTAL_STEPS.length - 1 && (
+                                    <div className="my-1 w-[2px] flex-1 bg-gray-200"></div>
+                                )}
+                            </div>
+                            <div
+                                className={
+                                    idx === PORTAL_STEPS.length - 1
+                                        ? 'flex-1'
+                                        : 'flex-1 pb-5'
+                                }
+                            >
+                                <p className="text-[14px] font-bold text-[#1A1A1A]">
+                                    {step.judul}
+                                </p>
+                                <p className="mt-0.5 text-[12px] leading-relaxed text-gray-500">
+                                    {step.isi}
+                                </p>
+                            </div>
+                        </div>
+                    ))}
+                </div>
             </div>
         </div>
     );

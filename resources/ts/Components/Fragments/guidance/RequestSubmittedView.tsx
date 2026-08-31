@@ -1,6 +1,7 @@
 import React from 'react';
 import { BookOpen, Check, Info, Eye, Calendar } from 'lucide-react';
 import { api } from '../../../lib/api';
+import LogbookGuideCard from './LogbookGuideCard';
 
 export default function RequestSubmittedView({ data, studentName, studentNim }) {
     return (
@@ -186,12 +187,7 @@ export default function RequestSubmittedView({ data, studentName, studentNim }) 
                     </div>
                 </div>
 
-                <div className="mt-4 rounded-xl border border-gray-200 bg-gray-50 p-5">
-                    <h3 className="text-[14px] font-bold text-[#1A1A1A]">Tips Mahasiswa</h3>
-                    <p className="mt-2 text-[13px] text-gray-600">
-                        Pastikan CV dan Portofolio Anda sudah diperbarui sebelum melamar ke mitra perusahaan baru.
-                    </p>
-                </div>
+                <LogbookGuideCard />
             </div>
         </div>
     );
