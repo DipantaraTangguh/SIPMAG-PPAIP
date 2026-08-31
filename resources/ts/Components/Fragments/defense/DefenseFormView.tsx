@@ -1,135 +1,7 @@
-import React, { useState, useRef } from 'react';
-import {
-    Check,
-    FileText,
-    Image as ImageIcon,
-    ImagePlus,
-    FileCheck,
-    ArrowRight,
-    AlertCircle,
-    Loader2,
-} from 'lucide-react';
+import React, { useState } from 'react';
+import { Check, ArrowRight, AlertCircle, Loader2 } from 'lucide-react';
 import { useDefenseWorkflow } from '../../../context/StudentWorkflowContext';
-
-// Komponen upload kecil, sengaja lokal ke form sidang.
-function UploadField({ label, hint, icon: Icon, fieldKey, files, setFiles, fileErrors, setFileErrors, dragOver, setDragOver, inputRefs, maxSizeMB }) {
-    const file = files[fieldKey];
-    
-    const onClick = () => {
-        if (inputRefs[fieldKey]?.current) {
-            inputRefs[fieldKey].current.click();
-        }
-    };
-
-    const handleFile = (selectedFile) => {
-        if (!selectedFile) return;
-        
-        let error = null;
-        if (selectedFile.type !== 'application/pdf') {
-            error = "Format tidak didukung. Gunakan file PDF.";
-        } else if (selectedFile.size > maxSizeMB * 1024 * 1024) {
-            error = "Ukuran file melebihi batas maksimal yang diizinkan.";
-        }
-
-        if (error) {
-            setFileErrors(prev => ({ ...prev, [fieldKey]: error }));
-            setFiles(prev => ({ ...prev, [fieldKey]: null }));
-        } else {
-            setFileErrors(prev => ({ ...prev, [fieldKey]: null }));
-            setFiles(prev => ({ ...prev, [fieldKey]: selectedFile }));
-        }
-    };
-
-    const formatFileSize = (bytes) => {
-        if (bytes < 1024 * 1024) {
-            return `${(bytes / 1024).toFixed(0)} KB`;
-        }
-        return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-    };
-
-    return (
-        <div>
-            <label className="text-[13px] font-semibold text-gray-700 mb-2 block">
-                {label}
-            </label>
-            <div
-                role="button"
-                tabIndex={0}
-                aria-label={`${label}. ${hint}`}
-                aria-invalid={!!fileErrors[fieldKey]}
-                aria-describedby={fileErrors[fieldKey] ? `error-${fieldKey}` : undefined}
-                onKeyDown={(e) => {
-                    if (e.key === ' ' || e.key === 'Enter') {
-                        e.preventDefault();
-                        onClick();
-                    }
-                }}
-                onDragOver={(e) => {
-                    e.preventDefault();
-                    setDragOver(fieldKey);
-                }}
-                onDragLeave={() => setDragOver(null)}
-                onDrop={(e) => {
-                    e.preventDefault();
-                    setDragOver(null);
-                    const droppedFile = e.dataTransfer.files[0];
-                    handleFile(droppedFile);
-                }}
-                onClick={onClick}
-                className={`border-2 rounded-xl p-5 text-center cursor-pointer transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary/20 sm:p-8 ${
-                    dragOver === fieldKey 
-                    ? 'border-primary bg-primary-pale/50' 
-                    : file
-                        ? 'border-solid border-green-500 bg-green-50/50'
-                        : 'border-dashed border-gray-300 bg-white hover:border-primary hover:bg-primary-pale/30'
-                }`}
-            >
-                {file ? (
-                    <div className="flex flex-col items-center">
-                        <FileCheck className="text-green-500 w-8 h-8" />
-                        <p className="font-bold text-[14px] text-[#1A1A1A] mt-2 max-w-[300px] truncate">
-                            {file.name}
-                        </p>
-                        <p className="text-gray-400 text-[12px] mt-0.5">
-                            {formatFileSize(file.size)}
-                        </p>
-                        <p className="text-primary text-[12px] font-medium underline mt-1.5">
-                            Ganti File
-                        </p>
-                    </div>
-                ) : (
-                    <div className="flex flex-col items-center">
-                        <Icon className="text-primary w-8 h-8" />
-                        <p className="font-bold text-[14px] text-[#1A1A1A] mt-3">
-                            Klik untuk unggah atau drag & drop
-                        </p>
-                        <p className="text-gray-400 text-[12px] mt-1">
-                            {hint}
-                        </p>
-                    </div>
-                )}
-            </div>
-            {fileErrors[fieldKey] && (
-                <p id={`error-${fieldKey}`} className="text-red-500 text-[12px] mt-2 flex items-center gap-1.5 font-medium" role="alert">
-                    <AlertCircle size={14} />
-                    {fileErrors[fieldKey]}
-                </p>
-            )}
-            <input 
-                type="file" 
-                ref={inputRefs[fieldKey]} 
-                className="hidden" 
-                accept=".pdf"
-                onChange={(e) => {
-                    const selected = e.target.files[0];
-                    handleFile(selected);
-                    // Reset value supaya file yang sama bisa dipilih ulang.
-                    e.target.value = '';
-                }}
-            />
-        </div>
-    );
-}
+import FileDropInput from '../../Elements/FileDropInput';
 
 // View utama buat upload berkas sidang.
 export default function DefenseFormView() {
@@ -147,18 +19,9 @@ export default function DefenseFormView() {
         check2: false
     });
 
-    const [fileErrors, setFileErrors] = useState({});
-    const [dragOver, setDragOver] = useState(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitError, setSubmitError] = useState(null);
 
-    const inputRefs = {
-        laporanAkhir: useRef(null),
-        posterPresentasi: useRef(null),
-        fotoKegiatan1: useRef(null),
-        fotoKegiatan2: useRef(null)
-    };
-    
     const isFormValid = 
         Object.values(files).every(f => f !== null) &&
         checks.check1 && 
@@ -195,49 +58,41 @@ export default function DefenseFormView() {
                     </h2>
 
                     <div className="flex flex-col gap-6">
-                        <UploadField
+                        <FileDropInput
                             label="Laporan Magang Akhir (PDF)"
-                            hint="Ukuran maksimal 10MB (Format .pdf)"
-                            icon={FileText}
-                            fieldKey="laporanAkhir"
+                            hint="PDF (maks. 10MB)"
+                            accept=".pdf"
+                            allowedTypes={['application/pdf']}
                             maxSizeMB={10}
-                            files={files} setFiles={setFiles}
-                            fileErrors={fileErrors} setFileErrors={setFileErrors}
-                            dragOver={dragOver} setDragOver={setDragOver}
-                            inputRefs={inputRefs}
+                            value={files.laporanAkhir}
+                            onChange={(file) => setFiles((prev) => ({ ...prev, laporanAkhir: file }))}
                         />
-                        <UploadField
+                        <FileDropInput
                             label="Poster Presentasi (PDF)"
-                            hint="Rasio 3:4, Maksimal 5MB (Format .pdf)"
-                            icon={ImageIcon}
-                            fieldKey="posterPresentasi"
+                            hint="PDF rasio 3:4 (maks. 5MB)"
+                            accept=".pdf"
+                            allowedTypes={['application/pdf']}
                             maxSizeMB={5}
-                            files={files} setFiles={setFiles}
-                            fileErrors={fileErrors} setFileErrors={setFileErrors}
-                            dragOver={dragOver} setDragOver={setDragOver}
-                            inputRefs={inputRefs}
+                            value={files.posterPresentasi}
+                            onChange={(file) => setFiles((prev) => ({ ...prev, posterPresentasi: file }))}
                         />
-                        <UploadField
+                        <FileDropInput
                             label="Foto Kegiatan Magang 1 (PDF)"
-                            hint="Rasio 3:4, Maksimal 5MB (Format .pdf)"
-                            icon={ImagePlus}
-                            fieldKey="fotoKegiatan1"
+                            hint="PDF rasio 3:4 (maks. 5MB)"
+                            accept=".pdf"
+                            allowedTypes={['application/pdf']}
                             maxSizeMB={5}
-                            files={files} setFiles={setFiles}
-                            fileErrors={fileErrors} setFileErrors={setFileErrors}
-                            dragOver={dragOver} setDragOver={setDragOver}
-                            inputRefs={inputRefs}
+                            value={files.fotoKegiatan1}
+                            onChange={(file) => setFiles((prev) => ({ ...prev, fotoKegiatan1: file }))}
                         />
-                        <UploadField
+                        <FileDropInput
                             label="Foto Kegiatan Magang 2 (PDF)"
-                            hint="Rasio 3:4, Maksimal 5MB (Format .pdf)"
-                            icon={ImagePlus}
-                            fieldKey="fotoKegiatan2"
+                            hint="PDF rasio 3:4 (maks. 5MB)"
+                            accept=".pdf"
+                            allowedTypes={['application/pdf']}
                             maxSizeMB={5}
-                            files={files} setFiles={setFiles}
-                            fileErrors={fileErrors} setFileErrors={setFileErrors}
-                            dragOver={dragOver} setDragOver={setDragOver}
-                            inputRefs={inputRefs}
+                            value={files.fotoKegiatan2}
+                            onChange={(file) => setFiles((prev) => ({ ...prev, fotoKegiatan2: file }))}
                         />
                     </div>
 

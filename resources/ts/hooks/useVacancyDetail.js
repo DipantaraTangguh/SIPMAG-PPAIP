@@ -31,18 +31,9 @@ export default function useVacancyDetail(vacancy) {
     // Gabung state session dan context supaya UI tetap konsisten.
     const isApplied = justApplied || alreadyApplied;
 
+    // Tipe dan ukuran diperiksa FileDropInput; cvError di sini khusus untuk
+    // galat yang datang dari server saat melamar.
     const handleFileChange = useCallback((file) => {
-        if (!file) return;
-
-        if (file.type !== 'application/pdf') {
-            setCvError('Hanya file PDF yang diizinkan.');
-            return;
-        }
-        if (file.size > 5 * 1024 * 1024) {
-            setCvError('Ukuran file melebihi 5MB.');
-            return;
-        }
-
         setCvFile(file);
         setCvError(null);
     }, []);

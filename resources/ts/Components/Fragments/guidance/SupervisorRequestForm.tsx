@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Lock, CloudUpload, ArrowRight, Info, BookOpen, FileSearch, X } from 'lucide-react';
+import { Lock, ArrowRight, Info, BookOpen } from 'lucide-react';
 import { useAuth } from '../../../context/AppContext';
+import FileDropInput from '../../Elements/FileDropInput';
 
 export default function SupervisorRequestForm({ onSubmit }) {
     const { student } = useAuth();
@@ -19,8 +20,6 @@ export default function SupervisorRequestForm({ onSubmit }) {
         loaFile: null
     });
 
-    const [fileError, setFileError] = useState(null);
-    const [isDragging, setIsDragging] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const isFormValid =
@@ -33,39 +32,6 @@ export default function SupervisorRequestForm({ onSubmit }) {
         formData.mulaiMagang !== '' &&
         formData.selesaiMagang !== '' &&
         formData.loaFile !== null;
-
-    const handleFileChange = (file) => {
-        if (!file) return;
-        const allowed = ['application/pdf', 'image/jpeg', 'image/png'];
-        if (!allowed.includes(file.type)) {
-            setFileError('Format tidak didukung. Gunakan PDF, JPG, atau PNG.');
-            return;
-        }
-        if (file.size > 5 * 1024 * 1024) {
-            setFileError('Ukuran file melebihi 5MB.');
-            return;
-        }
-        setFormData((prev) => ({ ...prev, loaFile: file }));
-        setFileError(null);
-    };
-
-    const handleDrop = (e) => {
-        e.preventDefault();
-        setIsDragging(false);
-        if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-            handleFileChange(e.dataTransfer.files[0]);
-        }
-    };
-
-    const handleDragOver = (e) => {
-        e.preventDefault();
-        setIsDragging(true);
-    };
-
-    const handleDragLeave = (e) => {
-        e.preventDefault();
-        setIsDragging(false);
-    };
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -246,61 +212,15 @@ export default function SupervisorRequestForm({ onSubmit }) {
                                 />
                             </div>
                         </div>
-                        <div>
-                            <label className="mb-1.5 block text-[11px] font-medium uppercase tracking-wider text-gray-400">
-                                UPLOAD LOA (LETTER OF ACCEPTANCE)
-                            </label>
-                            {!formData.loaFile ? (
-                                <div>
-                                    <label
-                                        onDrop={handleDrop}
-                                        onDragOver={handleDragOver}
-                                        onDragLeave={handleDragLeave}
-                                        aria-invalid={!!fileError}
-                                        aria-describedby={fileError ? 'loaFile-error' : undefined}
-                                        className={`flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed p-6 text-center transition-colors focus-within:ring-2 focus-within:ring-primary/20 sm:p-8 ${
-                                            isDragging ? 'border-primary bg-primary-pale' : 'border-gray-300 bg-white hover:border-primary hover:bg-primary-pale'
-                                        }`}
-                                    >
-                                        <CloudUpload className="h-9 w-9 text-primary" />
-                                        <p className="mt-3 text-[14px] font-bold text-[#1A1A1A]">
-                                            Klik untuk unggah atau drag and drop
-                                        </p>
-                                        <p className="mt-1 text-[12px] text-gray-400">
-                                            PDF, JPG, atau PNG (Maks. 5MB)
-                                        </p>
-                                        <input
-                                            type="file"
-                                            className="sr-only"
-                                            accept=".pdf,.jpg,.jpeg,.png"
-                                            onChange={(e) => handleFileChange(e.target.files[0])}
-                                        />
-                                    </label>
-                                    {fileError && <p id="loaFile-error" role="alert" className="mt-2 text-xs text-red-500">{fileError}</p>}
-                                </div>
-                            ) : (
-                                <div className="flex items-center justify-between rounded-xl border border-primary bg-primary-pale p-4">
-                                    <div className="flex items-center gap-3">
-                                        <FileSearch className="h-6 w-6 text-primary" />
-                                        <div>
-                                            <p className="text-[13px] font-bold text-[#1A1A1A] line-clamp-1 break-all">
-                                                {formData.loaFile.name}
-                                            </p>
-                                            <p className="text-[11px] text-gray-500">
-                                                {(formData.loaFile.size / 1024 / 1024).toFixed(2)} MB
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <button
-                                        type="button"
-                                        onClick={() => setFormData((prev) => ({ ...prev, loaFile: null }))}
-                                        className="rounded-full p-1.5 text-gray-400 hover:bg-white hover:text-gray-600"
-                                    >
-                                        <X className="h-4 w-4" />
-                                    </button>
-                                </div>
-                            )}
-                        </div>
+                        <FileDropInput
+                            label="Upload LoA (Letter of Acceptance)"
+                            hint="PDF, JPG, atau PNG (maks. 5MB)"
+                            accept=".pdf,.jpg,.jpeg,.png"
+                            allowedTypes={['application/pdf', 'image/jpeg', 'image/png']}
+                            maxSizeMB={5}
+                            value={formData.loaFile}
+                            onChange={(file) => setFormData((prev) => ({ ...prev, loaFile: file }))}
+                        />
                     </div>
                 </div>
                 <div className="mt-6 flex justify-stretch sm:justify-end">
