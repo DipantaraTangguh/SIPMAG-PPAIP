@@ -248,13 +248,18 @@ export default function LogbookTabContent() {
                                             {getLogbookDayName(entry.tanggal)}
                                         </p>
                                     </td>
-                                    <td className="relative px-5 py-4 align-top">
+                                    <td className="px-5 py-4 align-top">
                                         <p className="max-w-full truncate text-[14px] font-bold text-[#1A1A1A]">
                                             {entry.kegiatanHarian}
                                         </p>
-                                        <p className="mt-0.5 line-clamp-2 text-[12px] text-gray-500">
-                                            {entry.kegiatanDetail}
-                                        </p>
+                                        {entry.dpmNote && (
+                                            <p className="mt-2 rounded-lg border border-red-100 bg-red-50 px-3 py-2 text-[12px] leading-relaxed text-red-600">
+                                                <span className="font-bold">
+                                                    Catatan DPM:
+                                                </span>{" "}
+                                                {entry.dpmNote}
+                                            </p>
+                                        )}
                                     </td>
                                     <td className="px-5 py-4 align-top">
                                         <p
@@ -276,6 +281,32 @@ export default function LogbookTabContent() {
                                         >
                                             {entry.status}
                                         </span>
+                                        {/* Entri yang ditolak percuma diberi
+                                            catatan kalau mahasiswa tidak
+                                            punya jalan memperbaikinya.
+                                            Server menerima perubahan selama
+                                            status masih PendingReview atau
+                                            Rejected, jadi tombolnya muncul
+                                            di kedua keadaan itu. */}
+                                        {(entry.status === "Ditolak" ||
+                                            entry.status ===
+                                                "Menunggu Review") && (
+                                            <button
+                                                type="button"
+                                                onClick={() =>
+                                                    setEditEntry({
+                                                        id: entry.id,
+                                                        tanggal: entry.tanggal,
+                                                        kegiatanHarian:
+                                                            entry.kegiatanHarian,
+                                                        hasil: entry.hasil,
+                                                    })
+                                                }
+                                                className="mt-2 block w-full text-[12px] font-semibold text-primary underline-offset-2 hover:underline"
+                                            >
+                                                Perbaiki
+                                            </button>
+                                        )}
                                     </td>
                                 </tr>
                             ))}
@@ -348,8 +379,15 @@ export default function LogbookTabContent() {
                                                         : ""
                                                 }
                                                 onClick={openDatePicker}
+                                                // Saat memperbaiki entri,
+                                                // tanggalnya tidak ikut
+                                                // dikirim ke server, jadi
+                                                // field-nya dikunci daripada
+                                                // terlihat bisa diubah lalu
+                                                // diam-diam diabaikan.
                                                 disabled={
-                                                    !hasSelectableLogbookDate
+                                                    !hasSelectableLogbookDate ||
+                                                    isEdit
                                                 }
                                                 onChange={(e) =>
                                                     updateActiveData({
