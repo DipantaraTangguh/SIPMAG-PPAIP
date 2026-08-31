@@ -1,7 +1,6 @@
 import React from 'react';
 import { BookOpen, Check, Info, Eye, Calendar } from 'lucide-react';
 import { api } from '../../../lib/api';
-import LogbookGuideCard from './LogbookGuideCard';
 
 export default function RequestSubmittedView({ data, studentName, studentNim }) {
     return (
@@ -186,8 +185,6 @@ export default function RequestSubmittedView({ data, studentName, studentNim }) 
                         </p>
                     </div>
                 </div>
-
-                <LogbookGuideCard />
             </div>
         </div>
     );
