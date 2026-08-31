@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Lock, ArrowRight, Info, BookOpen } from 'lucide-react';
 import { useAuth } from '../../../context/AppContext';
 import FileDropInput from '../../Elements/FileDropInput';
+import LogbookGuideCard from './LogbookGuideCard';
 
 export default function SupervisorRequestForm({ onSubmit }) {
     const { student } = useAuth();
@@ -300,12 +301,7 @@ export default function SupervisorRequestForm({ onSubmit }) {
                         </p>
                     </div>
                 </div>
-                <div className="mt-4 rounded-xl border border-gray-200 bg-gray-50 p-5">
-                    <h3 className="text-[14px] font-bold text-[#1A1A1A]">Tips Mahasiswa</h3>
-                    <p className="mt-2 text-[13px] text-gray-600">
-                        Pastikan CV dan Portofolio Anda sudah diperbarui sebelum melamar ke mitra perusahaan baru.
-                    </p>
-                </div>
+                <LogbookGuideCard />
             </div>
         </div>
     );
