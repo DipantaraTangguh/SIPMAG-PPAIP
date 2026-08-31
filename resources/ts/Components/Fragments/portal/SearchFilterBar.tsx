@@ -134,13 +134,6 @@ export default function SearchFilterBar({
                                     onChange={(v) => onFilterChange('location', v)}
                                 />
                             </div>
-                            <button
-                                type="button"
-                                onClick={() => setPanelOpen(false)}
-                                className="mt-4 w-full rounded-lg bg-primary py-2 text-[13px] font-bold text-white transition-colors hover:bg-primary-hover"
-                            >
-                                Terapkan
-                            </button>
                         </div>
                     )}
                 </div>
