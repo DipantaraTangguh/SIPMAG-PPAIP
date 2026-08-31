@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { BadgeCheck, Upload, Loader2, XCircle } from "lucide-react";
+import { BadgeCheck, Loader2, XCircle } from "lucide-react";
 import { useForm1Workflow } from "../../../context/StudentWorkflowContext";
+import FileDropInput from "../../Elements/FileDropInput";
 
 /**
  * Panel state AwaitingConfirmation (magang non-wajib jalur Form 2), dipakai juga
@@ -151,33 +152,16 @@ export default function Form1KonfirmasiPanel({ allowDecline = true }) {
                         />
                     </div>
                 </div>
-                <div>
-                    <label
-                        htmlFor="konfirmasi-loa"
-                        className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-black"
-                    >
-                        Bukti Diterima / LoA (PDF atau gambar, maks 5MB)
-                    </label>
-                    <label
-                        htmlFor="konfirmasi-loa"
-                        className={`flex cursor-pointer items-center gap-3 rounded-lg border border-dashed px-4 py-3 text-sm transition-colors ${
-                            loaFile
-                                ? "border-green-400 bg-green-50 text-green-700"
-                                : "border-gray-300 text-gray-500 hover:border-primary hover:text-primary"
-                        }`}
-                    >
-                        <Upload className="h-4 w-4 shrink-0" />
-                        {loaFile ? loaFile.name : "Pilih file LoA…"}
-                    </label>
-                    <input
-                        id="konfirmasi-loa"
-                        type="file"
-                        accept=".pdf,.jpg,.jpeg,.png"
-                        onChange={(e) => setLoaFile(e.target.files?.[0] ?? null)}
-                        className="sr-only"
-                        disabled={isSubmitting}
-                    />
-                </div>
+                <FileDropInput
+                    label="Bukti Diterima / LoA"
+                    hint="PDF, JPG, atau PNG (maks. 5MB)"
+                    accept=".pdf,.jpg,.jpeg,.png"
+                    allowedTypes={["application/pdf", "image/jpeg", "image/png"]}
+                    maxSizeMB={5}
+                    value={loaFile}
+                    onChange={setLoaFile}
+                    disabled={isSubmitting}
+                />
 
                 <button
                     type="button"

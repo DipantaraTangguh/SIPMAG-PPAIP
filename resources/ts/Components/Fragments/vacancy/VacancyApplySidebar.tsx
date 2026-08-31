@@ -1,19 +1,16 @@
-import React, { useRef, useState } from 'react';
+import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import {
     Clock,
-    CloudUpload,
     MapPin,
-    X,
-    FileText,
     Info,
     CheckCircle,
     Loader2,
     Check,
-    CheckSquare,
 } from 'lucide-react';
 import { useForm1Workflow } from '../../../context/StudentWorkflowContext';
+import FileDropInput from '../../Elements/FileDropInput';
 
 export default function VacancyApplySidebar({
     vacancy,
@@ -31,7 +28,6 @@ export default function VacancyApplySidebar({
     onApply,
 }) {
     const navigate = useNavigate();
-    const fileInputRef = useRef(null);
     const [showConfirmModal, setShowConfirmModal] = useState(false);
     const { form1Submission } = useForm1Workflow();
 
@@ -41,19 +37,6 @@ export default function VacancyApplySidebar({
         form1Submission?.jenisMagang === 'non_wajib'
             ? 'Profil'
             : 'Bimbingan & Logbook';
-
-    const handleDropzoneClick = () => fileInputRef.current?.click();
-
-    const handleInputChange = (e) => {
-        const file = e.target.files?.[0];
-        if (file) onFileChange(file);
-    };
-
-    const formatSize = (bytes) => {
-        if (bytes < 1024) return `${bytes} B`;
-        if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`;
-        return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-    };
 
     return (
         <div className="self-start xl:sticky xl:top-6">
@@ -97,64 +80,16 @@ export default function VacancyApplySidebar({
                         Unggah CV &amp; Portfolio
                     </p>
 
-                    <input
-                        ref={fileInputRef}
-                        type="file"
+                    <FileDropInput
+                        hint="PDF (maks. 5MB)"
                         accept=".pdf"
-                        className="hidden"
-                        onChange={handleInputChange}
+                        allowedTypes={['application/pdf']}
+                        maxSizeMB={5}
+                        value={cvFile}
+                        onChange={(file) => (file ? onFileChange(file) : onRemoveFile())}
+                        error={cvError}
                     />
 
-                    {!cvFile ? (
-                        <button
-                            type="button"
-                            onClick={handleDropzoneClick}
-                            aria-label="Unggah CV & Portfolio. PDF, Maksimal 5MB"
-                            aria-invalid={!!cvError}
-                            aria-describedby={cvError ? "cv-error-msg" : undefined}
-                            className="flex w-full flex-col items-center rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 px-4 py-6 text-center transition-colors hover:border-primary/50 hover:bg-primary-pale focus:outline-none focus:ring-2 focus:ring-primary/20"
-                        >
-                            <CloudUpload className="h-8 w-8 text-gray-300" />
-                            <span className="mt-2 text-[13px] text-gray-500">
-                                Klik untuk unggah CV
-                            </span>
-                            <span className="mt-0.5 text-[11px] italic text-gray-400">
-                                PDF
-                            </span>
-                            <span className="text-[11px] italic text-gray-400">
-                                Maksimal 5MB
-                            </span>
-                        </button>
-                    ) : (
-                        <div className="flex items-center justify-between rounded-xl border border-primary bg-primary-pale px-3 py-3">
-                            <div className="flex items-center gap-2 overflow-hidden">
-                                <FileText className="h-4 w-4 flex-shrink-0 text-primary" />
-                                <div className="min-w-0">
-                                    <p className="truncate text-xs font-bold text-gray-900">
-                                        {cvFile.name}
-                                    </p>
-                                    <p className="text-[10px] text-gray-500">
-                                        {formatSize(cvFile.size)}
-                                    </p>
-                                </div>
-                            </div>
-                            {!isApplied && (
-                                <button
-                                    type="button"
-                                    onClick={onRemoveFile}
-                                    className="flex-shrink-0 rounded p-0.5 text-gray-400 hover:text-red-500"
-                                >
-                                    <X className="h-4 w-4" />
-                                </button>
-                            )}
-                        </div>
-                    )}
-
-                    {cvError && (
-                        <p id="cv-error-msg" className="mt-1.5 text-xs text-red-500" role="alert">
-                            {cvError}
-                        </p>
-                    )}
                 </div>
                 )}
                 <div className="mt-4">
