@@ -26,7 +26,7 @@ class StoreLogbookRequest extends FormRequest
         ];
     }
 
-    protected function dateRules(Student $student, ?int $ignoreId = null, bool $required = true): array
+    protected function dateRules(Student $student): array
     {
         $period = $this->internshipPeriod($student);
 
@@ -37,15 +37,19 @@ class StoreLogbookRequest extends FormRequest
         }
 
         return [
-            $required ? 'required' : 'sometimes',
+            'required',
             'date',
             'after_or_equal:'.$period['start_date'],
             'before_or_equal:'.$period['maximum_date'],
-            function (string $attribute, mixed $value, Closure $fail) use ($student, $ignoreId): void {
+            function (string $attribute, mixed $value, Closure $fail) use ($student): void {
+                // Entri yang ditolak tidak menghalangi tanggalnya dipakai
+                // lagi: mahasiswa memperbaiki dengan mengirim entri baru,
+                // bukan menyunting yang lama. Yang dijaga tinggal satu --
+                // tidak boleh ada dua entri hidup untuk tanggal yang sama.
                 $duplicateExists = Logbook::query()
                     ->where('student_id', $student->id)
                     ->whereDate('tanggal', $value)
-                    ->when($ignoreId, fn ($query) => $query->whereKeyNot($ignoreId))
+                    ->where('status', '!=', 'Rejected')
                     ->exists();
 
                 if ($duplicateExists) {

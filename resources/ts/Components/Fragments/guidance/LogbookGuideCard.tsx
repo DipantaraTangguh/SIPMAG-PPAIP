@@ -20,7 +20,7 @@ const LOGBOOK_RULES = [
     },
     {
         judul: 'DPM meninjau tiap akhir pekan',
-        isi: 'Entri bisa disetujui atau ditolak disertai catatan. Entri yang ditolak dapat diperbaiki lewat tombol Perbaiki, lalu kembali menunggu review.',
+        isi: 'Entri bisa disetujui atau ditolak disertai catatan. Entri yang ditolak tidak disunting -- kirim entri baru untuk tanggal yang sama sesuai catatan DPM.',
     },
     {
         judul: 'Enam entri disetujui',

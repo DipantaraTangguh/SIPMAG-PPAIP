@@ -48,7 +48,6 @@ Route::middleware('auth:sanctum')->group(function () {
         // Logbook mingguan mahasiswa.
         Route::get('/logbooks', [LogbookController::class, 'index']);
         Route::post('/logbooks', [LogbookController::class, 'store']);
-        Route::put('/logbooks/{id}', [LogbookController::class, 'update']);
 
         // Sidang baru kebuka setelah logbook beres.
         Route::get('/defense', [DefenseController::class, 'show']);

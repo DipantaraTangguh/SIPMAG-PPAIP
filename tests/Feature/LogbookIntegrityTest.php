@@ -96,35 +96,52 @@ class LogbookIntegrityTest extends TestCase
         $this->assertSame(0, $student->logbooks()->count());
     }
 
-    public function test_logbook_update_cannot_reuse_another_entry_date(): void
+    /**
+     * Entri yang ditolak tidak disunting; mahasiswa mengirim entri baru untuk
+     * tanggal yang sama. Yang tetap dijaga hanya satu: tidak boleh ada dua
+     * entri hidup pada tanggal yang sama.
+     */
+    public function test_rejected_entry_frees_its_date_for_a_new_entry(): void
     {
         [$user, $student] = $this->createStudentWithPeriod(
             today()->subDays(10),
             today()
         );
-        $first = $this->createLogbook(
-            $student,
-            today()->subDays(2)->toDateString(),
-            'PendingReview'
+        $this->actingAs($user);
+
+        $tanggal = today()->subDay()->toDateString();
+        $this->createLogbook($student, $tanggal, 'Rejected');
+
+        $this->postJson('/api/logbooks', $this->logbookPayload($tanggal))
+            ->assertCreated();
+
+        $this->assertSame(2, $student->logbooks()->count());
+        $this->assertSame(
+            1,
+            $student->logbooks()->where('status', 'PendingReview')->count()
         );
-        $second = $this->createLogbook(
-            $student,
-            today()->subDay()->toDateString(),
-            'Rejected'
+    }
+
+    public function test_a_date_still_allows_only_one_live_entry(): void
+    {
+        [$user, $student] = $this->createStudentWithPeriod(
+            today()->subDays(10),
+            today()
         );
         $this->actingAs($user);
 
-        $this->putJson(
-            "/api/logbooks/{$second->id}",
-            $this->logbookPayload($first->tanggal->toDateString())
-        )
-            ->assertUnprocessable()
-            ->assertJsonValidationErrors('tanggal');
+        $tanggal = today()->subDay()->toDateString();
 
-        $this->assertSame(
-            today()->subDay()->toDateString(),
-            $second->fresh()->tanggal->toDateString()
-        );
+        foreach (['PendingReview', 'Approved'] as $statusHidup) {
+            $student->logbooks()->forceDelete();
+            $this->createLogbook($student, $tanggal, $statusHidup);
+
+            $this->postJson('/api/logbooks', $this->logbookPayload($tanggal))
+                ->assertUnprocessable()
+                ->assertJsonValidationErrors('tanggal');
+
+            $this->assertSame(1, $student->logbooks()->count());
+        }
     }
 
     public function test_approved_count_is_derived_from_logbook_records(): void

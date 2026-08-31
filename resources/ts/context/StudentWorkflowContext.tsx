@@ -315,27 +315,6 @@ export function StudentWorkflowProvider({ children }) {
         }));
     }, []);
 
-    const updateLogbookEntry = useCallback(async (entryId, updates) => {
-        const data = await api.put(`/logbooks/${entryId}`, {
-            tanggal: updates.tanggal,
-            kegiatan_harian: updates.kegiatanHarian,
-            hasil: updates.hasil,
-        });
-
-        setState((s) => ({
-            ...s,
-            logbookEntries: s.logbookEntries.map(e =>
-                e.id === entryId ? {
-                    ...e,
-                    tanggal: data.logbook.tanggal,
-                    kegiatanHarian: data.logbook.kegiatan_harian,
-                    hasil: data.logbook.hasil,
-                    status: 'Menunggu Review',
-                    dpmNote: null,
-                } : e
-            ),
-        }));
-    }, []);
     const submitSidang = useCallback(async (files) => {
         const fd = new FormData();
         // Frontend pakai camelCase, backend minta field Laravel-style.
@@ -503,12 +482,10 @@ export function StudentWorkflowProvider({ children }) {
         logbookEntries: state.logbookEntries,
         logbookPeriod: state.logbookPeriod,
         addLogbookEntry,
-        updateLogbookEntry,
     }), [
         state.logbookEntries,
         state.logbookPeriod,
         addLogbookEntry,
-        updateLogbookEntry,
     ]);
 
     const defenseValue = useMemo(() => ({
