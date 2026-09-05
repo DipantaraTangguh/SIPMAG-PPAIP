@@ -36,7 +36,7 @@ class AdminPanelProvider extends PanelProvider
             ->brandLogo(fn (): string => Auth::check()
                 ? asset('assets/images/logo-ubakrie-putih.png')
                 : asset('assets/images/logo-ubakrie.png'))
-            ->brandLogoHeight('1.75rem')
+            ->brandLogoHeight('2.5rem')
             ->login()
             ->colors([
                 'primary' => Color::hex('#682828'),
