@@ -125,4 +125,80 @@ class KaprodiBulkScheduleSidangTest extends TestCase
             ->test(ListDefenseSchedule::class)
             ->assertTableBulkActionExists('scheduleSidangBulk');
     }
+
+    /**
+     * DPM mahasiswa tidak boleh sekaligus jadi pengujinya. Penjadwalan massal
+     * memakai penguji yang sama untuk semua mahasiswa terpilih, jadi tanpa
+     * penjagaan ini sebagian di antaranya bisa kebagian DPM-nya sendiri --
+     * dan DefenseAssessmentService hanya akan mengenali dosen itu sebagai DPM,
+     * sehingga nilai penguji tidak pernah terisi dan mahasiswanya tertahan di
+     * AwaitingDefense tanpa jalan keluar.
+     */
+    public function test_bulk_scheduling_skips_students_whose_own_dpm_is_an_examiner(): void
+    {
+        $kaprodiUser = User::factory()->create(['role' => 'kaprodi']);
+        Lecturer::create([
+            'user_id' => $kaprodiUser->id,
+            'nidn' => '2222222220',
+            'lecturer_name' => 'Kaprodi SI',
+            'contact' => $kaprodiUser->email,
+            'study_program' => 'Sistem Informasi',
+        ]);
+
+        $penguji1 = Lecturer::create([
+            'user_id' => User::factory()->create(['role' => 'dosen_penguji'])->id,
+            'nidn' => '2222222221',
+            'lecturer_name' => 'Penguji Satu',
+            'contact' => 'p1@example.test',
+            'study_program' => 'Sistem Informasi',
+        ]);
+        $penguji2 = Lecturer::create([
+            'user_id' => User::factory()->create(['role' => 'dosen_penguji'])->id,
+            'nidn' => '2222222222',
+            'lecturer_name' => 'Penguji Dua',
+            'contact' => 'p2@example.test',
+            'study_program' => 'Sistem Informasi',
+        ]);
+
+        // Mahasiswa kedua dibimbing oleh dosen yang dipilih jadi Penguji 1.
+        $aman = $this->siapSidang('BENTROK1', null);
+        $bentrok = $this->siapSidang('BENTROK2', $penguji1->id);
+
+        Livewire::actingAs($kaprodiUser)
+            ->test(ListDefenseSchedule::class)
+            ->callTableBulkAction('scheduleSidangBulk', collect([$aman, $bentrok]), [
+                'scheduled_date' => '2027-02-20',
+                'scheduled_time' => '10:00',
+                'room' => 'Ruang B',
+                'dosen_penguji_1_id' => $penguji1->id,
+                'dosen_penguji_2_id' => $penguji2->id,
+            ]);
+
+        $this->assertSame('Scheduled', $aman->sidangSubmission->refresh()->status);
+
+        // Yang bentrok tetap menunggu jadwal, bukan dijadwalkan lalu terjebak.
+        $this->assertSame('Pending', $bentrok->sidangSubmission->refresh()->status);
+        $this->assertNull($bentrok->sidangSubmission->dosen_penguji_1_id);
+    }
+
+    private function siapSidang(string $nim, ?int $dpmId): Student
+    {
+        $student = Student::create([
+            'user_id' => User::factory()->create(['role' => 'mahasiswa'])->id,
+            'nim' => $nim,
+            'name' => 'Mahasiswa '.$nim,
+            'study_program' => 'Sistem Informasi',
+            'email' => strtolower($nim).'@example.test',
+        ]);
+        $student->forceFill(['access_status' => 'AwaitingDefense', 'dpm_id' => $dpmId])->save();
+
+        DefenseSubmission::create([
+            'student_id' => $student->id,
+            'status' => 'Pending',
+            'laporan_path' => 'test/laporan.pdf',
+            'poster_path' => 'test/poster.pdf',
+        ]);
+
+        return $student;
+    }
 }

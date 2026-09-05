@@ -113,6 +113,36 @@ class KaprodiStudentResource extends Resource
             ->withCount(['logbooks as approved_logbook_count' => fn ($query) => $query->where('status', 'Approved')]);
     }
 
+    /**
+     * Alasan penolakan, dipakai aksi per-mahasiswa maupun aksi massal supaya
+     * bunyinya sama di kedua tempat.
+     */
+    protected const OWN_DPM_EXAMINER_REASON = 'dosen pengujinya adalah DPM mahasiswa itu sendiri';
+
+    /**
+     * DPM mahasiswa tidak boleh sekaligus jadi pengujinya.
+     *
+     * Bukan sekadar aturan administratif: DefenseAssessmentService mengenali
+     * peran seorang dosen lewat match yang mencocokkan DPM lebih dulu,
+     * sehingga dosen rangkap hanya akan pernah mengisi nilai sebagai DPM.
+     * Nilai penguji tidak akan pernah terisi, finalScore tetap null, dan
+     * mahasiswa tertahan di AwaitingDefense tanpa jalan keluar -- tombol
+     * penjadwalan sudah hilang begitu berkasnya berstatus Scheduled.
+     *
+     * @param  array<string, mixed>  $data
+     */
+    protected static function ownDpmIsAmongExaminers(Student $student, array $data): bool
+    {
+        if ($student->dpm_id === null) {
+            return false;
+        }
+
+        return in_array($student->dpm_id, [
+            $data['dosen_penguji_1_id'] ?? null,
+            $data['dosen_penguji_2_id'] ?? null,
+        ]);
+    }
+
     public static function form(Form $form): Form
     {
         return $form->schema([
@@ -394,6 +424,20 @@ class KaprodiStudentResource extends Resource
                             ->preload(),
                     ])
                     ->action(function (Student $record, array $data) {
+                        // Daftar pilihannya sudah mengecualikan DPM mahasiswa
+                        // ini, tapi tetap diperiksa lagi di sini karena data
+                        // form bisa datang dari permintaan yang dirakit
+                        // sendiri, bukan hanya dari dropdown.
+                        if (static::ownDpmIsAmongExaminers($record, $data)) {
+                            Notification::make()
+                                ->title('Dosen penguji tidak boleh DPM mahasiswa itu sendiri')
+                                ->body(static::OWN_DPM_EXAMINER_REASON)
+                                ->danger()
+                                ->send();
+
+                            return;
+                        }
+
                         $lecturerId = static::currentUser()?->signatoryLecturer()?->id;
 
                         $record->sidangSubmission->update([
@@ -452,7 +496,7 @@ class KaprodiStudentResource extends Resource
                         ->required()
                         ->options(function () {
                             $prodi = static::currentUser()?->resolveStudyProgram();
-    
+
                             return Lecturer::whereNotNull('user_id')
                                 ->when($prodi, fn ($q) => $q->where('study_program', $prodi))
                                 ->pluck('lecturer_name', 'id');
@@ -465,7 +509,7 @@ class KaprodiStudentResource extends Resource
                         ->different('dosen_penguji_1_id')
                         ->options(function () {
                             $prodi = static::currentUser()?->resolveStudyProgram();
-    
+
                             return Lecturer::whereNotNull('user_id')
                                 ->when($prodi, fn ($q) => $q->where('study_program', $prodi))
                                 ->pluck('lecturer_name', 'id');
@@ -475,12 +519,18 @@ class KaprodiStudentResource extends Resource
                 ])
                 ->action(function (Collection $records, array $data) {
                     $lecturerId = static::currentUser()?->signatoryLecturer()?->id;
-    
-                    $eligible = $records->filter(fn (Student $s) => $s->access_status === 'AwaitingDefense' &&
+
+                    $siap = $records->filter(fn (Student $s) => $s->access_status === 'AwaitingDefense' &&
                         $s->sidangSubmission &&
                         $s->sidangSubmission->status === 'Pending'
                     );
-    
+
+                    // Penguji yang sama untuk semua mahasiswa terpilih berarti
+                    // sebagian di antaranya bisa kebagian DPM-nya sendiri.
+                    // Mereka dilewati, bukan dijadwalkan lalu terjebak.
+                    $bentrok = $siap->filter(fn (Student $s) => static::ownDpmIsAmongExaminers($s, $data));
+                    $eligible = $siap->reject(fn (Student $s) => static::ownDpmIsAmongExaminers($s, $data));
+
                     foreach ($eligible as $student) {
                         $student->sidangSubmission->update([
                             'status' => 'Scheduled',
@@ -493,13 +543,17 @@ class KaprodiStudentResource extends Resource
                             'scheduled_at' => now(),
                         ]);
                     }
-    
-                    $skipped = $records->count() - $eligible->count();
+
+                    $belumSiap = $records->count() - $siap->count();
                     $body = "{$eligible->count()} sidang berhasil dijadwalkan.";
-                    if ($skipped > 0) {
-                        $body .= " {$skipped} mahasiswa dilewati (belum siap sidang).";
+                    if ($belumSiap > 0) {
+                        $body .= " {$belumSiap} mahasiswa dilewati (belum siap sidang).";
                     }
-    
+                    if ($bentrok->isNotEmpty()) {
+                        $nama = $bentrok->pluck('name')->implode(', ');
+                        $body .= " {$bentrok->count()} mahasiswa dilewati karena ".static::OWN_DPM_EXAMINER_REASON." ({$nama}).";
+                    }
+
                     Notification::make()
                         ->title('Jadwal sidang serentak diterapkan')
                         ->body($body)
