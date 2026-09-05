@@ -49,6 +49,34 @@
         box-shadow: none !important;
     }
 
+    /* ── Logo selebar sidebar ────────────────────────────────────────────
+       brandLogoHeight hanya mengatur tinggi, jadi lebarnya diatur di sini dan
+       tingginya dibiarkan mengikuti rasio gambar. Kepala sidebar bawaannya
+       terkunci 64px; dilepas jadi otomatis supaya logo tidak terpotong. */
+    .fi-sidebar-header {
+        position: relative;
+        height: auto !important;
+        padding: 1rem !important;
+    }
+
+    .fi-sidebar-header > div:first-child {
+        flex: 1 1 auto;
+        min-width: 0;
+    }
+
+    .fi-sidebar-header img {
+        width: 100% !important;
+        height: auto !important;
+    }
+
+    /* Tombol menciutkan dipindah ke pojok supaya tidak memakan lebar logo.
+       Sudut kanan atas gambar memang bidang kosong. */
+    .fi-sidebar-header .fi-icon-btn {
+        position: absolute;
+        top: 0.375rem;
+        right: 0.375rem;
+    }
+
     /* Nama grup: cukup terbaca, tetap satu tingkat di bawah item navigasinya. */
     .fi-sidebar-group-label {
         color: rgb(255 255 255 / 0.6) !important;
