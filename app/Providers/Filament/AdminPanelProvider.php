@@ -10,13 +10,16 @@ use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
+use Filament\View\PanelsRenderHook;
 use Filament\Widgets;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use Illuminate\View\View;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -27,13 +30,22 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->brandName('SIPMAG')
-            ->brandLogo(asset('assets/images/logo-ubakrie.png'))
+            // Logo mengikuti latar tempatnya dirender: versi putih di sidebar
+            // yang maroon, versi asli di halaman login yang berlatar terang --
+            // di sana wordmark putih tidak akan terlihat sama sekali.
+            ->brandLogo(fn (): string => Auth::check()
+                ? asset('assets/images/logo-ubakrie-putih.png')
+                : asset('assets/images/logo-ubakrie.png'))
             ->brandLogoHeight('1.75rem')
             ->login()
             ->colors([
                 'primary' => Color::hex('#682828'),
             ])
             ->font('Plus Jakarta Sans')
+            // Satu tampilan saja. Panel ini memakai warna institusi, dan mode
+            // gelap membuat maroon-nya berkompromi dengan latar abu Filament.
+            ->darkMode(false)
+            ->renderHook(PanelsRenderHook::HEAD_END, fn (): View => view('filament.brand-theme'))
             // Sidebar bisa diciutkan supaya tabel yang lebar -- daftar mahasiswa
             // punya sampai sepuluh kolom -- dapat ruang tanpa perlu menggeser
             // ke samping.
