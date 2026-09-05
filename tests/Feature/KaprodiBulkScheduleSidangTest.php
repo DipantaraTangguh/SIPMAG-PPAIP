@@ -2,6 +2,9 @@
 
 namespace Tests\Feature;
 
+use App\Filament\Resources\Kaprodi\KaprodiDefenseScheduleResource\Pages\ListDefenseSchedule;
+use App\Filament\Resources\Kaprodi\KaprodiDpmAssignmentResource\Pages\ListDpmAssignment;
+use App\Filament\Resources\Kaprodi\KaprodiForm1ReviewResource\Pages\ListForm1Review;
 use App\Filament\Resources\Kaprodi\KaprodiStudentResource\Pages\ListStudents;
 use App\Models\DefenseSubmission;
 use App\Models\Lecturer;
@@ -69,9 +72,15 @@ class KaprodiBulkScheduleSidangTest extends TestCase
             'email' => 'bulk3@example.test',
         ]);
 
+        // Mahasiswa yang belum siap tidak akan pernah muncul di halaman ini,
+        // jadi tidak mungkin ikut terpilih sejak awal.
         Livewire::actingAs($kaprodiUser)
-            ->test(ListStudents::class)
-            ->callTableBulkAction('scheduleSidangBulk', $students->push($notReady), [
+            ->test(ListDefenseSchedule::class)
+            ->assertCanNotSeeTableRecords([$notReady]);
+
+        Livewire::actingAs($kaprodiUser)
+            ->test(ListDefenseSchedule::class)
+            ->callTableBulkAction('scheduleSidangBulk', $students, [
                 'scheduled_date' => '2027-01-15',
                 'scheduled_time' => '09:00',
                 'room' => 'Ruang Sidang A',
@@ -79,7 +88,7 @@ class KaprodiBulkScheduleSidangTest extends TestCase
                 'dosen_penguji_2_id' => $penguji2->id,
             ]);
 
-        foreach ($students->take(2) as $student) {
+        foreach ($students as $student) {
             $student->sidangSubmission->refresh();
             $this->assertSame('Scheduled', $student->sidangSubmission->status);
             $this->assertSame('Ruang Sidang A', $student->sidangSubmission->room);
@@ -88,5 +97,32 @@ class KaprodiBulkScheduleSidangTest extends TestCase
         }
 
         $this->assertNull($notReady->fresh()->sidangSubmission);
+    }
+
+    /**
+     * Penjadwalan serentak hanya milik tumpukan Jadwal Sidang. Tumpukan lain
+     * tidak pernah memuat baris yang siap dijadwalkan, jadi tombolnya di sana
+     * hanya akan melaporkan semua barisnya dilewati.
+     */
+    public function test_bulk_scheduling_is_absent_from_the_other_kaprodi_piles(): void
+    {
+        $kaprodiUser = User::factory()->create(['role' => 'kaprodi']);
+        Lecturer::create([
+            'user_id' => $kaprodiUser->id,
+            'nidn' => '1111111113',
+            'lecturer_name' => 'Kaprodi SI',
+            'contact' => $kaprodiUser->email,
+            'study_program' => 'Sistem Informasi',
+        ]);
+
+        foreach ([ListForm1Review::class, ListDpmAssignment::class, ListStudents::class] as $page) {
+            Livewire::actingAs($kaprodiUser)
+                ->test($page)
+                ->assertTableBulkActionDoesNotExist('scheduleSidangBulk');
+        }
+
+        Livewire::actingAs($kaprodiUser)
+            ->test(ListDefenseSchedule::class)
+            ->assertTableBulkActionExists('scheduleSidangBulk');
     }
 }
