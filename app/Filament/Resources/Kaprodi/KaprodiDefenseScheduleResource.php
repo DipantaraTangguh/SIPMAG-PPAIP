@@ -32,6 +32,17 @@ class KaprodiDefenseScheduleResource extends KaprodiStudentResource
         return static::whereNeedsDefenseSchedule(parent::getEloquentQuery());
     }
 
+    /**
+     * Satu-satunya halaman yang memuat penjadwalan serentak: seluruh barisnya
+     * memang menunggu dijadwalkan, jadi "pilih semua" langsung bermakna.
+     *
+     * @return array<int, \Filament\Tables\Actions\BulkAction>
+     */
+    protected static function pileBulkActions(): array
+    {
+        return [static::scheduleSidangBulkAction()];
+    }
+
     public static function getNavigationBadge(): ?string
     {
         return static::countPile(static::whereNeedsDefenseSchedule(...));
