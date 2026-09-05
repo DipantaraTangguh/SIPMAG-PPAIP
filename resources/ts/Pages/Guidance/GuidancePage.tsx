@@ -5,18 +5,14 @@ import { useAuth } from '../../context/AppContext';
 import { useForm1Workflow } from '../../context/StudentWorkflowContext';
 import GuidanceLockedState from '../../Components/Fragments/guidance/GuidanceLockedState';
 import GuidanceFullPage from '../../Components/Fragments/guidance/GuidanceFullPage';
+import { canAccessGuidance } from '../../utils/accessUtils';
 
 export default function GuidancePage() {
     const { student } = useAuth();
     const { form1Submission } = useForm1Workflow();
     const accessStatus = student?.accessStatus;
 
-    const hasAccess =
-        accessStatus === 'HasApplication' ||
-        accessStatus === 'HasDPM' ||
-        accessStatus === 'LogbookComplete' ||
-        accessStatus === 'AwaitingDefense' ||
-        accessStatus === 'CycleCompleted';
+    const hasAccess = canAccessGuidance(accessStatus);
 
     // Magang non-wajib berhenti di Form 2 / lamaran mitra: tidak ada tahap
     // DPM, logbook, maupun sidang.

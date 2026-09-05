@@ -44,12 +44,4 @@ final class DefenseDocument
 
         return $attribute ? $submission->{$attribute} : null;
     }
-
-    public static function resolvedPath(DefenseSubmission $submission, string $document): ?string
-    {
-        return StoredFilePath::resolve(
-            storage_path('app/private'),
-            self::storedPath($submission, $document),
-        );
-    }
 }

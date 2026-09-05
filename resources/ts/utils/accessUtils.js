@@ -28,6 +28,22 @@ export const FORM2_LOCKED_MESSAGE =
 export const hasSecuredInternship = (accessStatus) =>
     SECURED_INTERNSHIP_STATUSES.includes(accessStatus);
 
+/**
+ * Tahap bimbingan terbuka sejak mahasiswa mengajukan pembimbing sampai
+ * siklusnya ditutup. Didefinisikan di sini, bukan ditulis tangan di halaman,
+ * supaya tidak melenceng dari daftar status lain saat alurnya berubah.
+ */
+const GUIDANCE_ACCESS_STATUSES = [
+    'HasApplication',
+    'HasDPM',
+    'LogbookComplete',
+    'AwaitingDefense',
+    'CycleCompleted',
+];
+
+export const canAccessGuidance = (accessStatus) =>
+    GUIDANCE_ACCESS_STATUSES.includes(accessStatus);
+
 const SIDANG_ACCESS_STATUSES = [
     'LogbookComplete',
     'AwaitingDefense',
