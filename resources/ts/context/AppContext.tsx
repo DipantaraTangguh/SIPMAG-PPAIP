@@ -75,8 +75,6 @@ export function AuthProvider({ children }) {
         logout,
         refreshProfile,
         updateStudentLocally,
-        user: auth.student ? { ...auth.student, role: auth.userRole } : null,
-        isAuthenticated: auth.isLoggedIn,
     }), [auth, login, logout, refreshProfile, updateStudentLocally]);
 
     return (
