@@ -48,7 +48,7 @@ class PpaipMitraApplicantResource extends Resource
 
     protected static ?int $navigationSort = 2;
 
-    protected static ?string $slug = 'ppaip/mitra-applicants';
+    protected static ?string $slug = 'ppaip/partner-applicants';
 
     public static function canAccess(): bool
     {
@@ -203,7 +203,7 @@ class PpaipMitraApplicantResource extends Resource
                     ->label('Unduh CV')
                     ->icon('heroicon-o-arrow-down-tray')
                     ->visible(fn (Application $record): bool => ! empty($record->cv_file_path))
-                    ->url(fn (Application $record): string => route('mitra-applications.cv.download', $record)),
+                    ->url(fn (Application $record): string => route('partner-applications.cv.download', $record)),
             ])
             ->bulkActions([])
             ->defaultSort('created_at', 'desc');
@@ -224,8 +224,8 @@ class PpaipMitraApplicantResource extends Resource
         }
 
         $filename = e(basename($record->cv_file_path));
-        $previewUrl = e(route('mitra-applications.cv.preview', $record));
-        $downloadUrl = e(route('mitra-applications.cv.download', $record));
+        $previewUrl = e(route('partner-applications.cv.preview', $record));
+        $downloadUrl = e(route('partner-applications.cv.download', $record));
 
         return new HtmlString(
             '<div class="flex flex-wrap items-center gap-3">'.

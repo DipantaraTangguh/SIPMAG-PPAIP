@@ -24,7 +24,7 @@ class KaprodiDpmAssignmentResource extends KaprodiStudentResource
 
     protected static ?int $navigationSort = 2;
 
-    protected static ?string $slug = 'kaprodi/tunjuk-dpm';
+    protected static ?string $slug = 'kaprodi/dpm-assignment';
 
     public static function getEloquentQuery(): Builder
     {

@@ -117,7 +117,7 @@ class InternshipCyclesExport implements FromQuery, ShouldAutoSize, WithColumnFor
             return '-';
         }
 
-        $url = route('rekap-magang.loa.download', $cycle);
+        $url = route('internship-cycles.loa.download', $cycle);
 
         return '=HYPERLINK("'.$this->escapeFormulaString($url).'","'.$this->escapeFormulaString(basename($cycle->loa_path)).'")';
     }

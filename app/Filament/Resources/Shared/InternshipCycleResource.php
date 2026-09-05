@@ -40,7 +40,7 @@ class InternshipCycleResource extends Resource
 
     protected static ?int $navigationSort = 1;
 
-    protected static ?string $slug = 'rekap-magang';
+    protected static ?string $slug = 'internship-cycles';
 
     private static function currentUser(): ?User
     {
@@ -121,9 +121,9 @@ class InternshipCycleResource extends Resource
                         ->placeholder('Belum diunggah')
                         ->formatStateUsing(fn (?string $state, InternshipCycle $record): HtmlString => new HtmlString(
                             $state
-                                ? '<a href="'.e(route('rekap-magang.loa.preview', $record)).'" target="_blank" rel="noopener" class="text-primary-600 underline">Pratinjau</a>'
+                                ? '<a href="'.e(route('internship-cycles.loa.preview', $record)).'" target="_blank" rel="noopener" class="text-primary-600 underline">Pratinjau</a>'
                                     .' &middot; '
-                                    .'<a href="'.e(route('rekap-magang.loa.download', $record)).'" class="text-primary-600 underline">Unduh</a>'
+                                    .'<a href="'.e(route('internship-cycles.loa.download', $record)).'" class="text-primary-600 underline">Unduh</a>'
                                 : '<span class="text-gray-400">Belum diunggah</span>'
                         ))
                         ->columnSpanFull(),

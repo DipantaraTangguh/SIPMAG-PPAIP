@@ -30,7 +30,7 @@ export default function Form1ApprovedPanel({
             const filename = studentNim
                 ? `Surat_Keterangan_Form1_${studentNim}.pdf`
                 : pdfFileName;
-            await api.download('/form1/surat-keterangan', filename);
+            await api.download('/form1/certificate', filename);
         } catch (err) {
             console.error('[Form1] Download error:', err);
             setDownloadError(err.message || 'Gagal mengunduh dokumen.');

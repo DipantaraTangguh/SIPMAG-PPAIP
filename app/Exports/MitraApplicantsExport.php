@@ -98,7 +98,7 @@ class MitraApplicantsExport implements FromQuery, ShouldAutoSize, WithColumnForm
             return '-';
         }
 
-        $url = route('mitra-applications.cv.download', $application);
+        $url = route('partner-applications.cv.download', $application);
         $filename = basename($application->cv_file_path);
 
         return '=HYPERLINK("'.$this->escapeFormulaString($url).'","'.$this->escapeFormulaString($filename).'")';
