@@ -26,11 +26,18 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('admin')
-            ->brandName('Admin Panel')
+            ->brandName('SIPMAG')
+            ->brandLogo(asset('assets/images/logo-ubakrie.png'))
+            ->brandLogoHeight('1.75rem')
             ->login()
             ->colors([
                 'primary' => Color::hex('#682828'),
             ])
+            ->font('Plus Jakarta Sans')
+            // Sidebar bisa diciutkan supaya tabel yang lebar -- daftar mahasiswa
+            // punya sampai sepuluh kolom -- dapat ruang tanpa perlu menggeser
+            // ke samping.
+            ->sidebarCollapsibleOnDesktop()
             ->favicon(asset('assets/images/favicon.ico'))
             // Resource Filament dipisah per role, jadi subfolder ikut discan.
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
