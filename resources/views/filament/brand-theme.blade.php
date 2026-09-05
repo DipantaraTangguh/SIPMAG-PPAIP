@@ -65,7 +65,7 @@
     }
 
     .fi-sidebar-header img {
-        width: 70% !important;
+        width: 58% !important;
         height: auto !important;
         margin-inline: auto;
     }
