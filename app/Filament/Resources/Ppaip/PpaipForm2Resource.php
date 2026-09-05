@@ -56,14 +56,22 @@ class PpaipForm2Resource extends Resource
      * Jumlah pengajuan yang menunggu keputusan PPAIP.
      *
      * Sengaja memakai syarat yang sama persis dengan tombol Setujui/Tolak
-     * (status PendingReview) supaya angka di sidebar selalu sama dengan
-     * jumlah baris yang benar-benar bisa ditindak. null menyembunyikan
-     * badge saat tidak ada pekerjaan, jadi angka nol tidak ikut memenuhi
-     * layar.
+     * (status PendingReview) supaya angkanya selalu sama dengan jumlah baris
+     * yang benar-benar bisa ditindak. Dipakai badge sidebar maupun widget
+     * dashboard, lewat satu jalur ini, supaya keduanya tidak bisa berbeda.
+     */
+    public static function pendingCount(): int
+    {
+        return static::getModel()::where('status', 'PendingReview')->count();
+    }
+
+    /**
+     * null menyembunyikan badge saat tidak ada pekerjaan, jadi angka nol
+     * tidak ikut memenuhi layar.
      */
     public static function getNavigationBadge(): ?string
     {
-        $count = static::getModel()::where('status', 'PendingReview')->count();
+        $count = static::pendingCount();
 
         return $count > 0 ? (string) $count : null;
     }

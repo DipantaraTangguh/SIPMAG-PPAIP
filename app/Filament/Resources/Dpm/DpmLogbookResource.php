@@ -29,25 +29,32 @@ class DpmLogbookResource extends Resource
     {
         return Auth::user()?->role === 'dpm';
     }
+
     /**
      * Jumlah mahasiswa bimbingan yang punya logbook menunggu review.
      *
      * Yang dihitung mahasiswa, bukan entri logbook, supaya angkanya sama
      * dengan jumlah baris yang muncul di tabel -- satu mahasiswa dengan
-     * lima logbook tertunda tetap satu pekerjaan untuk dibuka.
+     * lima logbook tertunda tetap satu pekerjaan untuk dibuka. Dipakai badge
+     * sidebar maupun widget dashboard lewat satu jalur ini.
      */
-    public static function getNavigationBadge(): ?string
+    public static function pendingCount(): int
     {
         $lecturerId = Auth::user()?->lecturer?->id;
 
         if (! $lecturerId) {
-            return null;
+            return 0;
         }
 
-        $count = static::getModel()::query()
+        return static::getModel()::query()
             ->where('dpm_id', $lecturerId)
             ->whereHas('logbooks', fn (Builder $query) => $query->where('status', 'PendingReview'))
             ->count();
+    }
+
+    public static function getNavigationBadge(): ?string
+    {
+        $count = static::pendingCount();
 
         return $count > 0 ? (string) $count : null;
     }

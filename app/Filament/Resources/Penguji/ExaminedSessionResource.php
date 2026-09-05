@@ -88,19 +88,24 @@ class ExaminedSessionResource extends Resource
      * tidak lagi menuntut tindakan, jadi tidak ikut dihitung meski tombolnya
      * berubah jadi "Edit Nilai".
      */
-    public static function getNavigationBadge(): ?string
+    public static function pendingCount(): int
     {
         $lecturerId = Auth::user()?->lecturer?->id;
 
         if (! $lecturerId) {
-            return null;
+            return 0;
         }
 
-        $count = static::getModel()::query()
+        return static::getModel()::query()
             ->assessableBy($lecturerId)
             ->where('status', 'Scheduled')
             ->whereDoesntHave('assessments', fn (Builder $query) => $query->where('lecturer_id', $lecturerId))
             ->count();
+    }
+
+    public static function getNavigationBadge(): ?string
+    {
+        $count = static::pendingCount();
 
         return $count > 0 ? (string) $count : null;
     }

@@ -87,15 +87,25 @@ class KaprodiStudentResource extends Resource
      */
     protected static function countPile(callable $scope): ?string
     {
+        $count = static::pileCount($scope);
+
+        return $count > 0 ? (string) $count : null;
+    }
+
+    /**
+     * Jumlah mentah satu tumpukan, dipakai badge sidebar maupun widget
+     * dashboard. Keduanya lewat sini supaya angkanya tidak mungkin berbeda.
+     * Nol untuk pengguna tanpa program studi.
+     */
+    public static function pileCount(callable $scope): int
+    {
         $prodi = static::currentUser()?->resolveStudyProgram();
 
         if (! $prodi) {
-            return null;
+            return 0;
         }
 
-        $count = $scope(static::getModel()::query()->where('study_program', $prodi))->count();
-
-        return $count > 0 ? (string) $count : null;
+        return $scope(static::getModel()::query()->where('study_program', $prodi))->count();
     }
 
     public static function getNavigationBadgeColor(): ?string
