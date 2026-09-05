@@ -10,7 +10,7 @@ function ApprovedCard({ data }) {
         setIsDownloading(true);
         try {
             const filename = `Surat_Permohonan_Magang_${data.companyName || data.id}.pdf`;
-            await api.download(`/form2/${data.id}/surat-pengantar`, filename);
+            await api.download(`/form2/${data.id}/cover-letter`, filename);
         } catch (err) {
             console.error('[Form2] Download error:', err);
             setDownloadError(err.message || 'Gagal mengunduh dokumen.');

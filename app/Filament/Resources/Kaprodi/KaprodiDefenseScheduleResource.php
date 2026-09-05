@@ -25,7 +25,7 @@ class KaprodiDefenseScheduleResource extends KaprodiStudentResource
 
     protected static ?int $navigationSort = 3;
 
-    protected static ?string $slug = 'kaprodi/jadwal-sidang';
+    protected static ?string $slug = 'kaprodi/defense-schedule';
 
     public static function getEloquentQuery(): Builder
     {

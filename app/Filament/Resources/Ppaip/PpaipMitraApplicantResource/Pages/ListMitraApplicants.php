@@ -17,7 +17,7 @@ class ListMitraApplicants extends ListRecords
                 ->label('Ekspor Excel')
                 ->icon('heroicon-o-arrow-down-tray')
                 ->color('success')
-                ->url(route('mitra-applications.export')),
+                ->url(route('partner-applications.export')),
         ];
     }
 }

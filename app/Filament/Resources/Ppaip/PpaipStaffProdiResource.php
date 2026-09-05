@@ -41,7 +41,7 @@ class PpaipStaffProdiResource extends Resource
 
     protected static ?int $navigationSort = 4;
 
-    protected static ?string $slug = 'ppaip/staff-prodi';
+    protected static ?string $slug = 'ppaip/program-staff';
 
     public static function canAccess(): bool
     {

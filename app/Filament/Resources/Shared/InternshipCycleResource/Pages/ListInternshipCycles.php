@@ -17,7 +17,7 @@ class ListInternshipCycles extends ListRecords
                 ->label('Ekspor Excel')
                 ->icon('heroicon-o-arrow-down-tray')
                 ->color('success')
-                ->url(route('rekap-magang.export')),
+                ->url(route('internship-cycles.export')),
         ];
     }
 }

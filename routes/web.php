@@ -37,7 +37,7 @@ if (! function_exists('serveStoredFile')) {
     }
 }
 
-Route::middleware(['web', 'auth'])->prefix('admin/mitra-applications')->group(function () {
+Route::middleware(['web', 'auth'])->prefix('admin/partner-applications')->group(function () {
     Route::get('/export', function (Request $request) {
         abort_unless($request->user()?->isPpaip(), 403);
         Gate::authorize('viewAny', InternshipApplication::class);
@@ -45,14 +45,14 @@ Route::middleware(['web', 'auth'])->prefix('admin/mitra-applications')->group(fu
         $filename = 'pelamar_mitra_'.now()->format('Ymd_His').'.xlsx';
 
         return Excel::download(new MitraApplicantsExport, $filename, ExcelWriter::XLSX);
-    })->name('mitra-applications.export');
+    })->name('partner-applications.export');
 
     Route::get('/{application}/cv/preview', function (Request $request, InternshipApplication $application) {
         abort_unless($request->user()?->isPpaip(), 403);
         Gate::authorize('view', $application);
 
         return serveStoredFile($application->cv_file_path, 'CV tidak tersedia.');
-    })->name('mitra-applications.cv.preview');
+    })->name('partner-applications.cv.preview');
 
     Route::get('/{application}/cv/download', function (Request $request, InternshipApplication $application) {
         abort_unless($request->user()?->isPpaip(), 403);
@@ -61,7 +61,7 @@ Route::middleware(['web', 'auth'])->prefix('admin/mitra-applications')->group(fu
         $name = 'cv_'.($application->student?->nim ?? $application->id);
 
         return serveStoredFile($application->cv_file_path, 'CV tidak tersedia.', $name);
-    })->name('mitra-applications.cv.download');
+    })->name('partner-applications.cv.download');
 });
 
 Route::middleware(['web', 'auth'])->prefix('admin/defense-documents')->group(function () {
@@ -117,28 +117,29 @@ Route::middleware(['web', 'auth'])->prefix('admin/kaprodi/loa')->group(function 
 
 // Rekap riwayat magang (internship_cycles): ekspor + berkas LoA arsip.
 // Otorisasi lewat InternshipCyclePolicy -- PPAIP semua prodi, Kaprodi prodinya.
-// Prefix sengaja lebih dalam dari slug Filament 'rekap-magang': rute view-nya
-// pakai '/{record}' satu segmen, jadi '/export' akan tertelan kalau sejajar.
-Route::middleware(['web', 'auth'])->prefix('admin/rekap-magang/berkas')->group(function () {
+// Prefix sengaja lebih dalam dari slug Filament 'internship-cycles': rute
+// view-nya pakai '/{record}' satu segmen, jadi '/export' akan tertelan kalau
+// disejajarkan dengannya.
+Route::middleware(['web', 'auth'])->prefix('admin/internship-cycles/documents')->group(function () {
     Route::get('/export', function (Request $request) {
         Gate::authorize('viewAny', InternshipCycle::class);
 
         $filename = 'rekap_magang_'.now()->format('Ymd_His').'.xlsx';
 
         return Excel::download(new InternshipCyclesExport($request->user()), $filename, ExcelWriter::XLSX);
-    })->name('rekap-magang.export');
+    })->name('internship-cycles.export');
 
     Route::get('/{cycle}/loa/preview', function (InternshipCycle $cycle) {
         Gate::authorize('view', $cycle);
 
         return serveStoredFile($cycle->loa_path, 'LoA tidak tersedia.');
-    })->name('rekap-magang.loa.preview');
+    })->name('internship-cycles.loa.preview');
 
     Route::get('/{cycle}/loa/download', function (InternshipCycle $cycle) {
         Gate::authorize('view', $cycle);
 
         return serveStoredFile($cycle->loa_path, 'LoA tidak tersedia.', "loa_{$cycle->nim}_siklus{$cycle->cycle_number}");
-    })->name('rekap-magang.loa.download');
+    })->name('internship-cycles.loa.download');
 });
 
 // Sisanya lempar ke React router.

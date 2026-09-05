@@ -62,13 +62,13 @@ class PpaipRoleRevisionTest extends TestCase
             $this->assertFalse(PpaipMitraApplicantResource::canCreate());
             $this->assertContains($application->id, PpaipMitraApplicantResource::getEloquentQuery()->pluck('id')->all());
 
-            $this->get('/admin/ppaip/mitra-applicants')
+            $this->get('/admin/ppaip/partner-applicants')
                 ->assertOk()
                 ->assertSee('Pelamar Mitra')
                 ->assertSee($application->student->name)
                 ->assertSee($application->internship->company_name);
 
-            $this->get(route('mitra-applications.cv.download', $application))
+            $this->get(route('partner-applications.cv.download', $application))
                 ->assertOk();
         } finally {
             File::delete($absolutePath);
@@ -83,11 +83,11 @@ class PpaipRoleRevisionTest extends TestCase
 
         try {
             $this->actingAs($kaprodi)
-                ->get(route('mitra-applications.cv.download', $application))
+                ->get(route('partner-applications.cv.download', $application))
                 ->assertForbidden();
 
             $this->actingAs($kaprodi)
-                ->get(route('mitra-applications.export'))
+                ->get(route('partner-applications.export'))
                 ->assertForbidden();
         } finally {
             File::delete($absolutePath);
@@ -101,7 +101,7 @@ class PpaipRoleRevisionTest extends TestCase
 
         $this->actingAs($ppaip);
 
-        $response = $this->get(route('mitra-applications.export'))
+        $response = $this->get(route('partner-applications.export'))
             ->assertOk()
             ->assertHeader(
                 'content-type',

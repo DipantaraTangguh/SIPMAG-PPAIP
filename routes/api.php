@@ -29,7 +29,7 @@ Route::middleware('auth:sanctum')->group(function () {
         // Form 1: cek syarat akademik dulu.
         Route::get('/form1', [Form1Controller::class, 'show']);
         Route::post('/form1', [Form1Controller::class, 'store']);
-        Route::get('/form1/surat-keterangan', [Form1Controller::class, 'downloadSuratKeterangan']);
+        Route::get('/form1/certificate', [Form1Controller::class, 'downloadSuratKeterangan']);
 
         // Lamaran dari portal mitra.
         Route::get('/applications', [ApplicationController::class, 'index']);
@@ -38,7 +38,7 @@ Route::middleware('auth:sanctum')->group(function () {
         // Form 2 buat jalur mandiri.
         Route::get('/form2', [Form2Controller::class, 'index']);
         Route::post('/form2', [Form2Controller::class, 'store']);
-        Route::get('/form2/{id}/surat-pengantar', [Form2Controller::class, 'downloadSuratPengantar']);
+        Route::get('/form2/{id}/cover-letter', [Form2Controller::class, 'downloadSuratPengantar']);
 
         // Request DPM setelah jalur magang valid.
         Route::get('/supervisor-application', [SupervisorController::class, 'show']);

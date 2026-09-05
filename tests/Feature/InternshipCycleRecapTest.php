@@ -20,7 +20,7 @@ class InternshipCycleRecapTest extends TestCase
         $this->cycle('Informatika', 'RECAP-IF', 'Mahasiswa IF');
 
         $this->actingAs($ppaipUser)
-            ->get('/admin/rekap-magang')
+            ->get('/admin/internship-cycles')
             ->assertOk()
             ->assertSee('Rekap Magang')
             ->assertSee('RECAP-SI')
@@ -34,7 +34,7 @@ class InternshipCycleRecapTest extends TestCase
         $this->cycle('Informatika', 'RECAP-IF', 'Mahasiswa IF');
 
         $this->actingAs($kaprodiUser)
-            ->get('/admin/rekap-magang')
+            ->get('/admin/internship-cycles')
             ->assertOk()
             ->assertSee('RECAP-SI')
             ->assertDontSee('RECAP-IF');
@@ -48,12 +48,12 @@ class InternshipCycleRecapTest extends TestCase
         // 404, bukan 403: getEloquentQuery() sudah membuang baris lintas prodi
         // dari scope-nya, jadi keberadaan datanya pun tidak bocor.
         $this->actingAs($kaprodiUser)
-            ->get("/admin/rekap-magang/{$cycle->id}")
+            ->get("/admin/internship-cycles/{$cycle->id}")
             ->assertNotFound();
 
         // Berkas LoA-nya tetap dijaga policy secara terpisah.
         $this->actingAs($kaprodiUser)
-            ->get(route('rekap-magang.loa.preview', $cycle))
+            ->get(route('internship-cycles.loa.preview', $cycle))
             ->assertForbidden();
     }
 
@@ -69,11 +69,11 @@ class InternshipCycleRecapTest extends TestCase
         ]);
 
         $this->actingAs($dpmUser)
-            ->get('/admin/rekap-magang')
+            ->get('/admin/internship-cycles')
             ->assertForbidden();
 
         $this->actingAs($dpmUser)
-            ->get(route('rekap-magang.export'))
+            ->get(route('internship-cycles.export'))
             ->assertForbidden();
     }
 
@@ -84,7 +84,7 @@ class InternshipCycleRecapTest extends TestCase
         $this->cycle('Informatika', 'RECAP-IF', 'Mahasiswa IF');
 
         $response = $this->actingAs($kaprodiUser)
-            ->get(route('rekap-magang.export'))
+            ->get(route('internship-cycles.export'))
             ->assertOk();
 
         $this->assertStringContainsString(
