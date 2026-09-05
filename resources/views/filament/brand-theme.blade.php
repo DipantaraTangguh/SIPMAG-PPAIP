@@ -15,14 +15,32 @@
 --}}
 <style>
     :root {
-        --sipmag-maroon: #682828;
-        --sipmag-maroon-gelap: #501e1e;
-        --sipmag-maroon-terang: #7d3434;
+        /* Maroon pekat dan bersaturasi. Nada yang lebih pucat terbaca seperti
+           tercampur putih dan membuat sidebar tampak berkabut. */
+        --sipmag-maroon: #4a0f13;
+        --sipmag-maroon-gelap: #360a0d;
+        --sipmag-maroon-terang: #5f171b;
+
+        /* Latar konten sengaja bukan putih murni: kartu dan tabel Filament
+           sudah putih, jadi halaman yang sedikit lebih gelap membuat keduanya
+           terpisah sekaligus menurunkan silau pada layar yang dipelototi
+           berjam-jam. Nadanya dihangatkan supaya sejalan dengan maroon. */
+        --sipmag-kanvas: #f2efec;
+    }
+
+    .fi-body {
+        background-color: var(--sipmag-kanvas) !important;
     }
 
     .fi-sidebar,
     .fi-sidebar-header {
         background-color: var(--sipmag-maroon) !important;
+    }
+
+    /* Garis tepi bawaannya gelap dan tak terlihat di atas maroon; diganti
+       nada terang tipis supaya batas sidebar tetap tegas. */
+    .fi-sidebar {
+        --tw-ring-color: rgb(255 255 255 / 0.08) !important;
     }
 
     /* Garis pemisah bawaan berwarna gelap, tidak terlihat di atas maroon. */
