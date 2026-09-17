@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
 /**
- * Akun untuk sesi uji coba: 21 mahasiswa peserta, 10 akun cadangan (1 per
+ * Akun untuk sesi uji coba: 26 mahasiswa peserta, 10 akun cadangan (1 per
  * program studi), 1 Kaprodi tiap program studi, dan 3 dosen tiap program
  * studi (1 pembimbing/DPM + 2 penguji). Akun PPAIP tidak disentuh -- tetap
  * pakai yang lama.
@@ -85,6 +85,11 @@ class TestingAccountsSeeder extends Seeder
         ['1232002087', 'Achmad Taufik Alfarizy', 'Sistem Informasi'],
         ['1232002056', 'Abshina Attar Kaur', 'Sistem Informasi'],
         ['1231002005', 'Alia Diandra Cahyani', 'Akuntansi'],
+        ['1232002016', 'Muhammad Rafa Afriadi', 'Sistem Informasi'],
+        ['1232002043', 'Reino Rachmatullah', 'Sistem Informasi'],
+        ['1232002002', 'Rizki Akbar Mardiyansyah', 'Sistem Informasi'],
+        ['1232002067', 'Supriatna Saputra', 'Sistem Informasi'],
+        ['1232002076', 'Eka Saputra', 'Sistem Informasi'],
     ];
 
     /**
