@@ -222,7 +222,7 @@ export default function LogbookTabContent() {
                                         </p>
                                     </td>
                                     <td className="px-5 py-4 align-top">
-                                        <p className="max-w-full truncate text-[14px] font-bold text-[#1A1A1A]">
+                                        <p className="break-words text-[14px] font-bold text-[#1A1A1A]">
                                             {entry.kegiatanHarian}
                                         </p>
                                         {entry.dpmNote && (
@@ -236,7 +236,7 @@ export default function LogbookTabContent() {
                                     </td>
                                     <td className="px-5 py-4 align-top">
                                         <p
-                                            className={`text-[13px] ${entry.hasil === "-" ? "text-gray-300" : "text-gray-600"}`}
+                                            className={`break-words text-[13px] ${entry.hasil === "-" ? "text-gray-300" : "text-gray-600"}`}
                                         >
                                             {entry.hasil}
                                         </p>
