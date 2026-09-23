@@ -1,0 +1,6 @@
+# Pipeline PDF Form 2 — Surat Pengantar
+Form 2 "surat pengantar" PDF: `PdfService::downloadForm2RequestLetter` maps submission data to `<<placeholder>>` values; `DocxToPdfRenderer::render` fills `public/assets/template-form-2.docx` (ZipArchive + strtr on document.xml, escaping handled in renderer) and converts via LibreOffice headless (installed by brew cask 2026-07-03). No dompdf fallback by design — returns 503 with install hint when soffice missing, because an HTML replica would violate the "PDF identical to template" requirement. `LIBREOFFICE_PATH` env overrides binary autodetection. Template's example letter number was normalized to a `<<Nomor Surat>>` placeholder (2026-07-03 thermo-nuclear review) so all fields use one uniform placeholder scheme.
+
+**Kenapa:** User wants generated PDF identical to the official DOCX template in assets.
+
+**Cara memakainya:** If the DOCX template is re-saved in Word, placeholders may get split across `<w:t>` runs — after any template edit, regenerate a letter and check no literal `<<...>>` remains. Project path contains a space ("Dokumen Skripsi"), so the `-env:UserInstallation` file URI in DocxToPdfRenderer must stay rawurlencoded (soffice SIGABRTs otherwise).
