@@ -109,6 +109,7 @@ npx tsc --noEmit
 | Berkas | Isi |
 | --- | --- |
 | [docs/PRD.md](docs/PRD.md) | Spesifikasi produk: peran, alur, aturan bisnis, dan state mahasiswa |
+| [docs/catatan-teknis/](docs/catatan-teknis/) | Sebab dan jebakan yang tidak terbaca dari kode — baca sebelum menyentuh template DOCX, `APP_URL`, atau alur siklus magang |
 | [docs/deploy-render.md](docs/deploy-render.md) | Panduan deploy Docker penuh |
 
 ## Deploy
