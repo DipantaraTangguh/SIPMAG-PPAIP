@@ -61,28 +61,12 @@ Butuh Docker dan Docker Compose. Tidak perlu memasang PHP, Node, atau MySQL di m
 
 ```bash
 cp .env.example .env
-```
-
-`.env.example` masih memakai bawaan Laravel, jadi sesuaikan dulu agar cocok dengan `compose.yaml`:
-
-```dotenv
-APP_URL=http://localhost:8000
-
-DB_CONNECTION=mysql
-DB_HOST=mysql          # nama service, bukan 127.0.0.1
-DB_PORT=3306           # port di dalam jaringan Docker
-DB_DATABASE=sipmag
-DB_USERNAME=admin
-DB_PASSWORD=admin
-```
-
-Lalu nyalakan dan siapkan datanya:
-
-```bash
 docker compose up -d
 docker compose exec app php artisan key:generate
 docker compose exec app php artisan migrate --seed
 ```
+
+`.env.example` sudah disetel mengikuti `compose.yaml`, jadi bisa disalin apa adanya — tidak ada yang perlu disunting untuk menjalankannya secara lokal.
 
 Layanan yang tersedia setelah itu:
 
