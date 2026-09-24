@@ -12,8 +12,8 @@ use Illuminate\Support\Str;
 /**
  * Akun untuk sesi uji coba: 26 mahasiswa peserta, 10 akun cadangan (1 per
  * program studi), 1 Kaprodi tiap program studi, dan 3 dosen tiap program
- * studi (1 pembimbing/DPM + 2 penguji). Akun PPAIP tidak disentuh -- tetap
- * pakai yang lama.
+ * studi (1 pembimbing/DPM + 2 penguji). Akun dosen dan PPAIP bernama peran
+ * (kaprodi-sif, dospem-sif-1, dospeng-sif-2, PPAIP), bukan nama orang.
  *
  * Aman dijalankan di database yang sudah berisi data:
  * - Idempotent, dicocokkan lewat NIM (mahasiswa), program studi (Kaprodi),
@@ -33,24 +33,49 @@ class TestingAccountsSeeder extends Seeder
     private const STUDENT_EMAIL_DOMAIN = '@student.bakrie.ac.id';
 
     /**
-     * Satu Kaprodi per program studi: [program studi, nama, email, NIDN].
+     * Kode singkat tiap program studi, dipakai di nama dan email akun dosen
+     * (mis. kaprodi-sif, dospem-tif-1). Akun dosen sengaja bernama peran,
+     * bukan nama orang, supaya data uji coba tidak memuat identitas dosen
+     * sungguhan.
+     *
+     * @var array<string, string>
+     */
+    private const PROGRAM_CODES = [
+        'Manajemen' => 'mnj',
+        'Akuntansi' => 'akt',
+        'Ilmu Politik' => 'ipl',
+        'Ilmu Komunikasi' => 'ikm',
+        'Informatika' => 'tif',
+        'Sistem Informasi' => 'sif',
+        'Teknik Industri' => 'tid',
+        'Teknik Sipil' => 'tsp',
+        'Teknik Lingkungan' => 'tlk',
+        'Ilmu & Teknologi Pangan' => 'itp',
+    ];
+
+    /**
+     * Satu Kaprodi per program studi: [program studi, awalan email lama, NIDN].
+     *
+     * Awalan email lama adalah akun bernama orang dari versi seeder
+     * sebelumnya. Kalau akun itu ada, ia di-rename ke kaprodi-<kode> (lihat
+     * renameLegacyAccounts()), jadi id user, kata sandi, dan relasinya tetap.
      *
      * NIDN di sini placeholder berformat valid dan hanya dipakai saat baris
      * dosennya belum ada. Ganti lewat panel admin kalau sudah dapat yang asli.
      *
-     * @var array<int, array{0: string, 1: string, 2: string, 3: string}>
+     * @var array<int, array{0: string, 1: string, 2: string}>
      */
     private const KAPRODI = [
-        ['Manajemen', 'Prof. M. Taufiq Amir, S.E., M.M., Ph.D.', 'taufiq.amir', '0301017001'],
-        ['Akuntansi', 'Monica Weni Pratiwi, SE., M.Si.', 'monica.pratiwi', '0302027502'],
-        ['Ilmu Politik', 'Dr. Rer. Pol. Aditya Batara Gunawan, S.Sos., M.Litt.', 'aditya.gunawan', '0303038003'],
-        ['Ilmu Komunikasi', 'Dra. Suharyanti, M.S.M., Ph.D.', 'suharyanti', '0304046504'],
-        ['Informatika', 'Ir. Iwan Adhicandra, S.T., M.Sc., Ph.D., SMIEEE', 'iwan.adhicandra', '0305057005'],
-        ['Sistem Informasi', 'Prof. Dr. Hoga Saragih, S.T., M.T, IPM., CIRR., MIEEE., M.Th, Ph.D.', 'hoga.saragih', '0422117502'],
-        ['Teknik Industri', 'Edo Suryo Pratomo, S.T., M.Sc., Ph.D., CAMF', 'edo.pratomo', '0307078507'],
-        ['Teknik Sipil', 'Fatin Adriati, S.T., M.T., IPP.', 'fatin.adriati', '0308088208'],
-        ['Teknik Lingkungan', 'Ir. Aqil Azizi, M.ApplSc., Ph.D., GP., IPM', 'aqil.azizi', '0309097209'],
-        ['Ilmu & Teknologi Pangan', 'Kurnia Ramadhan, S.TP., M.Sc., Ph.D.', 'kurnia.ramadhan', '0310108010'],
+        ['Manajemen', 'taufiq.amir', '0301017001'],
+        ['Akuntansi', 'monica.pratiwi', '0302027502'],
+        ['Ilmu Politik', 'aditya.gunawan', '0303038003'],
+        ['Ilmu Komunikasi', 'suharyanti', '0304046504'],
+        ['Informatika', 'iwan.adhicandra', '0305057005'],
+        ['Sistem Informasi', 'hoga.saragih', '0422117502'],
+        ['Teknik Industri', 'edo.pratomo', '0307078507'],
+        ['Teknik Sipil', 'fatin.adriati', '0308088208'],
+        ['Teknik Lingkungan', 'aqil.azizi', '0309097209'],
+        ['Ilmu & Teknologi Pangan', 'kurnia.ramadhan', '0310108010'],
     ];
 
     /**
@@ -115,61 +140,71 @@ class TestingAccountsSeeder extends Seeder
 
     /**
      * Tiga dosen per program studi: pembimbing (DPM) lalu dua penguji.
-     * [program studi, nama, role, awalan email].
+     * [program studi, role, nomor urut, awalan email lama].
      *
-     * role 'dpm' -> muncul di pilihan "Pilih DPM" Kaprodi. role
-     * 'dosen_penguji' -> muncul di pilihan Dosen Penguji 1/2 saat
-     * menjadwalkan sidang. Beda dari Kaprodi: tidak ada batas satu per
-     * prodi, jadi tidak perlu logika reuse/hapus akun lama.
+     * role 'dpm' -> muncul di pilihan "Pilih DPM" Kaprodi, bernama
+     * dospem-<kode>-<n>. role 'dosen_penguji' -> muncul di pilihan Dosen
+     * Penguji 1/2 saat menjadwalkan sidang, bernama dospeng-<kode>-<n>.
+     * Beda dari Kaprodi: tidak ada batas satu per prodi, jadi tidak perlu
+     * logika reuse/hapus akun lama.
      *
-     * Dua nama ("Dita Nurmadewi", "Maya Puspita") sama persis dengan akun
-     * dosen demo bawaan (dari LecturerSeeder, Sistem Informasi) -- sengaja
-     * dijadikan satu identitas, bukan dibuat akun baru. Awalan emailnya
-     * dibuat sama dengan email lama supaya seedDosen() menemukan dan
-     * memakai ulang baris Lecturer itu (lihat catatan di seedDosen()).
+     * Awalan email lama dipakai renameLegacyAccounts() untuk me-rename akun
+     * bernama orang dari versi seeder sebelumnya.
      *
-     * @var array<int, array{0: string, 1: string, 2: string, 3: string}>
+     * @var array<int, array{0: string, 1: string, 2: int, 3: string}>
      */
     private const DOSEN = [
-        ['Manajemen', 'Prof. Muchsin Saggaff Shihab, S.E., M.Sc., MBA, Ph.D.', 'dpm', 'muchsin.shihab'],
-        ['Manajemen', 'Ananda Fortunisa, SE., MSi.', 'dosen_penguji', 'ananda.fortunisa'],
-        ['Manajemen', 'Ir. Aurino Rilman A. Djamaris, MM', 'dosen_penguji', 'aurino.djamaris'],
+        ['Manajemen', 'dpm', 1, 'muchsin.shihab'],
+        ['Manajemen', 'dosen_penguji', 1, 'ananda.fortunisa'],
+        ['Manajemen', 'dosen_penguji', 2, 'aurino.djamaris'],
 
-        ['Akuntansi', 'Drs. Tri Pujadi Susilo, S.E., M.M., Ak., CA', 'dpm', 'tri.susilo'],
-        ['Akuntansi', 'Dr. Jurica Lucyanda, SE, M.Si.', 'dosen_penguji', 'jurica.lucyanda'],
-        ['Akuntansi', 'Dr. Tita Djuitaningsih, SE., M.Si., Ak., CA', 'dosen_penguji', 'tita.djuitaningsih'],
+        ['Akuntansi', 'dpm', 1, 'tri.susilo'],
+        ['Akuntansi', 'dosen_penguji', 1, 'jurica.lucyanda'],
+        ['Akuntansi', 'dosen_penguji', 2, 'tita.djuitaningsih'],
 
-        ['Ilmu Komunikasi', 'Mirana Hanathasia, S.Sos., M. Media Prac.', 'dpm', 'mirana.hanathasia'],
-        ['Ilmu Komunikasi', 'Dr. Dessy Kania, B.A., M.A.', 'dosen_penguji', 'dessy.kania'],
-        ['Ilmu Komunikasi', 'Dianingtyas Murtanti Putri, S.Sos., M.Si.', 'dosen_penguji', 'dianingtyas.putri'],
+        ['Ilmu Komunikasi', 'dpm', 1, 'mirana.hanathasia'],
+        ['Ilmu Komunikasi', 'dosen_penguji', 1, 'dessy.kania'],
+        ['Ilmu Komunikasi', 'dosen_penguji', 2, 'dianingtyas.putri'],
 
-        ['Ilmu Politik', 'Asmiati Malik, Ph.D.', 'dpm', 'asmiati.malik'],
-        ['Ilmu Politik', 'Dr. M. Tri Andika Kurniawan, S.Sos., M.A.', 'dosen_penguji', 'tri.kurniawan'],
-        ['Ilmu Politik', 'Dr. Bambang Sukma Wijaya', 'dosen_penguji', 'bambang.wijaya'],
+        ['Ilmu Politik', 'dpm', 1, 'asmiati.malik'],
+        ['Ilmu Politik', 'dosen_penguji', 1, 'tri.kurniawan'],
+        ['Ilmu Politik', 'dosen_penguji', 2, 'bambang.wijaya'],
 
-        ['Informatika', 'Berkah Iman Santoso, S.T., M.T.I., MIEEE', 'dpm', 'berkah.santoso'],
-        ['Informatika', 'Guson P. Kuntarto, S.T., M.Sc., MACM', 'dosen_penguji', 'guson.kuntarto'],
-        ['Informatika', 'Albert Arapenta Sembiring, S.T., M.Kom, MIEEE', 'dosen_penguji', 'albert.sembiring'],
+        ['Informatika', 'dpm', 1, 'berkah.santoso'],
+        ['Informatika', 'dosen_penguji', 1, 'guson.kuntarto'],
+        ['Informatika', 'dosen_penguji', 2, 'albert.sembiring'],
 
-        ['Sistem Informasi', 'Dita Nurmadewi S.Kom, M.Kom', 'dpm', 'dita.nurmadewi'],
-        ['Sistem Informasi', 'Zakiul Fahmi Jailani S.Kom, M.Kom', 'dosen_penguji', 'zakiul.jailani'],
-        ['Sistem Informasi', 'Haris Rafi S.Kom, M.Kom', 'dosen_penguji', 'haris.rafi'],
+        ['Sistem Informasi', 'dpm', 1, 'dita.nurmadewi'],
+        ['Sistem Informasi', 'dosen_penguji', 1, 'zakiul.jailani'],
+        ['Sistem Informasi', 'dosen_penguji', 2, 'haris.rafi'],
 
-        ['Teknik Industri', 'Mirsa Diah Novianti, S.T., M.T.', 'dpm', 'mirsa.novianti'],
-        ['Teknik Industri', 'Arief Bimantoro Suharko, Ph.D.', 'dosen_penguji', 'arief.suharko'],
-        ['Teknik Industri', 'Maya Puspita, PhD.', 'dosen_penguji', 'maya.puspita'],
+        ['Teknik Industri', 'dpm', 1, 'mirsa.novianti'],
+        ['Teknik Industri', 'dosen_penguji', 1, 'arief.suharko'],
+        ['Teknik Industri', 'dosen_penguji', 2, 'maya.puspita'],
 
-        ['Teknik Sipil', 'Jouvan Chandra Pratama Putra, S.T., M.Eng.', 'dpm', 'jouvan.putra'],
-        ['Teknik Sipil', 'Safrilah, S.T., M.Sc., IPP.', 'dosen_penguji', 'safrilah'],
-        ['Teknik Sipil', 'Bima S.T', 'dosen_penguji', 'bima'],
+        ['Teknik Sipil', 'dpm', 1, 'jouvan.putra'],
+        ['Teknik Sipil', 'dosen_penguji', 1, 'safrilah'],
+        ['Teknik Sipil', 'dosen_penguji', 2, 'bima'],
 
-        ['Teknik Lingkungan', 'Prof. Deffi Ayu Puspito Sari, S.T., M.Agr.Sc., Ph.D., IPM., ASEAN Eng.', 'dpm', 'deffi.sari'],
-        ['Teknik Lingkungan', 'Prof Siti S.T', 'dosen_penguji', 'siti.lingkungan'],
-        ['Teknik Lingkungan', 'Prof Faiz S.T', 'dosen_penguji', 'faiz.lingkungan'],
+        ['Teknik Lingkungan', 'dpm', 1, 'deffi.sari'],
+        ['Teknik Lingkungan', 'dosen_penguji', 1, 'siti.lingkungan'],
+        ['Teknik Lingkungan', 'dosen_penguji', 2, 'faiz.lingkungan'],
 
-        ['Ilmu & Teknologi Pangan', 'Prof. Ardiansyah, S.TP., M.Si., Ph.D.', 'dpm', 'ardiansyah'],
-        ['Ilmu & Teknologi Pangan', 'Dr.agr. Wahyudi David, S.TP., M.Sc.', 'dosen_penguji', 'wahyudi.david'],
-        ['Ilmu & Teknologi Pangan', 'Dr. Rizki Maryam Astuti, S.Si., M.Si.', 'dosen_penguji', 'rizki.astuti'],
+        ['Ilmu & Teknologi Pangan', 'dpm', 1, 'ardiansyah'],
+        ['Ilmu & Teknologi Pangan', 'dosen_penguji', 1, 'wahyudi.david'],
+        ['Ilmu & Teknologi Pangan', 'dosen_penguji', 2, 'rizki.astuti'],
+    ];
+
+    /**
+     * Akun DPM tambahan dari UserSeeder versi lama yang tidak ada di DOSEN:
+     * [program studi, nomor urut, awalan email lama]. Hanya di-rename kalau
+     * ada -- seeder ini tidak membuatnya.
+     *
+     * @var array<int, array{0: string, 1: int, 2: string}>
+     */
+    private const LEGACY_EXTRA_DPM = [
+        ['Sistem Informasi', 2, 'ahmad.fauzi'],
+        ['Informatika', 2, 'siti.aminah'],
     ];
 
     /**
@@ -189,6 +224,7 @@ class TestingAccountsSeeder extends Seeder
     public function run(): void
     {
         $this->cleanupSupersededDosen();
+        $this->renameLegacyAccounts();
         $this->seedKaprodi();
         $this->seedDosen();
         $this->seedStudents(self::STUDENTS, 'Peserta uji coba');
@@ -206,12 +242,81 @@ class TestingAccountsSeeder extends Seeder
         }
     }
 
+    /**
+     * Akun dosen dan PPAIP dulu bernama orang sungguhan. Di database yang
+     * sudah berisi data (production), akun lama itu di-rename ke nama peran
+     * alih-alih dibuatkan akun baru, supaya bimbingan, jadwal sidang, dan
+     * nilai yang sudah tercatat tetap menempel ke akun yang sama.
+     *
+     * Dilewati kalau email baru sudah terpakai -- berarti rename sudah
+     * pernah jalan, atau akun barunya sudah dibuat terpisah.
+     */
+    private function renameLegacyAccounts(): void
+    {
+        $renames = [];
+
+        foreach (self::KAPRODI as [$program, $legacyPrefix]) {
+            $renames[$legacyPrefix] = $this->kaprodiIdentity($program);
+        }
+
+        foreach (self::DOSEN as [$program, $role, $number, $legacyPrefix]) {
+            $renames[$legacyPrefix] = $this->dosenIdentity($program, $role, $number);
+        }
+
+        foreach (self::LEGACY_EXTRA_DPM as [$program, $number, $legacyPrefix]) {
+            $renames[$legacyPrefix] = $this->dosenIdentity($program, 'dpm', $number);
+        }
+
+        $renamed = 0;
+
+        foreach ($renames as $legacyPrefix => [$name, $email]) {
+            $user = User::where('email', $legacyPrefix.self::EMAIL_DOMAIN)->first();
+            if (! $user || User::where('email', $email)->exists()) {
+                continue;
+            }
+
+            $user->fill(['name' => $name, 'email' => $email])->save();
+            Lecturer::where('user_id', $user->id)->update([
+                'lecturer_name' => $name,
+                'contact' => $email,
+            ]);
+            $renamed++;
+        }
+
+        User::where('email', 'ppaip'.self::EMAIL_DOMAIN)->update(['name' => 'PPAIP']);
+
+        if ($renamed > 0) {
+            $this->command?->info("Akun lama bernama orang di-rename ke nama peran: {$renamed} akun.");
+        }
+    }
+
+    /**
+     * @return array{0: string, 1: string} [nama, email]
+     */
+    private function kaprodiIdentity(string $program): array
+    {
+        $code = self::PROGRAM_CODES[$program];
+
+        return ['Kaprodi '.strtoupper($code), "kaprodi-{$code}".self::EMAIL_DOMAIN];
+    }
+
+    /**
+     * @return array{0: string, 1: string} [nama, email]
+     */
+    private function dosenIdentity(string $program, string $role, int $number): array
+    {
+        $code = self::PROGRAM_CODES[$program];
+        $prefix = $role === 'dpm' ? 'dospem' : 'dospeng';
+
+        return [ucfirst($prefix).' '.strtoupper($code).' '.$number, "{$prefix}-{$code}-{$number}".self::EMAIL_DOMAIN];
+    }
+
     private function seedKaprodi(): void
     {
         $password = Hash::make(self::PASSWORD);
 
-        foreach (self::KAPRODI as [$program, $name, $emailPrefix, $nidn]) {
-            $email = $emailPrefix.self::EMAIL_DOMAIN;
+        foreach (self::KAPRODI as [$program, , $nidn]) {
+            [$name, $email] = $this->kaprodiIdentity($program);
 
             $user = User::firstOrNew(['email' => $email]);
             $user->fill(['name' => $name, 'role' => 'kaprodi']);
@@ -254,8 +359,8 @@ class TestingAccountsSeeder extends Seeder
         $password = Hash::make(self::PASSWORD);
         $rows = [];
 
-        foreach (self::DOSEN as $index => [$program, $name, $role, $emailPrefix]) {
-            $email = $emailPrefix.self::EMAIL_DOMAIN;
+        foreach (self::DOSEN as $index => [$program, $role, $number]) {
+            [$name, $email] = $this->dosenIdentity($program, $role, $number);
 
             $user = User::firstOrNew(['email' => $email]);
             $user->fill(['name' => $name, 'role' => $role]);
@@ -265,10 +370,10 @@ class TestingAccountsSeeder extends Seeder
             $user->save();
 
             // Kunci lewat user_id, bukan NIDN baru -- kalau user ini sudah
-            // punya baris Lecturer (mis. akun dosen demo bawaan yang
-            // namanya sama persis dengan salah satu dosen di daftar ini),
-            // baris itu dipakai ulang sebagai SATU identitas, bukan
-            // ditambah baris kedua yang bikin dosen kelihatan dobel.
+            // punya baris Lecturer (mis. akun dosen demo bawaan dari
+            // LecturerSeeder, atau akun lama yang baru di-rename), baris itu
+            // dipakai ulang sebagai SATU identitas, bukan ditambah baris
+            // kedua yang bikin dosen kelihatan dobel.
             $lecturer = Lecturer::where('user_id', $user->id)->first()
                 // Placeholder unik per baris -- ganti lewat panel admin
                 // kalau sudah dapat NIDN asli.

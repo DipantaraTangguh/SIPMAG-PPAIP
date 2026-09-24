@@ -86,9 +86,12 @@ Seluruh akun hasil seeder memakai kata sandi `password`. Mahasiswa masuk dengan 
 | Peran | Kredensial |
 | --- | --- |
 | PPAIP | `ppaip@bakrie.ac.id` |
-| Kaprodi | email dosen Kaprodi tiap prodi, mis. `taufiq.amir@bakrie.ac.id` |
-| DPM | mis. `dita.nurmadewi@bakrie.ac.id` |
+| Kaprodi | `kaprodi-<kode>@bakrie.ac.id`, mis. `kaprodi-sif@bakrie.ac.id` |
+| DPM | `dospem-<kode>-1@bakrie.ac.id`, mis. `dospem-sif-1@bakrie.ac.id` |
+| Dosen Penguji | `dospeng-<kode>-<1/2>@bakrie.ac.id`, mis. `dospeng-sif-2@bakrie.ac.id` |
 | Mahasiswa | NIM, mis. `1231001162` |
+
+Kode prodi: `mnj` Manajemen, `akt` Akuntansi, `ipl` Ilmu Politik, `ikm` Ilmu Komunikasi, `tif` Informatika, `sif` Sistem Informasi, `tid` Teknik Industri, `tsp` Teknik Sipil, `tlk` Teknik Lingkungan, `itp` Ilmu & Teknologi Pangan.
 
 ## Pengujian
 

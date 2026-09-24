@@ -15,7 +15,7 @@ class UserSeeder extends Seeder
         DB::table('users')->insert([
             // Akun admin PPAIP buat manage data lintas prodi.
             [
-                'name' => 'Dr. Rizki Maryam Astuti, M.Si.',
+                'name' => 'PPAIP',
                 'email' => 'ppaip@bakrie.ac.id',
                 'password' => $password,
                 'role' => 'ppaip',
@@ -24,8 +24,8 @@ class UserSeeder extends Seeder
             ],
             // Kaprodi demo untuk prodi Sistem Informasi.
             [
-                'name' => 'Prof. Dr. Hoga Saragih, ST, MT',
-                'email' => 'hoga.saragih@bakrie.ac.id',
+                'name' => 'Kaprodi SIF',
+                'email' => 'kaprodi-sif@bakrie.ac.id',
                 'password' => $password,
                 'role' => 'kaprodi',
                 'created_at' => now(),
@@ -33,8 +33,8 @@ class UserSeeder extends Seeder
             ],
             // Kaprodi demo untuk prodi Informatika.
             [
-                'name' => 'Dr. Budi Santoso, M.T.',
-                'email' => 'budi.santoso@bakrie.ac.id',
+                'name' => 'Kaprodi TIF',
+                'email' => 'kaprodi-tif@bakrie.ac.id',
                 'password' => $password,
                 'role' => 'kaprodi',
                 'created_at' => now(),
@@ -42,8 +42,8 @@ class UserSeeder extends Seeder
             ],
             // Akun DPM demo pertama.
             [
-                'name' => 'Dita Nurmadewi, S.Kom.',
-                'email' => 'dita.nurmadewi@bakrie.ac.id',
+                'name' => 'Dospem SIF 1',
+                'email' => 'dospem-sif-1@bakrie.ac.id',
                 'password' => $password,
                 'role' => 'dpm',
                 'created_at' => now(),
@@ -51,8 +51,8 @@ class UserSeeder extends Seeder
             ],
             // Akun DPM demo kedua.
             [
-                'name' => 'Dr. Ahmad Fauzi, M.T.',
-                'email' => 'ahmad.fauzi@bakrie.ac.id',
+                'name' => 'Dospem SIF 2',
+                'email' => 'dospem-sif-2@bakrie.ac.id',
                 'password' => $password,
                 'role' => 'dpm',
                 'created_at' => now(),
@@ -60,8 +60,8 @@ class UserSeeder extends Seeder
             ],
             // Akun DPM demo ketiga.
             [
-                'name' => 'Siti Aminah, M.Kom.',
-                'email' => 'siti.aminah@bakrie.ac.id',
+                'name' => 'Dospem TIF 2',
+                'email' => 'dospem-tif-2@bakrie.ac.id',
                 'password' => $password,
                 'role' => 'dpm',
                 'created_at' => now(),
@@ -78,8 +78,8 @@ class UserSeeder extends Seeder
             ],
             // Akun dosen penguji demo.
             [
-                'name' => 'Dr. Maya Puspita, M.Kom.',
-                'email' => 'maya.puspita@bakrie.ac.id',
+                'name' => 'Dospeng TID 2',
+                'email' => 'dospeng-tid-2@bakrie.ac.id',
                 'password' => $password,
                 'role' => 'dosen_penguji',
                 'created_at' => now(),
