@@ -6,6 +6,22 @@
 # container jalan.
 set -e
 
+# ── Hapus .env bawaan image ──────────────────────────────────────────────────
+# .env.example bisa ter-copy jadi .env saat build oleh skrip composer
+# (post-root-package-install / setup). Kalau ada, Laravel memprioritaskan isi
+# .env daripada environment variable OS -- akibatnya nilai yang diatur di
+# Railway (DB_HOST, DB_PASSWORD, dll.) tidak pernah terbaca.
+if [ -f /var/www/.env ]; then
+    echo "[boot] PERINGATAN: .env ditemukan di image, menghapus agar env var OS dipakai."
+    rm -f /var/www/.env
+fi
+
+# ── Diagnostik env var ───────────────────────────────────────────────────────
+echo "[boot] DB_* env vars yang terdeteksi:"
+env | sort | grep -iE "^DB_" || echo "  (tidak ada)"
+echo "[boot] RAILWAY_* env vars:"
+env | sort | grep -iE "^RAILWAY" || echo "  (tidak ada)"
+
 PORT="${PORT:-10000}"
 
 # ── APP_URL harus sama persis dengan origin yang dibuka browser ──────────────
