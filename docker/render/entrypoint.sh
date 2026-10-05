@@ -103,6 +103,7 @@ fi
 # MySQL jalan sebagai service terpisah dan bisa saja belum siap menerima
 # koneksi saat web service sudah start.
 if [ -n "${DB_HOST}" ]; then
+    getent hosts "$DB_HOST" || echo "DNS gagal untuk $DB_HOST"
     printf 'Menunggu MySQL di %s:%s' "${DB_HOST}" "${DB_PORT:-3306}"
     i=0
     until mysqladmin ping -h"${DB_HOST}" -P"${DB_PORT:-3306}" --silent 2>/dev/null; do
